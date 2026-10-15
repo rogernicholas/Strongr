@@ -9,7 +9,9 @@
     "newWorkout": "New workout",
     "routines": "Routines",
     "settings": "Settings",
-    "about": "About"
+    "about": "About",
+    "resume": "Resume workout",
+    "resumeHint": "You have a workout in progress."
   },
   "settings": {
     "title": "Settings",
@@ -61,7 +63,30 @@
     "deleteTitle": "Delete routine {{name}}?",
     "deleteBody": "Your logged workouts are not affected.",
     "longPressHint": "Tap a routine to start from it. Long-press to delete.",
-    "startWorkout": "Start workout",
-    "startComingSoon": "Logging sets arrives in the next update."
+    "startWorkout": "Start workout"
+  },
+  "logging": {
+    "title": "Workout",
+    "reps": "reps",
+    "seconds": "seconds",
+    "meters": "meters",
+    "warmup": "Warm-up set",
+    "warmupShort": "warm-up",
+    "addSet": "Add set {{n}}",
+    "saveSet": "Save set",
+    "deleteSet": "Delete set",
+    "tapToEdit": "Tap to edit or delete",
+    "setCount_one": "{{count}} set",
+    "setCount_other": "{{count}} sets",
+    "lastTime": "Last time: {{sets}}",
+    "firstTime": "First time logging this",
+    "addExercise": "+ Add exercise",
+    "noExercises": "No exercises yet. Add one to start logging.",
+    "finish": "Finish workout",
+    "finishTitle": "Finish workout?",
+    "finishBody": "It will be saved to your history. A workout with no sets is discarded.",
+    "saved": "Workout saved",
+    "discarded": "Empty workout discarded",
+    "addToWorkout": "Add to workout"
   }
 }

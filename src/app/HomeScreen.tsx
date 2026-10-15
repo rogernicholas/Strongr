@@ -4,9 +4,11 @@ import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 
 import { formatLongDate } from '@/core/dates';
+import { useDb } from '@/core/db';
 import { useTranslation } from '@/core/i18n';
+import { createWorkoutRepository } from '@/data';
 import { RoutineList } from '@/features/templates';
-import { AppText, Button, Screen } from '@/ui';
+import { AppText, Button, Card, Screen } from '@/ui';
 
 import type { RootStackParamList } from './navigation';
 
@@ -14,12 +16,15 @@ export function HomeScreen({ navigation }: NativeStackScreenProps<RootStackParam
   const { t, i18n } = useTranslation();
   const [focusCount, setFocusCount] = useState(0);
   const [today, setToday] = useState(() => new Date());
+  const [activeWorkoutId, setActiveWorkoutId] = useState<string | null>(null);
+  const db = useDb();
 
   useFocusEffect(
     useCallback(() => {
       setFocusCount((n) => n + 1);
       setToday(new Date());
-    }, []),
+      void createWorkoutRepository(db).findActive().then(setActiveWorkoutId);
+    }, [db]),
   );
 
   return (
@@ -29,10 +34,20 @@ export function HomeScreen({ navigation }: NativeStackScreenProps<RootStackParam
         <AppText variant="title">{t('app.name')}</AppText>
       </View>
 
-      <Button
-        label={t('home.newWorkout')}
-        onPress={() => navigation.navigate('PickExercises', {})}
-      />
+      {activeWorkoutId ? (
+        <Card
+          accessibilityLabel={t('home.resume')}
+          onPress={() => navigation.navigate('LogWorkout', { workoutId: activeWorkoutId })}
+        >
+          <AppText style={{ fontSize: 18, fontWeight: '600' }}>{t('home.resume')}</AppText>
+          <AppText variant="muted">{t('home.resumeHint')}</AppText>
+        </Card>
+      ) : (
+        <Button
+          label={t('home.newWorkout')}
+          onPress={() => navigation.navigate('PickExercises', {})}
+        />
+      )}
 
       <AppText variant="label" style={{ marginTop: 8 }}>
         {t('home.routines').toUpperCase()}

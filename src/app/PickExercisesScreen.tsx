@@ -4,10 +4,10 @@ import { ToastAndroid, View } from 'react-native';
 
 import { useDb } from '@/core/db';
 import { useTranslation } from '@/core/i18n';
-import { createRoutineRepository } from '@/data';
+import { createRoutineRepository, createWorkoutRepository } from '@/data';
 import { ExercisePicker } from '@/features/exercises';
 import { SaveRoutineDialog, suggestRoutineName } from '@/features/templates';
-import { AppText, Button } from '@/ui';
+import { Button } from '@/ui';
 
 import type { RootStackParamList } from './navigation';
 
@@ -17,7 +17,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'PickExercises'>;
 export function PickExercisesScreen({ route, navigation }: Props) {
   const { t } = useTranslation();
   const db = useDb();
-  const { routineId, routineName, exerciseIds } = route.params;
+  const { routineId, routineName, exerciseIds, addToWorkoutId } = route.params;
   const [saveDialog, setSaveDialog] = useState<{ ids: string[]; suggestion: string } | null>(null);
 
   async function openSaveDialog(ids: string[]) {
@@ -41,6 +41,34 @@ export function PickExercisesScreen({ route, navigation }: Props) {
     if (!routineId || !routineName) return;
     await createRoutineRepository(db).update(routineId, { exerciseIds: ids });
     ToastAndroid.show(t('routines.saved', { name: routineName }), ToastAndroid.SHORT);
+  }
+
+  async function start(ids: string[]) {
+    const workoutId = await createWorkoutRepository(db).start({
+      exerciseIds: ids,
+      templateId: routineId ?? null,
+      name: routineName ?? null,
+    });
+    navigation.replace('LogWorkout', { workoutId, title: routineName });
+  }
+
+  async function addToWorkout(workoutId: string, ids: string[]) {
+    await createWorkoutRepository(db).addExercises(workoutId, ids);
+    navigation.goBack();
+  }
+
+  if (addToWorkoutId) {
+    return (
+      <ExercisePicker
+        renderFooter={(ids) => (
+          <Button
+            label={t('logging.addToWorkout')}
+            disabled={ids.length === 0}
+            onPress={() => void addToWorkout(addToWorkoutId, ids)}
+          />
+        )}
+      />
+    );
   }
 
   return (
@@ -69,8 +97,11 @@ export function PickExercisesScreen({ route, navigation }: Props) {
                 </View>
               ) : null}
             </View>
-            <Button label={t('routines.startWorkout')} disabled onPress={() => {}} />
-            <AppText variant="muted">{t('routines.startComingSoon')}</AppText>
+            <Button
+              label={t('routines.startWorkout')}
+              disabled={ids.length === 0}
+              onPress={() => void start(ids)}
+            />
           </View>
         )}
       />
