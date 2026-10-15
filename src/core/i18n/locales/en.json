@@ -11,7 +11,8 @@
     "settings": "Settings",
     "about": "About",
     "resume": "Resume workout",
-    "resumeHint": "You have a workout in progress."
+    "resumeHint": "You have a workout in progress.",
+    "history": "Calendar"
   },
   "settings": {
     "title": "Settings",
@@ -88,5 +89,27 @@
     "saved": "Workout saved",
     "discarded": "Empty workout discarded",
     "addToWorkout": "Add to workout"
+  },
+  "history": {
+    "title": "Calendar",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "restDay": "No workout this day.",
+    "deleteTitle": "Delete this workout?",
+    "deleteBody": "It will be removed from your calendar and exports.",
+    "longPressHint": "Long-press to delete"
+  },
+  "progress": {
+    "bodyweightThisWeek": "Bodyweight this week",
+    "bodyweightAdd": "Tap to add"
+  },
+  "backup": {
+    "exportTxt": "Export all workouts (.txt)",
+    "header": "Strongr export · {{date}} · weights in {{unit}}",
+    "bodyweight": "Bodyweight (week)",
+    "warmupNote": "w = warm-up set, @ = RPE",
+    "nothingTitle": "Nothing to export yet",
+    "nothingBody": "Finish a workout first.",
+    "failed": "Export failed. Please try again."
   }
 }

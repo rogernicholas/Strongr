@@ -7,6 +7,8 @@ import { formatLongDate } from '@/core/dates';
 import { useDb } from '@/core/db';
 import { useTranslation } from '@/core/i18n';
 import { createWorkoutRepository } from '@/data';
+import { ExportButton } from '@/features/backup';
+import { WeeklyBodyweight } from '@/features/progress';
 import { RoutineList } from '@/features/templates';
 import { AppText, Button, Card, Screen } from '@/ui';
 
@@ -62,6 +64,14 @@ export function HomeScreen({ navigation }: NativeStackScreenProps<RootStackParam
           })
         }
       />
+
+      <Button
+        label={t('home.history')}
+        variant="secondary"
+        onPress={() => navigation.navigate('Calendar')}
+      />
+      <WeeklyBodyweight key={`bw-${focusCount}`} />
+      <ExportButton />
 
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
         <View style={{ flex: 1 }}>

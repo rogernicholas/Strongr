@@ -268,6 +268,27 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       return 'saved';
     },
 
+    /** Finished workouts started in [from, to), oldest first, with all sets. */
+    async listFinished(from = 0, to = Number.MAX_SAFE_INTEGER): Promise<Workout[]> {
+      const rows = await db.getAll<{ id: string }>(
+        `SELECT id FROM workouts
+         WHERE deleted_at IS NULL AND ended_at IS NOT NULL AND started_at >= ? AND started_at < ?
+         ORDER BY started_at`,
+        [from, to],
+      );
+      const workouts = await Promise.all(rows.map((r) => repo.get(r.id)));
+      return workouts.filter((w): w is Workout => w !== null);
+    },
+
+    async remove(workoutId: string): Promise<void> {
+      const now = clock();
+      await db.run('UPDATE workouts SET deleted_at = ?, updated_at = ? WHERE id = ?', [
+        now,
+        now,
+        workoutId,
+      ]);
+    },
+
     /** Sets from the most recent other workout that logged this exercise. */
     async previousSets(exerciseId: string, excludeWorkoutId: string): Promise<LoggedSet[]> {
       const last = await db.getFirst<{ id: string }>(

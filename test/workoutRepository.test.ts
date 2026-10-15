@@ -129,3 +129,31 @@ describe('workoutRepository', () => {
     expect(await repo.previousSets(id('Squat'), w4)).toEqual([]);
   });
 });
+
+describe('workoutRepository history', () => {
+  it('lists finished workouts in a range and removes them', async () => {
+    const db = openNodeDb();
+    await migrate(db, migrations);
+    const exercises = createExerciseRepository(db);
+    await exercises.syncSeeds(seedExercises);
+    const bench = (await exercises.list()).find((e) => e.name === 'Bench press')!.id;
+    let now = 0;
+    const repo = createWorkoutRepository(db, () => now);
+
+    now = 1_000;
+    const a = await repo.start({ exerciseIds: [bench] });
+    await repo.addSet((await repo.get(a))!.exercises[0]!.id, set(50, 7));
+    await repo.finish(a);
+    now = 5_000;
+    const b = await repo.start({ exerciseIds: [bench] });
+    await repo.addSet((await repo.get(b))!.exercises[0]!.id, set(50, 8));
+    await repo.finish(b);
+    now = 9_000;
+    await repo.start({ exerciseIds: [bench] }); // still running: not history
+
+    expect((await repo.listFinished()).map((w) => w.id)).toEqual([a, b]);
+    expect((await repo.listFinished(2_000, 6_000)).map((w) => w.id)).toEqual([b]);
+    await repo.remove(a);
+    expect((await repo.listFinished()).map((w) => w.id)).toEqual([b]);
+  });
+});
