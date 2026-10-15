@@ -212,4 +212,13 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-15: Default weight unit: kg, switchable to lb in Settings.
 - 2026-10-15: Set types: flexible. Weight and reps, plus optional time, distance and RPE (1-10), plus a warm-up flag so warm-ups can be excluded from stats.
 - 2026-10-15: Navigation uses React Navigation (native stack), per the plan, not Expo Router.
-- Open: seed exercises and muscle groups, scoreboard metric and caps, sign-in method.
+- 2026-10-15: Phase 2 UX (Roger's flow): pick the day's exercises from a default list (option to add custom) -> optionally save the selection as a routine (A, B, C...) -> log weight and reps per set -> the day appears on a calendar -> export all workout days to a simple .txt file.
+- 2026-10-15: Seed exercises: Roger's 13 plus about 30 common ones, grouped by muscle group (chest, back, shoulders, arms, legs, core). Users can add their own.
+- 2026-10-15: Routines are built by Roger in the app; none are hardcoded.
+- 2026-10-15: Each set has its own weight. Inputs pre-fill from the previous set; last session's numbers show inline.
+- 2026-10-15: Calendar: month view with a dot per workout day; tap a day to see it.
+- 2026-10-15: Export: .txt in notepad style, one day per block, via the Android share sheet. JSON and CSV backup come later.
+- 2026-10-15: Bodyweight is a weekly input, not per workout.
+- 2026-10-15: RPE off by default; rest timer off by default. Both toggle in Settings.
+- 2026-10-15: No import of old paper notes; start fresh.
+- Open: scoreboard metric and caps, sign-in method.
