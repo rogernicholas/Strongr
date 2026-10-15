@@ -5,6 +5,7 @@ import { useTranslation } from '@/core/i18n';
 import { useTheme } from '@/core/theme';
 import { AboutScreen, SettingsScreen } from '@/features/settings';
 
+import { CalendarScreen } from './CalendarScreen';
 import { HomeScreen } from './HomeScreen';
 import { LogWorkoutScreen } from './LogWorkoutScreen';
 import { PickExercisesScreen } from './PickExercisesScreen';
@@ -19,6 +20,7 @@ export type RootStackParamList = {
     addToWorkoutId?: string;
   };
   LogWorkout: { workoutId: string; title?: string };
+  Calendar: undefined;
   Settings: undefined;
   About: undefined;
 };
@@ -59,6 +61,11 @@ export function RootNavigation() {
           name="LogWorkout"
           component={LogWorkoutScreen}
           options={({ route }) => ({ title: route.params.title ?? t('logging.title') })}
+        />
+        <Stack.Screen
+          name="Calendar"
+          component={CalendarScreen}
+          options={{ title: t('history.title') }}
         />
         <Stack.Screen
           name="Settings"

@@ -15,3 +15,8 @@ export {
   type WorkoutExercise,
   type WorkoutRepository,
 } from './workoutRepository';
+export {
+  createBodyweightRepository,
+  type Bodyweight,
+  type BodyweightRepository,
+} from './bodyweightRepository';

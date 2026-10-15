@@ -19,6 +19,7 @@ const DATA_TABLES = [
   'workouts',
   'workout_exercises',
   'sets',
+  'bodyweights',
 ];
 
 async function count(db: ReturnType<typeof openNodeDb>, table: string) {

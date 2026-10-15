@@ -1,0 +1,1 @@
+export { WeeklyBodyweight } from './WeeklyBodyweight';
