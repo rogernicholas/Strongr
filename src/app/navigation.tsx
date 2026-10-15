@@ -6,11 +6,19 @@ import { useTheme } from '@/core/theme';
 import { AboutScreen, SettingsScreen } from '@/features/settings';
 
 import { HomeScreen } from './HomeScreen';
+import { LogWorkoutScreen } from './LogWorkoutScreen';
 import { PickExercisesScreen } from './PickExercisesScreen';
 
 export type RootStackParamList = {
   Home: undefined;
-  PickExercises: { routineId?: string; routineName?: string; exerciseIds?: string[] };
+  PickExercises: {
+    routineId?: string;
+    routineName?: string;
+    exerciseIds?: string[];
+    /** Picking exercises to add to a workout in progress. */
+    addToWorkoutId?: string;
+  };
+  LogWorkout: { workoutId: string; title?: string };
   Settings: undefined;
   About: undefined;
 };
@@ -41,7 +49,16 @@ export function RootNavigation() {
         <Stack.Screen
           name="PickExercises"
           component={PickExercisesScreen}
-          options={({ route }) => ({ title: route.params.routineName ?? t('exercises.title') })}
+          options={({ route }) => ({
+            title: route.params.addToWorkoutId
+              ? t('logging.addExercise')
+              : (route.params.routineName ?? t('exercises.title')),
+          })}
+        />
+        <Stack.Screen
+          name="LogWorkout"
+          component={LogWorkoutScreen}
+          options={({ route }) => ({ title: route.params.title ?? t('logging.title') })}
         />
         <Stack.Screen
           name="Settings"

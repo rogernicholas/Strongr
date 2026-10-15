@@ -1,0 +1,131 @@
+/** @jest-environment node */
+import { seedExercises } from '@/config/seedExercises';
+import { migrate, migrations } from '@/core/db';
+import { createExerciseRepository, createWorkoutRepository, type SetInput } from '@/data';
+
+import { openNodeDb } from './helpers/nodeDb';
+
+const set = (weightKg: number | null, reps: number | null, extra: Partial<SetInput> = {}) => ({
+  weightKg,
+  reps,
+  durationS: null,
+  distanceM: null,
+  rpe: null,
+  isWarmup: false,
+  ...extra,
+});
+
+async function setup() {
+  const db = openNodeDb();
+  await migrate(db, migrations);
+  const exercises = createExerciseRepository(db);
+  await exercises.syncSeeds(seedExercises);
+  const all = await exercises.list();
+  const id = (name: string) => all.find((e) => e.name === name)!.id;
+  let now = 1_000;
+  const repo = createWorkoutRepository(db, () => (now += 1_000));
+  return { db, repo, id };
+}
+
+describe('workoutRepository', () => {
+  it('starts a workout with exercises in order and logs sets', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press'), id('Row machine')] });
+    let workout = (await repo.get(workoutId))!;
+    expect(workout.exercises.map((e) => e.exerciseName)).toEqual(['Bench press', 'Row machine']);
+    expect(workout.endedAt).toBeNull();
+
+    const bench = workout.exercises[0]!.id;
+    await repo.addSet(bench, set(50, 7));
+    await repo.addSet(bench, set(50, 5));
+    await repo.addSet(bench, set(40, 8));
+    workout = (await repo.get(workoutId))!;
+    expect(workout.exercises[0]!.sets.map((s) => [s.position, s.weightKg, s.reps])).toEqual([
+      [0, 50, 7],
+      [1, 50, 5],
+      [2, 40, 8],
+    ]);
+  });
+
+  it('edits and deletes sets', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });
+    const we = (await repo.get(workoutId))!.exercises[0]!.id;
+    const first = await repo.addSet(we, set(50, 7));
+    const second = await repo.addSet(we, set(50, 5));
+    await repo.updateSet(first.id, set(52.5, 6, { isWarmup: true }));
+    await repo.deleteSet(second.id);
+    const sets = (await repo.get(workoutId))!.exercises[0]!.sets;
+    expect(sets).toEqual([expect.objectContaining({ weightKg: 52.5, reps: 6, isWarmup: true })]);
+  });
+
+  it('rejects empty sets', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });
+    const we = (await repo.get(workoutId))!.exercises[0]!.id;
+    await expect(repo.addSet(we, set(null, null))).rejects.toThrow();
+  });
+
+  it('tracks the active workout and finishes it', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });
+    expect(await repo.findActive()).toBe(workoutId);
+    const we = (await repo.get(workoutId))!.exercises[0]!.id;
+    await repo.addSet(we, set(50, 7));
+    expect(await repo.finish(workoutId)).toBe('saved');
+    expect(await repo.findActive()).toBeNull();
+    expect((await repo.get(workoutId))!.endedAt).not.toBeNull();
+  });
+
+  it('closes a workout left open when a new one starts', async () => {
+    const { repo, id } = await setup();
+    const first = await repo.start({ exerciseIds: [id('Bench press')] });
+    await repo.addSet((await repo.get(first))!.exercises[0]!.id, set(50, 7));
+    const second = await repo.start({ exerciseIds: [id('Squat')] });
+    expect(await repo.findActive()).toBe(second);
+    expect((await repo.get(first))!.endedAt).not.toBeNull();
+  });
+
+  it('discards a finished workout with no sets', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });
+    expect(await repo.finish(workoutId)).toBe('discarded');
+    expect(await repo.get(workoutId)).toBeNull();
+  });
+
+  it('adds exercises mid-workout at the end', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });
+    await repo.addExercises(workoutId, [id('Dips')]);
+    const names = (await repo.get(workoutId))!.exercises.map((e) => e.exerciseName);
+    expect(names).toEqual(['Bench press', 'Dips']);
+  });
+
+  it('finds the previous session for an exercise, skipping workouts without it', async () => {
+    const { repo, id } = await setup();
+    const bench = id('Bench press');
+
+    const w1 = await repo.start({ exerciseIds: [bench] });
+    await repo.addSet((await repo.get(w1))!.exercises[0]!.id, set(45, 8));
+    await repo.finish(w1);
+
+    const w2 = await repo.start({ exerciseIds: [bench, id('Dips')] });
+    const w2ex = (await repo.get(w2))!.exercises;
+    await repo.addSet(w2ex[0]!.id, set(50, 7));
+    await repo.addSet(w2ex[0]!.id, set(40, 8));
+    await repo.finish(w2);
+
+    // A later workout that has bench selected but no sets logged for it.
+    const w3 = await repo.start({ exerciseIds: [bench, id('Dips')] });
+    await repo.addSet((await repo.get(w3))!.exercises[1]!.id, set(null, 10));
+    await repo.finish(w3);
+
+    const w4 = await repo.start({ exerciseIds: [bench] });
+    const previous = await repo.previousSets(bench, w4);
+    expect(previous.map((s) => [s.weightKg, s.reps])).toEqual([
+      [50, 7],
+      [40, 8],
+    ]);
+    expect(await repo.previousSets(id('Squat'), w4)).toEqual([]);
+  });
+});
