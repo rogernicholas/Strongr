@@ -4,7 +4,7 @@
 
 Personal Android workout tracker, built with Expo (React Native) and TypeScript. The project is staged: personal use first, then friends, then possibly public with monetization. An optional social scoreboard (time in the gym) is a later module.
 
-Name: Strongr. Android package: `com.rogernicholas.strongr`.
+Name: Strongr. Android package: `app.strongr.android`.
 Owner: Roger. He makes the decisions; Claude writes the code.
 
 ## How we work (read this first)
@@ -207,7 +207,7 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-15: Staged path: personal, then friends, then possibly public and monetized.
 - 2026-10-15: Social scoreboard (time in gym, daily/weekly/monthly) is an experiment, built as an isolated optional module in Phase 4.
 - 2026-10-15: App name: Strongr. Repo: private `rogernicholas/strongr`.
-- 2026-10-15: Android package ID: `com.rogernicholas.strongr` (not tied to any domain; must be unique on Play and is permanent after the first release).
+- 2026-10-15: Android package ID: `app.strongr.android` (Roger chose a brand-style ID over his personal domain; unique on Play, permanent after the first release).
 - 2026-10-15: Languages: English only for now; every string still goes through i18next.
 - 2026-10-15: Default weight unit: kg, switchable to lb in Settings.
 - 2026-10-15: Set types: flexible. Weight and reps, plus optional time, distance and RPE (1-10), plus a warm-up flag so warm-ups can be excluded from stats.
