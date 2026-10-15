@@ -6,9 +6,11 @@ import { useTheme } from '@/core/theme';
 import { AboutScreen, SettingsScreen } from '@/features/settings';
 
 import { HomeScreen } from './HomeScreen';
+import { PickExercisesScreen } from './PickExercisesScreen';
 
 export type RootStackParamList = {
   Home: undefined;
+  PickExercises: { routineId?: string; routineName?: string; exerciseIds?: string[] };
   Settings: undefined;
   About: undefined;
 };
@@ -36,6 +38,11 @@ export function RootNavigation() {
     >
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="PickExercises"
+          component={PickExercisesScreen}
+          options={({ route }) => ({ title: route.params.routineName ?? t('exercises.title') })}
+        />
         <Stack.Screen
           name="Settings"
           component={SettingsScreen}

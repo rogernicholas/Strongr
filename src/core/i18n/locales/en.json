@@ -6,8 +6,8 @@
     "startupErrorDetail": "Your data has not been changed. Details: {{message}}"
   },
   "home": {
-    "title": "Strongr",
-    "comingSoon": "Workouts, templates and history arrive in Phase 2.",
+    "newWorkout": "New workout",
+    "routines": "Routines",
     "settings": "Settings",
     "about": "About"
   },
@@ -23,5 +23,45 @@
     "title": "About",
     "version": "Version",
     "schemaVersion": "Database version"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "saveFailed": "Couldn't save. Please try again."
+  },
+  "exercises": {
+    "title": "Choose exercises",
+    "search": "Search exercises",
+    "addOwn": "+ Add your own exercise",
+    "newExercise": "New exercise",
+    "namePlaceholder": "Exercise name",
+    "add": "Add",
+    "duplicate": "An exercise with that name already exists.",
+    "noMatches": "No exercises match. Add it as your own above.",
+    "selectedCount_one": "{{count}} exercise selected",
+    "selectedCount_other": "{{count}} exercises selected"
+  },
+  "muscleGroups": {
+    "chest": "Chest",
+    "back": "Back",
+    "shoulders": "Shoulders",
+    "arms": "Arms",
+    "legs": "Legs",
+    "core": "Core",
+    "other": "Other"
+  },
+  "routines": {
+    "saveTitle": "Save as routine",
+    "namePlaceholder": "Routine name, e.g. A",
+    "saveAs": "Save as routine",
+    "update": "Update routine {{name}}",
+    "saved": "Routine {{name}} saved",
+    "empty": "No routines yet. Start a new workout, pick exercises, and save them as a routine.",
+    "deleteTitle": "Delete routine {{name}}?",
+    "deleteBody": "Your logged workouts are not affected.",
+    "longPressHint": "Tap a routine to start from it. Long-press to delete.",
+    "startWorkout": "Start workout",
+    "startComingSoon": "Logging sets arrives in the next update."
   }
 }
