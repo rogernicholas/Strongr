@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "Strongr",
+    "loading": "Loading…",
+    "startupError": "Strongr couldn't open its database.",
+    "startupErrorDetail": "Your data has not been changed. Details: {{message}}"
+  },
+  "home": {
+    "title": "Strongr",
+    "comingSoon": "Workouts, templates and history arrive in Phase 2.",
+    "settings": "Settings",
+    "about": "About"
+  },
+  "settings": {
+    "title": "Settings",
+    "weightUnit": "Weight unit",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark"
+  },
+  "about": {
+    "title": "About",
+    "version": "Version",
+    "schemaVersion": "Database version"
+  }
+}
