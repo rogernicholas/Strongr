@@ -15,7 +15,11 @@ export function Screen({ children, top = false }: Props) {
   const edges: Edge[] = top ? ['top', 'bottom', 'left', 'right'] : ['bottom', 'left', 'right'];
   return (
     <SafeAreaView edges={edges} style={[styles.root, { backgroundColor: theme.colors.background }]}>
-      <ScrollView contentContainerStyle={{ padding: theme.spacing(4), gap: theme.spacing(3) }}>
+      <ScrollView
+        // A tap on a button acts at once instead of only closing the keyboard.
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ padding: theme.spacing(4), gap: theme.spacing(3) }}
+      >
         {children}
       </ScrollView>
     </SafeAreaView>

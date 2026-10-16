@@ -1,5 +1,5 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { Keyboard, Modal, View } from 'react-native';
+import type { ReactNode } from 'react';
+import { Modal, View } from 'react-native';
 
 import { useTheme } from '@/core/theme';
 
@@ -11,25 +11,25 @@ interface Props {
   message?: string;
   onRequestClose(): void;
   onShow?(): void;
+  /**
+   * Dialogs with a text field sit in the upper part of the screen, where the
+   * keyboard never reaches, so nothing has to move when it opens or closes.
+   */
+  hasInput?: boolean;
   children?: ReactNode;
 }
 
 /** Themed popup card over a dark backdrop; shared by every dialog in the app. */
-export function ModalCard({ visible, title, message, onRequestClose, onShow, children }: Props) {
+export function ModalCard({
+  visible,
+  title,
+  message,
+  onRequestClose,
+  onShow,
+  hasInput = false,
+  children,
+}: Props) {
   const theme = useTheme();
-  // Modals don't resize for the keyboard on Android, so lift the card above it ourselves.
-  const [keyboard, setKeyboard] = useState(0);
-  useEffect(() => {
-    const show = Keyboard.addListener('keyboardDidShow', (e) =>
-      setKeyboard(e.endCoordinates.height),
-    );
-    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboard(0));
-    return () => {
-      show.remove();
-      hide.remove();
-    };
-  }, []);
-
   return (
     <Modal
       visible={visible}
@@ -42,9 +42,9 @@ export function ModalCard({ visible, title, message, onRequestClose, onShow, chi
       <View
         style={{
           flex: 1,
-          justifyContent: 'center',
+          justifyContent: hasInput ? 'flex-start' : 'center',
           padding: theme.spacing(6),
-          paddingBottom: theme.spacing(6) + keyboard,
+          paddingTop: hasInput ? '18%' : theme.spacing(6),
           backgroundColor: theme.colors.backdrop,
         }}
       >

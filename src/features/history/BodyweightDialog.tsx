@@ -56,6 +56,7 @@ export function BodyweightDialog(props: Props) {
           : undefined
       }
       onRequestClose={onCancel}
+      hasInput
       onShow={() => setText(initial)}
     >
       <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>

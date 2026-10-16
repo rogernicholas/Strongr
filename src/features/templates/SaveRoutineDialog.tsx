@@ -20,6 +20,7 @@ export function SaveRoutineDialog({ visible, initialName, onSave, onCancel }: Pr
       visible={visible}
       title={t('routines.saveTitle')}
       onRequestClose={onCancel}
+      hasInput
       onShow={() => setName(initialName)}
     >
       <TextField

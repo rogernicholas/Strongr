@@ -49,6 +49,7 @@ export function RoutineCarousel({ selectedId, onSelect, reloadToken }: Props) {
       <AppText variant="label">{t('routines.title').toUpperCase()}</AppText>
       <ScrollView
         horizontal
+        keyboardShouldPersistTaps="handled"
         showsHorizontalScrollIndicator={false}
         snapToInterval={cardWidth + GAP}
         decelerationRate="fast"
