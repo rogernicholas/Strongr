@@ -36,6 +36,12 @@
         }
       ]
     ],
-    "backgroundColor": "#0C0C1D"
+    "backgroundColor": "#0C0C1D",
+    "extra": {
+      "eas": {
+        "projectId": "16b0cd94-1c33-48f7-bd51-e16a6f996efe"
+      }
+    },
+    "owner": "rozero_n"
   }
 }
