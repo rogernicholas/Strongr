@@ -8,25 +8,7 @@ import { fonts, useTheme } from '@/core/theme';
 import { createWorkoutRepository } from '@/data';
 import { AppText, Button, Card } from '@/ui';
 
-import { phraseIndex, summarizeWorkout, type WorkoutSummary } from './workoutSummary';
-
-const PHRASES = [
-  'done.phrase1',
-  'done.phrase2',
-  'done.phrase3',
-  'done.phrase4',
-  'done.phrase5',
-  'done.phrase6',
-  'done.phrase7',
-  'done.phrase8',
-  'done.phrase9',
-  'done.phrase10',
-  'done.phrase11',
-  'done.phrase12',
-  'done.phrase13',
-  'done.phrase14',
-  'done.phrase15',
-] as const;
+import { PHRASES, phraseIndex, summarizeWorkout, type WorkoutSummary } from './workoutSummary';
 
 interface Props {
   workoutId: string;

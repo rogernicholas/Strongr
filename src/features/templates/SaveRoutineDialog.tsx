@@ -13,16 +13,11 @@ interface Props {
 
 export function SaveRoutineDialog({ visible, initialName, onSave, onCancel }: Props) {
   const { t } = useTranslation();
+  // Seeded on mount; the parent remounts the dialog each time it opens (key).
   const [name, setName] = useState(initialName);
 
   return (
-    <ModalCard
-      visible={visible}
-      title={t('routines.saveTitle')}
-      onRequestClose={onCancel}
-      hasInput
-      onShow={() => setName(initialName)}
-    >
+    <ModalCard visible={visible} title={t('routines.saveTitle')} onRequestClose={onCancel} hasInput>
       <TextField
         value={name}
         onChangeText={setName}

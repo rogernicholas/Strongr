@@ -10,7 +10,6 @@ interface Props {
   title: string;
   message?: string;
   onRequestClose(): void;
-  onShow?(): void;
   /**
    * Dialogs with a text field sit in the upper part of the screen, where the
    * keyboard never reaches, so nothing has to move when it opens or closes.
@@ -25,7 +24,6 @@ export function ModalCard({
   title,
   message,
   onRequestClose,
-  onShow,
   hasInput = false,
   children,
 }: Props) {
@@ -37,7 +35,6 @@ export function ModalCard({
       statusBarTranslucent
       animationType="fade"
       onRequestClose={onRequestClose}
-      onShow={onShow}
     >
       <View
         style={{

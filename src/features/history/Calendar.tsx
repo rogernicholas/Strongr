@@ -34,11 +34,13 @@ interface Props {
   reloadToken?: number;
   /** Pad for the status bar; for use without a header. */
   top?: boolean;
+  /** Called after a workout or bodyweight was changed here, so other pages can refresh. */
+  onChanged?(): void;
 }
 
 const WEEK_CELL = 48;
 
-export function Calendar({ footer, reloadToken, top }: Props) {
+export function Calendar({ footer, reloadToken, top, onChanged }: Props) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const dialog = useDialog();
@@ -47,10 +49,21 @@ export function Calendar({ footer, reloadToken, top }: Props) {
   const today = new Date();
   const [month, setMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selected, setSelected] = useState(localDateKey(today));
+  // The calendar stays mounted in the pager; jump back to today once the date rolls over.
+  const [openedOn, setOpenedOn] = useState(localDateKey(today));
+  if (localDateKey(today) !== openedOn) {
+    setOpenedOn(localDateKey(today));
+    setMonth({ year: today.getFullYear(), month: today.getMonth() });
+    setSelected(localDateKey(today));
+  }
+  const weekdays = useMemo(() => weekdayNames(i18n.language), [i18n.language]);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [version, setVersion] = useState(0);
+  const [bodyweightVersion, setBodyweightVersion] = useState(0);
   const [bodyweights, setBodyweights] = useState<Map<string, number>>(new Map());
   const [editingWeek, setEditingWeek] = useState<string | null>(null);
+  // Bumped on open so the dialog remounts with fresh text but still fades out on close.
+  const [dialogKey, setDialogKey] = useState(0);
   const unit = settings.weightUnit;
 
   useEffect(() => {
@@ -74,20 +87,18 @@ export function Calendar({ footer, reloadToken, top }: Props) {
     return () => {
       active = false;
     };
-  }, [db, version, reloadToken]);
+  }, [db, bodyweightVersion, reloadToken]);
 
-  async function removeBodyweight() {
+  async function changeBodyweight(change: (week: string) => Promise<unknown>) {
     if (!editingWeek) return;
-    await createBodyweightRepository(db).remove(editingWeek);
-    setEditingWeek(null);
-    setVersion((v) => v + 1);
-  }
-
-  async function saveBodyweight(value: number) {
-    if (!editingWeek) return;
-    await createBodyweightRepository(db).set(editingWeek, fromDisplayWeight(value, unit));
-    setEditingWeek(null);
-    setVersion((v) => v + 1);
+    try {
+      await change(editingWeek);
+      setEditingWeek(null);
+      setBodyweightVersion((v) => v + 1);
+      onChanged?.();
+    } catch {
+      await dialog({ title: t('common.saveFailed'), confirmLabel: t('common.ok') });
+    }
   }
 
   const byDay = useMemo(() => {
@@ -116,6 +127,7 @@ export function Calendar({ footer, reloadToken, top }: Props) {
     if (!ok) return;
     await createWorkoutRepository(db).remove(workout.id);
     setVersion((v) => v + 1);
+    onChanged?.();
   }
 
   const todayKey = localDateKey(today);
@@ -140,7 +152,10 @@ export function Calendar({ footer, reloadToken, top }: Props) {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t('history.bodyweightTitle')}
-        onPress={() => setEditingWeek(weekStart)}
+        onPress={() => {
+          setDialogKey((k) => k + 1);
+          setEditingWeek(weekStart);
+        }}
         style={({ pressed }) => ({
           width: WEEK_CELL,
           height: 40,
@@ -178,7 +193,7 @@ export function Calendar({ footer, reloadToken, top }: Props) {
 
       <View>
         <View style={{ flexDirection: 'row' }}>
-          {weekdayNames(i18n.language).map((name) => (
+          {weekdays.map((name) => (
             <AppText key={name} variant="label" style={{ flex: 1, textAlign: 'center' }}>
               {name}
             </AppText>
@@ -263,11 +278,18 @@ export function Calendar({ footer, reloadToken, top }: Props) {
       )}
       {footer}
       <BodyweightDialog
+        key={dialogKey}
         weekStart={editingWeek}
         currentKg={editingWeek ? (bodyweights.get(editingWeek) ?? null) : null}
         unit={unit}
-        onSave={(value) => void saveBodyweight(value)}
-        onRemove={() => void removeBodyweight()}
+        onSave={(value) =>
+          void changeBodyweight((week) =>
+            createBodyweightRepository(db).set(week, fromDisplayWeight(value, unit)),
+          )
+        }
+        onRemove={() =>
+          void changeBodyweight((week) => createBodyweightRepository(db).remove(week))
+        }
         onCancel={() => setEditingWeek(null)}
       />
     </Screen>

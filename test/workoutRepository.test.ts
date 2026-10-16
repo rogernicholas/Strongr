@@ -151,7 +151,10 @@ describe('workoutRepository history', () => {
     now = 9_000;
     await repo.start({ exerciseIds: [bench] }); // still running: not history
 
-    expect((await repo.listFinished()).map((w) => w.id)).toEqual([a, b]);
+    const listed = await repo.listFinished();
+    expect(listed.map((w) => w.id)).toEqual([a, b]);
+    // Each workout gets only its own exercises and sets.
+    expect(listed.map((w) => w.exercises[0]!.sets.map((s) => s.reps))).toEqual([[7], [8]]);
     expect((await repo.listFinished(2_000, 6_000)).map((w) => w.id)).toEqual([b]);
     await repo.remove(a);
     expect((await repo.listFinished()).map((w) => w.id)).toEqual([b]);
@@ -187,5 +190,16 @@ describe('workoutRepository stats queries', () => {
     const sessions = await repo.exerciseSessions(bench);
     expect(sessions.map((s) => s.workoutId)).toEqual([first, second]);
     expect(sessions[0]!.sets.map((s) => s.weightKg)).toEqual([50, 55]);
+  });
+
+  it('leaves out exercises that only have warm-up sets', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press'), id('Row machine')] });
+    const [bench, row] = (await repo.get(workoutId))!.exercises;
+    await repo.addSet(bench!.id, set(50, 5));
+    await repo.addSet(row!.id, set(20, 10, { isWarmup: true }));
+    await repo.finish(workoutId);
+
+    expect((await repo.loggedExercises()).map((e) => e.name)).toEqual(['Bench press']);
   });
 });

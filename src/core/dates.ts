@@ -1,6 +1,18 @@
+// Building an Intl.DateTimeFormat is slow on Android, so each one is made once and reused.
+const formatters = new Map<string, Intl.DateTimeFormat>();
+function formatter(language: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const key = language + JSON.stringify(options);
+  let f = formatters.get(key);
+  if (!f) {
+    f = new Intl.DateTimeFormat(language, options);
+    formatters.set(key, f);
+  }
+  return f;
+}
+
 /** "Thursday 15 October 2026" in the given language. */
 export function formatLongDate(date: Date, language: string): string {
-  return new Intl.DateTimeFormat(language, {
+  return formatter(language, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -10,7 +22,7 @@ export function formatLongDate(date: Date, language: string): string {
 
 /** "14 Oct", or "14 Oct 2025" when not in the current year. */
 export function formatShortDate(date: Date, language: string, now = new Date()): string {
-  return new Intl.DateTimeFormat(language, {
+  return formatter(language, {
     day: 'numeric',
     month: 'short',
     ...(date.getFullYear() === now.getFullYear() ? {} : { year: 'numeric' }),
@@ -19,7 +31,7 @@ export function formatShortDate(date: Date, language: string, now = new Date()):
 
 /** "October 2026". */
 export function formatMonth(date: Date, language: string): string {
-  return new Intl.DateTimeFormat(language, { month: 'long', year: 'numeric' }).format(date);
+  return formatter(language, { month: 'long', year: 'numeric' }).format(date);
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');

@@ -28,7 +28,7 @@ function maxOf(values: (number | null)[]): number | null {
 }
 
 /** The best value of one session for a metric; warm-ups never count. */
-export function sessionValue(sets: readonly LoggedSet[], metric: Metric): number | null {
+function sessionValue(sets: readonly LoggedSet[], metric: Metric): number | null {
   const w = working(sets);
   switch (metric) {
     case 'topSet':
@@ -78,7 +78,8 @@ export function inRange(points: readonly Point[], range: Range, now: number): Po
 export function changeOver(points: readonly Point[], days: number): number | null {
   const latest = points[points.length - 1];
   if (!latest) return null;
-  const cutoff = latest.t - days * DAY;
+  // Half a day of slack so a daylight-saving switch doesn't skip the entry exactly `days` back.
+  const cutoff = latest.t - days * DAY + DAY / 2;
   const base = [...points].reverse().find((p) => p.t <= cutoff);
   return base ? latest.value - base.value : null;
 }
@@ -104,7 +105,8 @@ export function summarizeExercise(sessions: readonly ExerciseSession[]): Exercis
   return {
     bestSet,
     bestE1rm: maxOf(sessions.map((s) => sessionValue(s.sets, 'e1rm'))),
-    sessions: sessions.length,
+    // Warm-up-only sessions have nothing to graph, so they don't count.
+    sessions: sessions.filter((s) => working(s.sets).length > 0).length,
     lastAt: sessions[sessions.length - 1]?.startedAt ?? null,
   };
 }

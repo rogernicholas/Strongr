@@ -1,9 +1,8 @@
-import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
-import {
-  NotoSans_400Regular,
-  NotoSans_600SemiBold,
-  NotoSans_700Bold,
-} from '@expo-google-fonts/noto-sans';
+// Per-weight imports: the package roots would bundle every weight (about 11 MB).
+import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one/400Regular';
+import { NotoSans_400Regular } from '@expo-google-fonts/noto-sans/400Regular';
+import { NotoSans_600SemiBold } from '@expo-google-fonts/noto-sans/600SemiBold';
+import { NotoSans_700Bold } from '@expo-google-fonts/noto-sans/700Bold';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';

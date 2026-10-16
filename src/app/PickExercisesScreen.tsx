@@ -24,9 +24,14 @@ export function PickExercisesScreen({ route, navigation }: Props) {
   const db = useDb();
   const { routineId, routineName, exerciseIds, addToWorkoutId } = route.params;
   const [saveDialog, setSaveDialog] = useState<{ ids: string[]; suggestion: string } | null>(null);
+  // Bumped on open so the dialog remounts with the new suggestion but still fades out on close.
+  const [dialogKey, setDialogKey] = useState(0);
+  // Bumped after a save so the routine cards show the saved exercises.
+  const [routinesVersion, setRoutinesVersion] = useState(0);
 
   async function openSaveDialog(ids: string[]) {
     const existing = await createRoutineRepository(db).list();
+    setDialogKey((k) => k + 1);
     setSaveDialog({ ids, suggestion: suggestRoutineName(existing.map((r) => r.name)) });
   }
 
@@ -34,6 +39,7 @@ export function PickExercisesScreen({ route, navigation }: Props) {
     if (!saveDialog) return;
     const routine = await createRoutineRepository(db).create(name, saveDialog.ids);
     setSaveDialog(null);
+    setRoutinesVersion((v) => v + 1);
     ToastAndroid.show(t('routines.saved', { name: routine.name }), ToastAndroid.SHORT);
     navigation.setParams({
       routineId: routine.id,
@@ -45,6 +51,7 @@ export function PickExercisesScreen({ route, navigation }: Props) {
   async function saveChanges(ids: string[]) {
     if (!routineId || !routineName) return;
     await createRoutineRepository(db).update(routineId, { exerciseIds: ids });
+    setRoutinesVersion((v) => v + 1);
     // The routine now matches the selection, so the Save changes button hides.
     navigation.setParams({ exerciseIds: ids });
     ToastAndroid.show(t('routines.saved', { name: routineName }), ToastAndroid.SHORT);
@@ -81,13 +88,13 @@ export function PickExercisesScreen({ route, navigation }: Props) {
   return (
     <>
       <ExercisePicker
-        // Remount when a routine is picked so its exercises become the selection.
-        key={routineId ?? 'new'}
+        // Picking a routine makes its exercises the selection.
+        selectionKey={routineId ?? 'new'}
         initialSelectedIds={exerciseIds}
         header={
           <RoutineCarousel
             selectedId={routineId}
-            reloadToken={routineId}
+            reloadToken={routinesVersion}
             onSelect={(routine) =>
               navigation.setParams({
                 routineId: routine.id,
@@ -123,6 +130,7 @@ export function PickExercisesScreen({ route, navigation }: Props) {
         )}
       />
       <SaveRoutineDialog
+        key={dialogKey}
         visible={saveDialog !== null}
         initialName={saveDialog?.suggestion ?? ''}
         onCancel={() => setSaveDialog(null)}

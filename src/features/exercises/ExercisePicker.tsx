@@ -13,6 +13,8 @@ import { groupExercises } from './groupExercises';
 
 interface Props {
   initialSelectedIds?: readonly string[];
+  /** Change this to replace the selection with `initialSelectedIds` (e.g. a routine was picked). */
+  selectionKey?: string;
   /** Shown above the search field, e.g. routine shortcuts. */
   header?: ReactNode;
   /** Actions shown under the list; receives the selection in tap order. */
@@ -20,12 +22,23 @@ interface Props {
 }
 
 /** Choose exercises for today or for a routine. Order of selection is the workout order. */
-export function ExercisePicker({ initialSelectedIds = [], header, renderFooter }: Props) {
+export function ExercisePicker({
+  initialSelectedIds = [],
+  selectionKey,
+  header,
+  renderFooter,
+}: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
   const db = useDb();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selected, setSelected] = useState<string[]>([...initialSelectedIds]);
+  const [appliedKey, setAppliedKey] = useState(selectionKey);
+  // Reset during render (not in an effect) so the new selection shows without a flash.
+  if (selectionKey !== appliedKey) {
+    setAppliedKey(selectionKey);
+    setSelected([...initialSelectedIds]);
+  }
   const [query, setQuery] = useState('');
   const [adding, setAdding] = useState(false);
 

@@ -75,6 +75,15 @@ describe('stats', () => {
     expect(changeOver(points.slice(0, 1), 28)).toBeNull();
   });
 
+  it('still finds the entry four weeks back across a daylight-saving switch', () => {
+    // Spring forward makes four calendar weeks one hour short of 28 days.
+    const points = [
+      { t: 0, value: 80 },
+      { t: 28 * DAY - 60 * 60 * 1000, value: 78 },
+    ];
+    expect(changeOver(points, 28)).toBe(-2);
+  });
+
   it('summarizes bodyweight entries in week order', () => {
     const points = bodyweightPoints([
       { weekStart: '2026-10-12', weightKg: 77 },

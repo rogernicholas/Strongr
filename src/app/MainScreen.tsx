@@ -11,7 +11,7 @@ import { Calendar } from '@/features/history';
 import { StatsList } from '@/features/progress';
 import { AppText, PageDots, Screen } from '@/ui';
 
-import { HomePage } from './HomeScreen';
+import { HomePage } from './HomePage';
 import type { RootStackParamList } from './navigation';
 
 const PAGE_COUNT = 3;
@@ -24,6 +24,10 @@ export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParam
   const pager = useRef<ScrollView>(null);
   const [page, setPage] = useState(0);
   const [focusCount, setFocusCount] = useState(0);
+  // Edits on one page (e.g. bodyweight on Calendar) refresh the others.
+  const [dataVersion, setDataVersion] = useState(0);
+  const reloadToken = focusCount + dataVersion;
+  const onChanged = useCallback(() => setDataVersion((v) => v + 1), []);
 
   useFocusEffect(useCallback(() => setFocusCount((n) => n + 1), []));
 
@@ -51,16 +55,16 @@ export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParam
         onMomentumScrollEnd={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / width))}
       >
         <View style={{ width }}>
-          <HomePage navigation={navigation} reloadToken={focusCount} />
+          <HomePage navigation={navigation} reloadToken={reloadToken} />
         </View>
         <View style={{ width }}>
-          <Calendar top reloadToken={focusCount} footer={<ExportButton />} />
+          <Calendar top reloadToken={reloadToken} onChanged={onChanged} footer={<ExportButton />} />
         </View>
         <View style={{ width }}>
           <Screen top>
             <AppText variant="title">{t('stats.title')}</AppText>
             <StatsList
-              reloadToken={focusCount}
+              reloadToken={reloadToken}
               onOpen={(target) => navigation.navigate('StatsDetail', { target })}
             />
           </Screen>

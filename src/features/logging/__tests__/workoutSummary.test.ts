@@ -1,6 +1,8 @@
 import type { LoggedSet, Workout } from '@/data';
 
-import { PHRASE_COUNT, phraseIndex, summarizeWorkout } from '../workoutSummary';
+import { PHRASES, phraseIndex, summarizeWorkout } from '../workoutSummary';
+
+const PHRASE_COUNT = PHRASES.length;
 
 const set = (isWarmup = false): LoggedSet => ({
   id: 's',
@@ -19,6 +21,14 @@ describe('workout summary', () => {
     for (let i = 1; i < picks.length; i++) expect(picks[i]).not.toBe(picks[i - 1]);
     expect(new Set(picks.slice(0, PHRASE_COUNT)).size).toBe(PHRASE_COUNT);
     expect(picks.every((p) => p >= 0 && p < PHRASE_COUNT)).toBe(true);
+  });
+
+  it('rotates through any phrase count without repeats', () => {
+    for (const count of [2, 3, 4, 12, 14, 21]) {
+      const picks = Array.from({ length: count * 2 }, (_, n) => phraseIndex(n, count));
+      for (let i = 1; i < picks.length; i++) expect(picks[i]).not.toBe(picks[i - 1]);
+      expect(new Set(picks.slice(0, count)).size).toBe(count);
+    }
   });
 
   it('counts duration, exercises with sets and working sets', () => {

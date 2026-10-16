@@ -29,8 +29,10 @@ interface Props {
 export function BodyweightDialog(props: Props) {
   const { weekStart, currentKg, unit, onSave, onRemove, onCancel } = props;
   const { t, i18n } = useTranslation();
-  const [text, setText] = useState('');
   const initial = currentKg === null ? '' : formatNumber(toDisplayWeight(currentKg, unit), 1);
+  // Seeded on mount; the parent remounts the dialog per week (key) so the value is ready
+  // before autoFocus selects it.
+  const [text, setText] = useState(initial);
   const value = parse(text);
   const removing = value === 0;
   // Saving empty or 0 removes an existing entry; with no entry there is nothing to save.
@@ -57,7 +59,6 @@ export function BodyweightDialog(props: Props) {
       }
       onRequestClose={onCancel}
       hasInput
-      onShow={() => setText(initial)}
     >
       <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
         <TextField
