@@ -23,6 +23,6 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": ["expo-sqlite", "expo-sharing", "expo-font"],
-    "backgroundColor": "#0C0E17"
+    "backgroundColor": "#0C0C1D"
   }
 }

@@ -19,10 +19,10 @@ export function Button({ label, onPress, variant = 'primary', disabled }: Props)
   const theme = useTheme();
   const { colors } = theme;
   const look = {
-    primary: { bg: colors.primary, fg: colors.onPrimary },
-    secondary: { bg: colors.surface, fg: colors.text },
-    accent: { bg: colors.accent, fg: colors.onAccent },
-    quiet: { bg: colors.background, fg: colors.textMuted },
+    primary: { bg: colors.primary, fg: colors.onPrimary, dim: colors.primaryDim },
+    secondary: { bg: colors.surface, fg: colors.text, dim: colors.surface },
+    accent: { bg: colors.accent, fg: colors.onAccent, dim: colors.accentDim },
+    quiet: { bg: colors.background, fg: colors.textMuted, dim: colors.background },
   }[variant];
   return (
     <Pressable
@@ -36,11 +36,17 @@ export function Button({ label, onPress, variant = 'primary', disabled }: Props)
         paddingHorizontal: theme.spacing(4),
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: look.bg,
-        opacity: disabled ? 0.4 : pressed ? 0.8 : 1,
+        backgroundColor: disabled
+          ? look.dim
+          : pressed && variant === 'secondary'
+            ? colors.raised
+            : look.bg,
+        opacity: !disabled && pressed && variant !== 'secondary' ? 0.85 : 1,
       })}
     >
-      <AppText style={{ color: look.fg, fontWeight: '600' }}>{label}</AppText>
+      <AppText style={{ color: disabled ? colors.textMuted : look.fg, fontWeight: '600' }}>
+        {label}
+      </AppText>
     </Pressable>
   );
 }

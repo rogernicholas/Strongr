@@ -226,4 +226,6 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-16: Layout: three swipeable pages, Home -> Calendar -> Stats, with page dots. Home is just New workout (or Resume), with Settings and About as small links at the bottom. Routines appear as chips at the top of the exercise picker.
 - 2026-10-16: Calendar page: small Export link underneath; each week row has a bodyweight cell (tap to add or edit that week).
 - 2026-10-16: Stats page: bodyweight pinned first, then logged exercises. Exercise graph: heaviest working set per session (warm-ups excluded), toggle to estimated 1RM (Epley). Stats: best set, e1RM, sessions, last session, 4-week change. Bodyweight: current, lowest, highest, 4-week change. Ranges 3M / 1Y / All. Charts drawn with react-native-svg.
+- 2026-10-16: Colours harmonized around one blue hue: background #0C0C1D, navy surfaces #11135A (raised #1F226B), muted text #ABAED9, red #EB424B, teal #2AB1CF, plus dim red/teal for disabled states. No borders. All dialogs use the themed ModalCard, not native alerts.
+- 2026-10-16: A "good job" screen follows every saved workout, rotating through 15 phrases.
 - Open: scoreboard metric and caps, sign-in method.

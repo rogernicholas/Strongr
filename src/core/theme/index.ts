@@ -2,15 +2,22 @@ export interface Theme {
   dark: boolean;
   colors: {
     background: string;
+    /** Navy for buttons, cards and fields. */
     surface: string;
+    /** Lighter navy for pressed and raised surfaces. */
+    raised: string;
     text: string;
     textMuted: string;
     /** Main actions (red). */
     primary: string;
     onPrimary: string;
+    /** Dim red for disabled main actions. */
+    primaryDim: string;
     /** Highlights: today, selection, dots, graph lines (teal). */
     accent: string;
     onAccent: string;
+    /** Dim teal for disabled and subtle highlights. */
+    accentDim: string;
     /** Borders are off in the night theme (transparent). */
     border: string;
     /** Faint lines that must stay visible: chart grid, page dots, empty checkboxes. */
@@ -49,30 +56,44 @@ export function fontFamilyFor(weight: string | number | undefined): string {
 
 const spacing = (n: number) => n * 4;
 
-const brand = {
-  red: '#F61C24',
-  teal: '#41D2EF',
-  black: '#03020C',
-  navy: '#1D2180',
-  /** Buttons and containers. */
-  navyDark: '#11135A',
+/**
+ * One blue hue (238°) runs through the background, surfaces, muted text and
+ * lines, so the page reads as a deep version of the navy. Red and teal are
+ * tuned to sit closer in lightness so neither shouts.
+ */
+const palette = {
+  ink: '#0C0C1D',
+  navy: '#11135A',
+  navyRaised: '#1F226B',
+  line: '#2E317A',
+  mist: '#ABAED9',
+  white: '#F3F3FC',
+  red: '#EB424B',
+  redDim: '#793437',
+  redSoft: '#F76E75',
+  teal: '#2AB1CF',
+  tealDim: '#2E606B',
+  onTeal: '#080921',
 };
 
 export const darkTheme: Theme = {
   dark: true,
   colors: {
-    background: '#0C0E17',
-    surface: brand.navyDark,
-    text: '#FFFFFF',
-    textMuted: '#B4B7E0',
-    primary: brand.red,
-    onPrimary: '#FFFFFF',
-    accent: brand.teal,
-    onAccent: brand.black,
+    background: palette.ink,
+    surface: palette.navy,
+    raised: palette.navyRaised,
+    text: palette.white,
+    textMuted: palette.mist,
+    primary: palette.red,
+    onPrimary: palette.white,
+    primaryDim: palette.redDim,
+    accent: palette.teal,
+    onAccent: palette.onTeal,
+    accentDim: palette.tealDim,
     border: 'transparent',
-    subtle: '#2A2E6E',
-    danger: '#FF6B70',
-    backdrop: 'rgba(3, 2, 12, 0.78)',
+    subtle: palette.line,
+    danger: palette.redSoft,
+    backdrop: 'rgba(12, 12, 29, 0.82)',
   },
   spacing,
   radius: { sm: 10, md: 14, lg: 22, pill: 999 },

@@ -27,7 +27,7 @@ export function Card({ children, onPress, onLongPress, accessibilityLabel }: Pro
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
       onLongPress={onLongPress}
-      style={({ pressed }) => [style, { opacity: pressed ? 0.7 : 1 }]}
+      style={({ pressed }) => [style, pressed && { backgroundColor: theme.colors.raised }]}
     >
       {children}
     </Pressable>
