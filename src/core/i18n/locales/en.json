@@ -28,7 +28,8 @@
     "save": "Save",
     "delete": "Delete",
     "saveFailed": "Couldn't save. Please try again.",
-    "ok": "OK"
+    "ok": "OK",
+    "remove": "Remove"
   },
   "exercises": {
     "title": "Choose exercises",
@@ -99,7 +100,8 @@
     "deleteBody": "It will be removed from your calendar and exports.",
     "longPressHint": "Long-press to delete",
     "bodyweightTitle": "Bodyweight",
-    "weekOf": "Week of {{date}}"
+    "weekOf": "Week of {{date}}",
+    "bodyweightRemoveHint": "Clear it or enter 0 to remove."
   },
   "backup": {
     "exportTxt": "Export all workouts (.txt)",

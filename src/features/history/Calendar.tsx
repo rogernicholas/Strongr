@@ -76,6 +76,13 @@ export function Calendar({ footer, reloadToken, top }: Props) {
     };
   }, [db, version, reloadToken]);
 
+  async function removeBodyweight() {
+    if (!editingWeek) return;
+    await createBodyweightRepository(db).remove(editingWeek);
+    setEditingWeek(null);
+    setVersion((v) => v + 1);
+  }
+
   async function saveBodyweight(value: number) {
     if (!editingWeek) return;
     await createBodyweightRepository(db).set(editingWeek, fromDisplayWeight(value, unit));
@@ -260,6 +267,7 @@ export function Calendar({ footer, reloadToken, top }: Props) {
         currentKg={editingWeek ? (bodyweights.get(editingWeek) ?? null) : null}
         unit={unit}
         onSave={(value) => void saveBodyweight(value)}
+        onRemove={() => void removeBodyweight()}
         onCancel={() => setEditingWeek(null)}
       />
     </Screen>

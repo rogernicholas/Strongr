@@ -25,6 +25,15 @@ export function createBodyweightRepository(db: Db, clock: Clock = systemClock) {
       return rows.map((r) => ({ weekStart: r.week_start, weightKg: r.weight_kg }));
     },
 
+    /** Removes the bodyweight for a week (soft delete). */
+    async remove(weekStart: string): Promise<void> {
+      const now = clock();
+      await db.run(
+        'UPDATE bodyweights SET deleted_at = ?, updated_at = ? WHERE week_start = ? AND deleted_at IS NULL',
+        [now, now, weekStart],
+      );
+    },
+
     /** Sets (or replaces) the bodyweight for a week. */
     async set(weekStart: string, weightKg: number): Promise<void> {
       if (!(weightKg > 0)) throw new Error('Bodyweight must be positive.');
