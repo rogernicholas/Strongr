@@ -1,6 +1,7 @@
 {
   "app": {
     "name": "Strongr",
+    "logo": "Strongr.",
     "loading": "Loading…",
     "startupError": "Strongr couldn't open its database.",
     "startupErrorDetail": "Your data has not been changed. Details: {{message}}"

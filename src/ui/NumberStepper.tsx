@@ -1,6 +1,6 @@
 import { Pressable, TextInput, View } from 'react-native';
 
-import { useTheme } from '@/core/theme';
+import { fonts, useTheme } from '@/core/theme';
 
 import { AppText } from './AppText';
 
@@ -60,7 +60,7 @@ export function NumberStepper({ label, value, onChangeText, step, decimals = fal
             height: 56,
             textAlign: 'center',
             fontSize: 24,
-            fontWeight: '700',
+            fontFamily: fonts.bold,
             borderRadius: 14,
             borderWidth: 1,
             color: theme.colors.text,

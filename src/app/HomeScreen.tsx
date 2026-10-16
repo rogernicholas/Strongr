@@ -33,7 +33,7 @@ export function HomeScreen({ navigation }: NativeStackScreenProps<RootStackParam
     <Screen>
       <View style={{ gap: 4, marginTop: 24 }}>
         <AppText variant="muted">{formatLongDate(today, i18n.language)}</AppText>
-        <AppText variant="title">{t('app.name')}</AppText>
+        <AppText variant="logo">{t('app.logo')}</AppText>
       </View>
 
       {activeWorkoutId ? (

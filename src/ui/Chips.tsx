@@ -29,11 +29,11 @@ export function Chips<T extends string>({ options, value, onChange }: Props<T>) 
               borderRadius: 20,
               borderWidth: 1,
               justifyContent: 'center',
-              borderColor: selected ? theme.colors.primary : theme.colors.border,
-              backgroundColor: selected ? theme.colors.primary : theme.colors.surface,
+              borderColor: selected ? theme.colors.accent : theme.colors.border,
+              backgroundColor: selected ? theme.colors.accent : theme.colors.surface,
             }}
           >
-            <AppText style={{ color: selected ? theme.colors.onPrimary : theme.colors.text }}>
+            <AppText style={{ color: selected ? theme.colors.onAccent : theme.colors.text }}>
               {option.label}
             </AppText>
           </Pressable>

@@ -9,8 +9,12 @@ export interface Theme {
     surface: string;
     text: string;
     textMuted: string;
+    /** Main actions (red). */
     primary: string;
     onPrimary: string;
+    /** Highlights: today, selection, dots, graph lines (teal). */
+    accent: string;
+    onAccent: string;
     border: string;
     danger: string;
   };
@@ -19,18 +23,46 @@ export interface Theme {
   minTouch: number;
 }
 
+/** Font family names, as registered by useFonts in App.tsx. */
+export const fonts = {
+  logo: 'ChangaOne_400Regular',
+  regular: 'NotoSans_400Regular',
+  semibold: 'NotoSans_600SemiBold',
+  bold: 'NotoSans_700Bold',
+} as const;
+
+/**
+ * Android ignores fontWeight for custom fonts, so each weight is its own family.
+ * Maps a fontWeight to the matching Noto Sans family.
+ */
+export function fontFamilyFor(weight: string | number | undefined): string {
+  const w = Number(weight === 'bold' ? 700 : (weight ?? 400));
+  if (w >= 700) return fonts.bold;
+  if (w >= 600) return fonts.semibold;
+  return fonts.regular;
+}
+
 const spacing = (n: number) => n * 4;
+
+const brand = {
+  red: '#F61C24',
+  teal: '#41D2EF',
+  black: '#03020C',
+  navy: '#1D2180',
+};
 
 export const lightTheme: Theme = {
   dark: false,
   colors: {
-    background: '#F7F7F8',
+    background: '#F4F5FB',
     surface: '#FFFFFF',
-    text: '#111114',
-    textMuted: '#5E5E66',
-    primary: '#1F6FEB',
+    text: brand.black,
+    textMuted: '#55576E',
+    primary: brand.red,
     onPrimary: '#FFFFFF',
-    border: '#DADADF',
+    accent: brand.navy,
+    onAccent: '#FFFFFF',
+    border: '#D9DBEA',
     danger: '#C62828',
   },
   spacing,
@@ -40,14 +72,16 @@ export const lightTheme: Theme = {
 export const darkTheme: Theme = {
   dark: true,
   colors: {
-    background: '#0F0F12',
-    surface: '#1A1A1F',
-    text: '#F2F2F5',
-    textMuted: '#A0A0AA',
-    primary: '#4C8DFF',
-    onPrimary: '#0F0F12',
-    border: '#2E2E36',
-    danger: '#EF5350',
+    background: brand.navy,
+    surface: '#101146',
+    text: '#FFFFFF',
+    textMuted: '#B4B7E0',
+    primary: brand.red,
+    onPrimary: '#FFFFFF',
+    accent: brand.teal,
+    onAccent: brand.black,
+    border: '#3A3E9E',
+    danger: '#FF6B70',
   },
   spacing,
   minTouch: 48,
@@ -56,6 +90,6 @@ export const darkTheme: Theme = {
 export function useTheme(): Theme {
   const system = useColorScheme();
   const { settings } = useSettings();
-  const mode = settings.theme === 'system' ? (system ?? 'light') : settings.theme;
+  const mode = settings.theme === 'system' ? (system ?? 'dark') : settings.theme;
   return mode === 'dark' ? darkTheme : lightTheme;
 }

@@ -103,8 +103,8 @@ export function SetEditor(props: Props) {
             height: 24,
             borderRadius: 6,
             borderWidth: 2,
-            borderColor: isWarmup ? theme.colors.primary : theme.colors.border,
-            backgroundColor: isWarmup ? theme.colors.primary : 'transparent',
+            borderColor: isWarmup ? theme.colors.accent : theme.colors.border,
+            backgroundColor: isWarmup ? theme.colors.accent : 'transparent',
           }}
         />
         <AppText>{t('logging.warmup')}</AppText>

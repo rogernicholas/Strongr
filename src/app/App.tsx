@@ -1,3 +1,10 @@
+import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one';
+import {
+  NotoSans_400Regular,
+  NotoSans_600SemiBold,
+  NotoSans_700Bold,
+} from '@expo-google-fonts/noto-sans';
+import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
@@ -7,7 +14,7 @@ import { DbProvider } from '@/core/db';
 import { openExpoDb } from '@/core/db/expoDb';
 import { useTranslation } from '@/core/i18n';
 import { SettingsProvider } from '@/core/settings';
-import { useTheme } from '@/core/theme';
+import { darkTheme, useTheme } from '@/core/theme';
 
 import { bootstrap, type AppContext } from './bootstrap';
 import { RootNavigation } from './navigation';
@@ -17,6 +24,13 @@ type State =
 
 export default function App() {
   const [state, setState] = useState<State>({ status: 'loading' });
+  // If fonts fail to load the app still starts, with the system font.
+  const [fontsLoaded, fontError] = useFonts({
+    ChangaOne_400Regular,
+    NotoSans_400Regular,
+    NotoSans_600SemiBold,
+    NotoSans_700Bold,
+  });
 
   useEffect(() => {
     bootstrap(() => openExpoDb())
@@ -30,6 +44,7 @@ export default function App() {
   }, []);
 
   if (state.status !== 'ready') return <StartupScreen state={state} />;
+  if (!fontsLoaded && !fontError) return <StartupScreen state={{ status: 'loading' }} />;
 
   const { ctx } = state;
   return (
@@ -55,11 +70,13 @@ function StartupScreen({ state }: { state: Exclude<State, { status: 'ready' }> }
   return (
     <View style={styles.center}>
       {state.status === 'loading' ? (
-        <ActivityIndicator accessibilityLabel={t('app.loading')} />
+        <ActivityIndicator color={darkTheme.colors.accent} accessibilityLabel={t('app.loading')} />
       ) : (
         <>
           <Text style={styles.errorTitle}>{t('app.startupError')}</Text>
-          <Text>{t('app.startupErrorDetail', { message: state.error.message })}</Text>
+          <Text style={styles.errorText}>
+            {t('app.startupErrorDetail', { message: state.error.message })}
+          </Text>
         </>
       )}
     </View>
@@ -67,6 +84,14 @@ function StartupScreen({ state }: { state: Exclude<State, { status: 'ready' }> }
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 12 },
-  errorTitle: { fontSize: 18, fontWeight: '600' },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    gap: 12,
+    backgroundColor: darkTheme.colors.background,
+  },
+  errorTitle: { fontSize: 18, fontWeight: '600', color: darkTheme.colors.text },
+  errorText: { color: darkTheme.colors.text },
 });

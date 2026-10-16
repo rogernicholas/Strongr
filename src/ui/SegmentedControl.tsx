@@ -41,13 +41,13 @@ export function SegmentedControl<T extends string>({
               styles.item,
               {
                 minHeight: theme.minTouch,
-                backgroundColor: selected ? theme.colors.primary : theme.colors.surface,
+                backgroundColor: selected ? theme.colors.accent : theme.colors.surface,
               },
             ]}
           >
             <AppText
               style={{
-                color: selected ? theme.colors.onPrimary : theme.colors.text,
+                color: selected ? theme.colors.onAccent : theme.colors.text,
                 fontWeight: '600',
               }}
             >

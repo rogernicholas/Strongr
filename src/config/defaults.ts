@@ -14,7 +14,7 @@ export interface Settings {
 
 export const defaultSettings: Settings = {
   weightUnit: 'kg',
-  theme: 'system',
+  theme: 'dark',
   rpeEnabled: false,
   restTimerEnabled: false,
   plateCalculatorEnabled: false,

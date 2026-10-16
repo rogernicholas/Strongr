@@ -126,13 +126,13 @@ export function Calendar() {
                     borderRadius: 10,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: isSelected ? theme.colors.primary : 'transparent',
+                    backgroundColor: isSelected ? theme.colors.accent : 'transparent',
                     borderWidth: key === todayKey ? 1 : 0,
-                    borderColor: theme.colors.primary,
+                    borderColor: theme.colors.accent,
                   }}
                 >
                   <AppText
-                    style={{ color: isSelected ? theme.colors.onPrimary : theme.colors.text }}
+                    style={{ color: isSelected ? theme.colors.onAccent : theme.colors.text }}
                   >
                     {day.getDate()}
                   </AppText>
@@ -144,8 +144,8 @@ export function Calendar() {
                       marginTop: 2,
                       backgroundColor: hasWorkout
                         ? isSelected
-                          ? theme.colors.onPrimary
-                          : theme.colors.primary
+                          ? theme.colors.onAccent
+                          : theme.colors.accent
                         : 'transparent',
                     }}
                   />

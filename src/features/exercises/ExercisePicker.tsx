@@ -107,7 +107,7 @@ export function ExercisePicker({ initialSelectedIds = [], renderFooter }: Props)
                 marginBottom: 6,
                 borderRadius: 12,
                 borderWidth: 1,
-                borderColor: isSelected ? theme.colors.primary : theme.colors.border,
+                borderColor: isSelected ? theme.colors.accent : theme.colors.border,
                 backgroundColor: theme.colors.surface,
               }}
             >
@@ -119,12 +119,12 @@ export function ExercisePicker({ initialSelectedIds = [], renderFooter }: Props)
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderWidth: 2,
-                  borderColor: isSelected ? theme.colors.primary : theme.colors.border,
-                  backgroundColor: isSelected ? theme.colors.primary : 'transparent',
+                  borderColor: isSelected ? theme.colors.accent : theme.colors.border,
+                  backgroundColor: isSelected ? theme.colors.accent : 'transparent',
                 }}
               >
                 {isSelected ? (
-                  <AppText style={{ color: theme.colors.onPrimary, fontWeight: '700' }}>
+                  <AppText style={{ color: theme.colors.onAccent, fontWeight: '700' }}>
                     {index + 1}
                   </AppText>
                 ) : null}

@@ -38,7 +38,7 @@ export function ExerciseLogCard(props: Props) {
       style={{
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: expanded ? theme.colors.primary : theme.colors.border,
+        borderColor: expanded ? theme.colors.accent : theme.colors.border,
         backgroundColor: theme.colors.surface,
         overflow: 'hidden',
       }}

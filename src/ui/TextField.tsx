@@ -1,6 +1,6 @@
 import { TextInput, type TextInputProps } from 'react-native';
 
-import { useTheme } from '@/core/theme';
+import { fonts, useTheme } from '@/core/theme';
 
 export function TextField({ style, ...rest }: TextInputProps) {
   const theme = useTheme();
@@ -15,6 +15,7 @@ export function TextField({ style, ...rest }: TextInputProps) {
           borderRadius: 12,
           paddingHorizontal: 12,
           fontSize: 16,
+          fontFamily: fonts.regular,
           color: theme.colors.text,
           borderColor: theme.colors.border,
           backgroundColor: theme.colors.surface,
