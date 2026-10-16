@@ -65,7 +65,7 @@ src/
 - Timestamps are epoch milliseconds (UTC) in INTEGER columns. Workouts also store the device timezone.
 - Adding migration N: add `src/core/db/migrations/00N_name.ts`, append it to the list in `migrations/index.ts`, and add `test/migrations/fixtures/vN.ts` with sample data. The tests fail until the fixture exists.
 - Installable APK: `npx eas-cli build -p android --profile preview` (config in `eas.json`; the build runs in Expo's cloud under Roger's Expo account, so it runs on his PC after he has signed in with `npx eas-cli login` himself). Bump `version` and `android.versionCode` in `app.json` for each build that is shared.
-- Migration 001 has not shipped in an APK yet, so it may still be edited until the first APK (Phase 3). After that, forward-only.
+- The first APK (0.1.0, schema version 3) shipped on 2026-10-16, so every existing migration is frozen: schema changes need a new numbered migration.
 
 ## Data rules (cheap now, expensive later)
 
@@ -233,4 +233,5 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-16: Logging: weight and reps each get a full-width row with small borderless +/- buttons.
 - 2026-10-16: A week's bodyweight is removed by saving it empty or as 0 (button reads Delete).
 - 2026-10-16: Popups with a text field open in the upper part of the screen, clear of the keyboard; taps work on the first try while the keyboard is open.
+- 2026-10-16: First APK (0.1.0) built with EAS preview profile and installed by direct download; the Expo project is owned by Roger's `rozero_n` account. Workouts logged in Expo Go are not carried over.
 - Open: scoreboard metric and caps, sign-in method.
