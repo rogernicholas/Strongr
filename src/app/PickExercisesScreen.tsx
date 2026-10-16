@@ -6,7 +6,7 @@ import { useDb } from '@/core/db';
 import { useTranslation } from '@/core/i18n';
 import { createRoutineRepository, createWorkoutRepository } from '@/data';
 import { ExercisePicker } from '@/features/exercises';
-import { RoutineChips, SaveRoutineDialog, suggestRoutineName } from '@/features/templates';
+import { RoutineCarousel, SaveRoutineDialog, suggestRoutineName } from '@/features/templates';
 import { Button } from '@/ui';
 
 import type { RootStackParamList } from './navigation';
@@ -78,7 +78,7 @@ export function PickExercisesScreen({ route, navigation }: Props) {
         key={routineId ?? 'new'}
         initialSelectedIds={exerciseIds}
         header={
-          <RoutineChips
+          <RoutineCarousel
             selectedId={routineId}
             reloadToken={routineId}
             onSelect={(routine) =>

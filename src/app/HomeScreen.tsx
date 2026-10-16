@@ -47,20 +47,27 @@ export function HomePage({ navigation, reloadToken }: Props) {
           <AppText variant="muted">{formatLongDate(today, i18n.language)}</AppText>
         </View>
 
-        {activeWorkoutId ? (
-          <Card
-            accessibilityLabel={t('home.resume')}
-            onPress={() => navigation.navigate('LogWorkout', { workoutId: activeWorkoutId })}
-          >
-            <AppText style={{ fontSize: 18, fontWeight: '600' }}>{t('home.resume')}</AppText>
-            <AppText variant="muted">{t('home.resumeHint')}</AppText>
-          </Card>
-        ) : (
+        <View style={{ gap: theme.spacing(3) }}>
+          {activeWorkoutId ? (
+            <Card
+              accessibilityLabel={t('home.resume')}
+              onPress={() => navigation.navigate('LogWorkout', { workoutId: activeWorkoutId })}
+            >
+              <AppText style={{ fontSize: 18, fontWeight: '600' }}>{t('home.resume')}</AppText>
+              <AppText variant="muted">{t('home.resumeHint')}</AppText>
+            </Card>
+          ) : (
+            <Button
+              label={t('home.newWorkout')}
+              onPress={() => navigation.navigate('PickExercises', {})}
+            />
+          )}
           <Button
-            label={t('home.newWorkout')}
-            onPress={() => navigation.navigate('PickExercises', {})}
+            label={t('home.myRoutines')}
+            variant="secondary"
+            onPress={() => navigation.navigate('Routines')}
           />
-        )}
+        </View>
       </View>
 
       <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>

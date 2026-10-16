@@ -9,6 +9,7 @@ import { AboutScreen, SettingsScreen } from '@/features/settings';
 import { LogWorkoutScreen } from './LogWorkoutScreen';
 import { MainScreen } from './MainScreen';
 import { PickExercisesScreen } from './PickExercisesScreen';
+import { RoutinesScreen } from './RoutinesScreen';
 import { StatsDetailScreen } from './StatsDetailScreen';
 
 export type RootStackParamList = {
@@ -22,6 +23,7 @@ export type RootStackParamList = {
     addToWorkoutId?: string;
   };
   LogWorkout: { workoutId: string; title?: string };
+  Routines: undefined;
   StatsDetail: { target: StatsTarget };
   Settings: undefined;
   About: undefined;
@@ -63,6 +65,11 @@ export function RootNavigation() {
           name="LogWorkout"
           component={LogWorkoutScreen}
           options={({ route }) => ({ title: route.params.title ?? t('logging.title') })}
+        />
+        <Stack.Screen
+          name="Routines"
+          component={RoutinesScreen}
+          options={{ title: t('routines.title') }}
         />
         <Stack.Screen
           name="StatsDetail"
