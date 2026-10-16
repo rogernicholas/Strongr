@@ -71,7 +71,7 @@ export function RoutineCarousel({ selectedId, onSelect, reloadToken }: Props) {
                 borderRadius: theme.radius.md,
                 borderWidth: selected ? 2 : 1,
                 borderColor: selected ? theme.colors.accent : theme.colors.border,
-                backgroundColor: theme.colors.surface,
+                backgroundColor: theme.colors.raised,
                 opacity: pressed ? 0.7 : 1,
               })}
             >

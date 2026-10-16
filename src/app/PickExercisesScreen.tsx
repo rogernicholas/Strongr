@@ -6,7 +6,12 @@ import { useDb } from '@/core/db';
 import { useTranslation } from '@/core/i18n';
 import { createRoutineRepository, createWorkoutRepository } from '@/data';
 import { ExercisePicker } from '@/features/exercises';
-import { RoutineCarousel, SaveRoutineDialog, suggestRoutineName } from '@/features/templates';
+import {
+  hasRoutineChanges,
+  RoutineCarousel,
+  SaveRoutineDialog,
+  suggestRoutineName,
+} from '@/features/templates';
 import { Button } from '@/ui';
 
 import type { RootStackParamList } from './navigation';
@@ -37,9 +42,11 @@ export function PickExercisesScreen({ route, navigation }: Props) {
     });
   }
 
-  async function updateExisting(ids: string[]) {
+  async function saveChanges(ids: string[]) {
     if (!routineId || !routineName) return;
     await createRoutineRepository(db).update(routineId, { exerciseIds: ids });
+    // The routine now matches the selection, so the Save changes button hides.
+    navigation.setParams({ exerciseIds: ids });
     ToastAndroid.show(t('routines.saved', { name: routineName }), ToastAndroid.SHORT);
   }
 
@@ -92,26 +99,21 @@ export function PickExercisesScreen({ route, navigation }: Props) {
         }
         renderFooter={(ids) => (
           <View style={{ gap: 8 }}>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <View style={{ flex: 1 }}>
-                <Button
-                  label={t('routines.saveAs')}
-                  variant="secondary"
-                  disabled={ids.length === 0}
-                  onPress={() => void openSaveDialog(ids)}
-                />
-              </View>
-              {routineId && routineName ? (
-                <View style={{ flex: 1 }}>
-                  <Button
-                    label={t('routines.update', { name: routineName })}
-                    variant="secondary"
-                    disabled={ids.length === 0}
-                    onPress={() => void updateExisting(ids)}
-                  />
-                </View>
-              ) : null}
-            </View>
+            {!routineId ? (
+              <Button
+                label={t('routines.saveAs')}
+                variant="secondary"
+                disabled={ids.length === 0}
+                onPress={() => void openSaveDialog(ids)}
+              />
+            ) : hasRoutineChanges(exerciseIds ?? [], ids) ? (
+              <Button
+                label={t('routines.saveChanges')}
+                variant="accent"
+                disabled={ids.length === 0}
+                onPress={() => void saveChanges(ids)}
+              />
+            ) : null}
             <Button
               label={t('routines.startWorkout')}
               disabled={ids.length === 0}
