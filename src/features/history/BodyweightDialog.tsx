@@ -79,7 +79,7 @@ export function BodyweightDialog(props: Props) {
         </View>
         <View style={{ flex: 1 }}>
           <Button
-            label={removing && currentKg !== null ? t('common.remove') : t('common.save')}
+            label={removing && currentKg !== null ? t('common.delete') : t('common.save')}
             onPress={submit}
             disabled={!canSave}
           />

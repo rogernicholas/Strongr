@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, View } from 'react-native';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Keyboard, Modal, View } from 'react-native';
 
 import { useTheme } from '@/core/theme';
 
@@ -17,6 +17,19 @@ interface Props {
 /** Themed popup card over a dark backdrop; shared by every dialog in the app. */
 export function ModalCard({ visible, title, message, onRequestClose, onShow, children }: Props) {
   const theme = useTheme();
+  // Modals don't resize for the keyboard on Android, so lift the card above it ourselves.
+  const [keyboard, setKeyboard] = useState(0);
+  useEffect(() => {
+    const show = Keyboard.addListener('keyboardDidShow', (e) =>
+      setKeyboard(e.endCoordinates.height),
+    );
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboard(0));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
   return (
     <Modal
       visible={visible}
@@ -26,12 +39,12 @@ export function ModalCard({ visible, title, message, onRequestClose, onShow, chi
       onRequestClose={onRequestClose}
       onShow={onShow}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      <View
         style={{
           flex: 1,
           justifyContent: 'center',
           padding: theme.spacing(6),
+          paddingBottom: theme.spacing(6) + keyboard,
           backgroundColor: theme.colors.backdrop,
         }}
       >
@@ -52,7 +65,7 @@ export function ModalCard({ visible, title, message, onRequestClose, onShow, chi
           </View>
           {children}
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }
