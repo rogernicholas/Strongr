@@ -24,11 +24,16 @@ export function LogWorkoutScreen({ route, navigation }: Props) {
       reloadToken={focusCount}
       onAddExercises={() => navigation.navigate('PickExercises', { addToWorkoutId: workoutId })}
       onFinished={(result) => {
-        ToastAndroid.show(
-          t(result === 'saved' ? 'logging.saved' : 'logging.discarded'),
-          ToastAndroid.SHORT,
-        );
-        navigation.popToTop();
+        if (result === 'discarded') {
+          ToastAndroid.show(t('logging.discarded'), ToastAndroid.SHORT);
+          navigation.popToTop();
+          return;
+        }
+        // Replace the history so Back from the summary goes Home, not into the finished workout.
+        navigation.reset({
+          index: 1,
+          routes: [{ name: 'Main' }, { name: 'WorkoutDone', params: { workoutId } }],
+        });
       }}
     />
   );

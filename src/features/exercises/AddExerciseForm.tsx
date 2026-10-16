@@ -38,7 +38,7 @@ export function AddExerciseForm({ initialName, onCreated, onCancel }: Props) {
       style={{
         gap: 12,
         padding: 16,
-        borderRadius: 14,
+        borderRadius: theme.radius.md,
         borderWidth: 1,
         borderColor: theme.colors.border,
         backgroundColor: theme.colors.surface,
@@ -53,16 +53,18 @@ export function AddExerciseForm({ initialName, onCreated, onCancel }: Props) {
         }}
         placeholder={t('exercises.namePlaceholder')}
         autoFocus
+        inset
       />
       <Chips<MuscleGroup>
         value={muscleGroup}
         onChange={setMuscleGroup}
+        inset
         options={MUSCLE_GROUPS.map((g) => ({ value: g, label: t(`muscleGroups.${g}`) }))}
       />
       {error ? <AppText style={{ color: theme.colors.danger }}>{error}</AppText> : null}
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <View style={{ flex: 1 }}>
-          <Button label={t('common.cancel')} variant="secondary" onPress={onCancel} />
+          <Button label={t('common.cancel')} variant="quiet" onPress={onCancel} />
         </View>
         <View style={{ flex: 1 }}>
           <Button

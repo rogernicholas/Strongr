@@ -20,8 +20,8 @@ describe('settingsRepository', () => {
   it('saves and reloads, keeping a single row', async () => {
     const { db, repo } = await setup();
     await repo.save({ ...defaultSettings, weightUnit: 'lb' });
-    await repo.save({ ...defaultSettings, weightUnit: 'lb', theme: 'dark' });
-    expect(await repo.load()).toMatchObject({ weightUnit: 'lb', theme: 'dark' });
+    await repo.save({ ...defaultSettings, weightUnit: 'lb', rpeEnabled: true });
+    expect(await repo.load()).toMatchObject({ weightUnit: 'lb', rpeEnabled: true });
     expect(await db.getAll('SELECT * FROM settings')).toHaveLength(1);
   });
 

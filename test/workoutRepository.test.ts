@@ -151,9 +151,55 @@ describe('workoutRepository history', () => {
     now = 9_000;
     await repo.start({ exerciseIds: [bench] }); // still running: not history
 
-    expect((await repo.listFinished()).map((w) => w.id)).toEqual([a, b]);
+    const listed = await repo.listFinished();
+    expect(listed.map((w) => w.id)).toEqual([a, b]);
+    // Each workout gets only its own exercises and sets.
+    expect(listed.map((w) => w.exercises[0]!.sets.map((s) => s.reps))).toEqual([[7], [8]]);
     expect((await repo.listFinished(2_000, 6_000)).map((w) => w.id)).toEqual([b]);
     await repo.remove(a);
     expect((await repo.listFinished()).map((w) => w.id)).toEqual([b]);
+  });
+});
+
+describe('workoutRepository stats queries', () => {
+  it('lists logged exercises and their sessions, ignoring unfinished and deleted workouts', async () => {
+    const { repo, id } = await setup();
+    const bench = id('Bench press');
+    const row = id('Row machine');
+
+    const log = async (exerciseId: string, sets: SetInput[]) => {
+      const workoutId = await repo.start({ exerciseIds: [exerciseId] });
+      const we = (await repo.get(workoutId))!.exercises[0]!.id;
+      for (const s of sets) await repo.addSet(we, s);
+      return workoutId;
+    };
+
+    const first = await log(bench, [set(50, 8), set(55, 5)]);
+    await repo.finish(first);
+    const second = await log(bench, [set(57.5, 5)]);
+    await repo.finish(second);
+    const deleted = await log(row, [set(40, 10)]);
+    await repo.finish(deleted);
+    await repo.remove(deleted);
+    await log(row, [set(45, 10)]); // still open
+
+    expect(await repo.countFinished()).toBe(2);
+    expect(await repo.loggedExercises()).toEqual([
+      expect.objectContaining({ exerciseId: bench, name: 'Bench press', sessions: 2 }),
+    ]);
+    const sessions = await repo.exerciseSessions(bench);
+    expect(sessions.map((s) => s.workoutId)).toEqual([first, second]);
+    expect(sessions[0]!.sets.map((s) => s.weightKg)).toEqual([50, 55]);
+  });
+
+  it('leaves out exercises that only have warm-up sets', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press'), id('Row machine')] });
+    const [bench, row] = (await repo.get(workoutId))!.exercises;
+    await repo.addSet(bench!.id, set(50, 5));
+    await repo.addSet(row!.id, set(20, 10, { isWarmup: true }));
+    await repo.finish(workoutId);
+
+    expect((await repo.loggedExercises()).map((e) => e.name)).toEqual(['Bench press']);
   });
 });

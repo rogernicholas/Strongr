@@ -1,26 +1,22 @@
 {
   "app": {
     "name": "Strongr",
+    "logo": "Strongr.",
     "loading": "Loading…",
     "startupError": "Strongr couldn't open its database.",
     "startupErrorDetail": "Your data has not been changed. Details: {{message}}"
   },
   "home": {
     "newWorkout": "New workout",
-    "routines": "Routines",
     "settings": "Settings",
     "about": "About",
     "resume": "Resume workout",
     "resumeHint": "You have a workout in progress.",
-    "history": "Calendar"
+    "myRoutines": "My routines"
   },
   "settings": {
     "title": "Settings",
-    "weightUnit": "Weight unit",
-    "theme": "Theme",
-    "themeSystem": "System",
-    "themeLight": "Light",
-    "themeDark": "Dark"
+    "weightUnit": "Weight unit"
   },
   "about": {
     "title": "About",
@@ -31,7 +27,8 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
-    "saveFailed": "Couldn't save. Please try again."
+    "saveFailed": "Couldn't save. Please try again.",
+    "ok": "OK"
   },
   "exercises": {
     "title": "Choose exercises",
@@ -58,13 +55,17 @@
     "saveTitle": "Save as routine",
     "namePlaceholder": "Routine name, e.g. A",
     "saveAs": "Save as routine",
-    "update": "Update routine {{name}}",
     "saved": "Routine {{name}} saved",
-    "empty": "No routines yet. Start a new workout, pick exercises, and save them as a routine.",
     "deleteTitle": "Delete routine {{name}}?",
     "deleteBody": "Your logged workouts are not affected.",
+    "startWorkout": "Start workout",
+    "title": "My routines",
+    "empty": "No routines yet. Tap New workout, pick exercises and save them as a routine.",
     "longPressHint": "Tap a routine to start from it. Long-press to delete.",
-    "startWorkout": "Start workout"
+    "useHint": "Loads this routine’s exercises.",
+    "selected": "Selected",
+    "tapToUse": "Tap to use",
+    "saveChanges": "Save changes"
   },
   "logging": {
     "title": "Workout",
@@ -86,22 +87,19 @@
     "finish": "Finish workout",
     "finishTitle": "Finish workout?",
     "finishBody": "It will be saved to your history. A workout with no sets is discarded.",
-    "saved": "Workout saved",
     "discarded": "Empty workout discarded",
     "addToWorkout": "Add to workout"
   },
   "history": {
-    "title": "Calendar",
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
     "restDay": "No workout this day.",
     "deleteTitle": "Delete this workout?",
     "deleteBody": "It will be removed from your calendar and exports.",
-    "longPressHint": "Long-press to delete"
-  },
-  "progress": {
-    "bodyweightThisWeek": "Bodyweight this week",
-    "bodyweightAdd": "Tap to add"
+    "longPressHint": "Long-press to delete",
+    "bodyweightTitle": "Bodyweight",
+    "weekOf": "Week of {{date}}",
+    "bodyweightRemoveHint": "Clear it or enter 0 to remove."
   },
   "backup": {
     "exportTxt": "Export all workouts (.txt)",
@@ -111,5 +109,54 @@
     "nothingTitle": "Nothing to export yet",
     "nothingBody": "Finish a workout first.",
     "failed": "Export failed. Please try again."
+  },
+  "stats": {
+    "title": "Stats",
+    "bodyweight": "Bodyweight",
+    "noBodyweight": "No entries yet. Add one per week in the calendar.",
+    "exercises": "Exercises",
+    "noExercises": "Finish a workout and your exercises show up here.",
+    "sessionsLast_one": "{{count}} session · last {{date}}",
+    "sessionsLast_other": "{{count}} sessions · last {{date}}",
+    "metric": "Graph shows",
+    "topSet": "Top set",
+    "range": "Time range",
+    "range3m": "3M",
+    "range1y": "1Y",
+    "rangeAll": "All",
+    "bestSet": "Best set",
+    "e1rm": "Est. 1RM",
+    "sessions": "Sessions",
+    "lastSession": "Last session",
+    "change4w": "4-week change",
+    "current": "Current",
+    "lowest": "Lowest",
+    "highest": "Highest",
+    "noChartData": "Nothing to graph in this time range.",
+    "chartLabel_one": "Graph with {{count}} point, latest {{latest}}",
+    "chartLabel_other": "Graph with {{count}} points, latest {{latest}}"
+  },
+  "done": {
+    "phrase1": "Good job!",
+    "phrase2": "Nailed it.",
+    "phrase3": "Stronger than yesterday.",
+    "phrase4": "That’s how it’s done.",
+    "phrase5": "Another one in the books.",
+    "phrase6": "Beast mode: complete.",
+    "phrase7": "You showed up. That counts.",
+    "phrase8": "Solid work today.",
+    "phrase9": "Gains loading…",
+    "phrase10": "Crushed it!",
+    "phrase11": "Consistency wins.",
+    "phrase12": "One step closer.",
+    "phrase13": "Strong work.",
+    "phrase14": "Proud of that one.",
+    "phrase15": "Rest up. You earned it.",
+    "duration": "Duration",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "exercises": "Exercises",
+    "sets": "Sets",
+    "button": "Done"
   }
 }

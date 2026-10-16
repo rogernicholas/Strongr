@@ -52,7 +52,7 @@ export function SetEditor(props: Props) {
   return (
     <View style={{ gap: 12 }}>
       {tracks.weight || tracks.reps ? (
-        <View style={{ flexDirection: 'row', gap: 12 }}>
+        <View style={{ gap: 8 }}>
           {tracks.weight ? (
             <NumberStepper
               label={unit}
@@ -68,7 +68,7 @@ export function SetEditor(props: Props) {
         </View>
       ) : null}
       {tracks.time || tracks.distance ? (
-        <View style={{ flexDirection: 'row', gap: 12 }}>
+        <View style={{ gap: 8 }}>
           {tracks.time ? (
             <NumberStepper
               label={t('logging.seconds')}
@@ -103,8 +103,8 @@ export function SetEditor(props: Props) {
             height: 24,
             borderRadius: 6,
             borderWidth: 2,
-            borderColor: isWarmup ? theme.colors.primary : theme.colors.border,
-            backgroundColor: isWarmup ? theme.colors.primary : 'transparent',
+            borderColor: isWarmup ? theme.colors.accent : theme.colors.subtle,
+            backgroundColor: isWarmup ? theme.colors.accent : 'transparent',
           }}
         />
         <AppText>{t('logging.warmup')}</AppText>
@@ -115,12 +115,12 @@ export function SetEditor(props: Props) {
         <View style={{ flexDirection: 'row', gap: 8 }}>
           {onCancel ? (
             <View style={{ flex: 1 }}>
-              <Button label={t('common.cancel')} variant="secondary" onPress={onCancel} />
+              <Button label={t('common.cancel')} variant="quiet" onPress={onCancel} />
             </View>
           ) : null}
           {onDelete ? (
             <View style={{ flex: 1 }}>
-              <Button label={t('logging.deleteSet')} variant="secondary" onPress={onDelete} />
+              <Button label={t('logging.deleteSet')} variant="quiet" onPress={onDelete} />
             </View>
           ) : null}
         </View>

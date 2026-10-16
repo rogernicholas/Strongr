@@ -3,15 +3,19 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useTranslation } from '@/core/i18n';
 import { useTheme } from '@/core/theme';
+import type { StatsTarget } from '@/features/progress';
 import { AboutScreen, SettingsScreen } from '@/features/settings';
 
-import { CalendarScreen } from './CalendarScreen';
-import { HomeScreen } from './HomeScreen';
 import { LogWorkoutScreen } from './LogWorkoutScreen';
+import { MainScreen } from './MainScreen';
 import { PickExercisesScreen } from './PickExercisesScreen';
+import { RoutinesScreen } from './RoutinesScreen';
+import { StatsDetailScreen } from './StatsDetailScreen';
+import { WorkoutDoneScreen } from './WorkoutDoneScreen';
 
 export type RootStackParamList = {
-  Home: undefined;
+  /** Pager with Home, Calendar and Stats. */
+  Main: undefined;
   PickExercises: {
     routineId?: string;
     routineName?: string;
@@ -20,7 +24,10 @@ export type RootStackParamList = {
     addToWorkoutId?: string;
   };
   LogWorkout: { workoutId: string; title?: string };
-  Calendar: undefined;
+  /** "Good job" summary after a saved workout. */
+  WorkoutDone: { workoutId: string };
+  Routines: undefined;
+  StatsDetail: { target: StatsTarget };
   Settings: undefined;
   About: undefined;
 };
@@ -39,15 +46,20 @@ export function RootNavigation() {
         colors: {
           ...base.colors,
           background: theme.colors.background,
-          card: theme.colors.surface,
+          card: theme.colors.background,
           text: theme.colors.text,
           border: theme.colors.border,
           primary: theme.colors.primary,
         },
       }}
     >
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Navigator
+        screenOptions={{
+          contentStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+        }}
+      >
+        <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen
           name="PickExercises"
           component={PickExercisesScreen}
@@ -63,9 +75,24 @@ export function RootNavigation() {
           options={({ route }) => ({ title: route.params.title ?? t('logging.title') })}
         />
         <Stack.Screen
-          name="Calendar"
-          component={CalendarScreen}
-          options={{ title: t('history.title') }}
+          name="WorkoutDone"
+          component={WorkoutDoneScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Routines"
+          component={RoutinesScreen}
+          options={{ title: t('routines.title') }}
+        />
+        <Stack.Screen
+          name="StatsDetail"
+          component={StatsDetailScreen}
+          options={({ route }) => ({
+            title:
+              route.params.target.kind === 'exercise'
+                ? route.params.target.name
+                : t('stats.bodyweight'),
+          })}
         />
         <Stack.Screen
           name="Settings"

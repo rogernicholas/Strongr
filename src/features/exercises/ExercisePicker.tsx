@@ -13,17 +13,32 @@ import { groupExercises } from './groupExercises';
 
 interface Props {
   initialSelectedIds?: readonly string[];
+  /** Change this to replace the selection with `initialSelectedIds` (e.g. a routine was picked). */
+  selectionKey?: string;
+  /** Shown above the search field, e.g. routine shortcuts. */
+  header?: ReactNode;
   /** Actions shown under the list; receives the selection in tap order. */
   renderFooter(selectedIds: string[]): ReactNode;
 }
 
 /** Choose exercises for today or for a routine. Order of selection is the workout order. */
-export function ExercisePicker({ initialSelectedIds = [], renderFooter }: Props) {
+export function ExercisePicker({
+  initialSelectedIds = [],
+  selectionKey,
+  header,
+  renderFooter,
+}: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
   const db = useDb();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selected, setSelected] = useState<string[]>([...initialSelectedIds]);
+  const [appliedKey, setAppliedKey] = useState(selectionKey);
+  // Reset during render (not in an effect) so the new selection shows without a flash.
+  if (selectionKey !== appliedKey) {
+    setAppliedKey(selectionKey);
+    setSelected([...initialSelectedIds]);
+  }
   const [query, setQuery] = useState('');
   const [adding, setAdding] = useState(false);
 
@@ -52,6 +67,7 @@ export function ExercisePicker({ initialSelectedIds = [], renderFooter }: Props)
       style={{ flex: 1, backgroundColor: theme.colors.background }}
     >
       <View style={{ padding: 16, gap: 12 }}>
+        {header}
         <TextField
           value={query}
           onChangeText={setQuery}
@@ -105,9 +121,9 @@ export function ExercisePicker({ initialSelectedIds = [], renderFooter }: Props)
                 gap: 12,
                 paddingHorizontal: 12,
                 marginBottom: 6,
-                borderRadius: 12,
+                borderRadius: theme.radius.md,
                 borderWidth: 1,
-                borderColor: isSelected ? theme.colors.primary : theme.colors.border,
+                borderColor: isSelected ? theme.colors.accent : theme.colors.border,
                 backgroundColor: theme.colors.surface,
               }}
             >
@@ -119,12 +135,12 @@ export function ExercisePicker({ initialSelectedIds = [], renderFooter }: Props)
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderWidth: 2,
-                  borderColor: isSelected ? theme.colors.primary : theme.colors.border,
-                  backgroundColor: isSelected ? theme.colors.primary : 'transparent',
+                  borderColor: isSelected ? theme.colors.accent : theme.colors.subtle,
+                  backgroundColor: isSelected ? theme.colors.accent : 'transparent',
                 }}
               >
                 {isSelected ? (
-                  <AppText style={{ color: theme.colors.onPrimary, fontWeight: '700' }}>
+                  <AppText style={{ color: theme.colors.onAccent, fontWeight: '700' }}>
                     {index + 1}
                   </AppText>
                 ) : null}

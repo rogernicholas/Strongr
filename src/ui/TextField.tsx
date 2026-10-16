@@ -1,8 +1,9 @@
 import { TextInput, type TextInputProps } from 'react-native';
 
-import { useTheme } from '@/core/theme';
+import { fonts, useTheme } from '@/core/theme';
 
-export function TextField({ style, ...rest }: TextInputProps) {
+/** `inset` is for fields placed on a navy card or dialog: they take the dark page colour. */
+export function TextField({ style, inset, ...rest }: TextInputProps & { inset?: boolean }) {
   const theme = useTheme();
   return (
     <TextInput
@@ -10,14 +11,15 @@ export function TextField({ style, ...rest }: TextInputProps) {
       {...rest}
       style={[
         {
-          minHeight: theme.minTouch,
+          minHeight: theme.buttonHeight,
           borderWidth: 1,
-          borderRadius: 12,
+          borderRadius: theme.radius.md,
           paddingHorizontal: 12,
           fontSize: 16,
+          fontFamily: fonts.regular,
           color: theme.colors.text,
           borderColor: theme.colors.border,
-          backgroundColor: theme.colors.surface,
+          backgroundColor: inset ? theme.colors.background : theme.colors.surface,
         },
         style,
       ]}

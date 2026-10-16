@@ -1,11 +1,8 @@
 import type { WeightUnit } from '@/core/units';
 
-export type ThemePreference = 'system' | 'light' | 'dark';
-
 /** Every user-facing option, in one object. */
 export interface Settings {
   weightUnit: WeightUnit;
-  theme: ThemePreference;
   rpeEnabled: boolean;
   restTimerEnabled: boolean;
   plateCalculatorEnabled: boolean;
@@ -14,7 +11,6 @@ export interface Settings {
 
 export const defaultSettings: Settings = {
   weightUnit: 'kg',
-  theme: 'system',
   rpeEnabled: false,
   restTimerEnabled: false,
   plateCalculatorEnabled: false,

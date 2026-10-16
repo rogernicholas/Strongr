@@ -89,7 +89,7 @@ Create these interfaces in `core/` with no-op implementations, and make all feat
 
 ## Settings and feature flags
 
-- All user-facing options live in one settings object: units, theme (light/dark/system), RPE on/off, rest timer on/off, plate calculator on/off, social on/off.
+- All user-facing options live in one settings object: units, RPE on/off, rest timer on/off, plate calculator on/off, social on/off.
 - All feature flags live in one config object.
 - Ship the app with an About screen showing the version number.
 
@@ -221,4 +221,15 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-15: Bodyweight is a weekly input, not per workout.
 - 2026-10-15: RPE off by default; rest timer off by default. Both toggle in Settings.
 - 2026-10-15: No import of old paper notes; start fresh.
+- 2026-10-16: Look: logo "Strongr." in Changa One; all other text Noto Sans (bundled via @expo-google-fonts). Brand colours red #F61C24 (main actions), teal #41D2EF (highlights), black #03020C, navy #1D2180; background a darker navy.
+- 2026-10-16: Night theme only for now; the light/system theme setting is removed.
+- 2026-10-16: Layout: three swipeable pages, Home -> Calendar -> Stats, with page dots. Home is just New workout (or Resume), with Settings and About as small links at the bottom. A My routines button sits under New workout.
+- 2026-10-16: Calendar page: small Export link underneath; each week row has a bodyweight cell (tap to add or edit that week).
+- 2026-10-16: Stats page: bodyweight pinned first, then logged exercises. Exercise graph: heaviest working set per session (warm-ups excluded), toggle to estimated 1RM (Epley). Stats: best set, e1RM, sessions, last session, 4-week change. Bodyweight: current, lowest, highest, 4-week change. Ranges 3M / 1Y / All. Charts drawn with react-native-svg.
+- 2026-10-16: Colours harmonized around one blue hue: background #0C0C1D, navy surfaces #11135A (raised #1F226B), muted text #ABAED9, red #EB424B, teal #2AB1CF, plus dim red/teal for disabled states. No borders. All dialogs use the themed ModalCard, not native alerts.
+- 2026-10-16: A "good job" screen follows every saved workout, rotating through 15 phrases.
+- 2026-10-16: New workout shows routines as swipeable cards. With a routine selected there is no Save as / Update routine; a "Save changes" button appears above Start workout only when the exercises differ from the routine.
+- 2026-10-16: Logging: weight and reps each get a full-width row with small borderless +/- buttons.
+- 2026-10-16: A week's bodyweight is removed by saving it empty or as 0 (button reads Delete).
+- 2026-10-16: Popups with a text field open in the upper part of the screen, clear of the keyboard; taps work on the first try while the keyboard is open.
 - Open: scoreboard metric and caps, sign-in method.

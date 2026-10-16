@@ -8,10 +8,12 @@ interface Props<T extends string> {
   options: readonly { value: T; label: string }[];
   value: T | null;
   onChange(value: T): void;
+  /** For chips on a navy card: unselected ones take the dark page colour. */
+  inset?: boolean;
 }
 
 /** Wrapping single-choice chips, for when a segmented control would be too cramped. */
-export function Chips<T extends string>({ options, value, onChange }: Props<T>) {
+export function Chips<T extends string>({ options, value, onChange, inset }: Props<T>) {
   const theme = useTheme();
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -26,14 +28,18 @@ export function Chips<T extends string>({ options, value, onChange }: Props<T>) 
             style={{
               minHeight: 40,
               paddingHorizontal: 14,
-              borderRadius: 20,
+              borderRadius: theme.radius.pill,
               borderWidth: 1,
               justifyContent: 'center',
-              borderColor: selected ? theme.colors.primary : theme.colors.border,
-              backgroundColor: selected ? theme.colors.primary : theme.colors.surface,
+              borderColor: selected ? theme.colors.accent : theme.colors.border,
+              backgroundColor: selected
+                ? theme.colors.accent
+                : inset
+                  ? theme.colors.background
+                  : theme.colors.surface,
             }}
           >
-            <AppText style={{ color: selected ? theme.colors.onPrimary : theme.colors.text }}>
+            <AppText style={{ color: selected ? theme.colors.onAccent : theme.colors.text }}>
               {option.label}
             </AppText>
           </Pressable>

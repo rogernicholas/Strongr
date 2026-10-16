@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 
 import { useDb } from '@/core/db';
 import { useTranslation } from '@/core/i18n';
 import { createExerciseRepository, createRoutineRepository, type Routine } from '@/data';
-import { AppText, Card } from '@/ui';
+import { AppText, Card, useDialog } from '@/ui';
 
 interface Props {
   onSelect(routine: Routine): void;
@@ -15,6 +15,7 @@ interface Props {
 export function RoutineList({ onSelect, reloadToken }: Props) {
   const { t } = useTranslation();
   const db = useDb();
+  const dialog = useDialog();
   const [routines, setRoutines] = useState<Routine[] | null>(null);
   const [names, setNames] = useState<Map<string, string>>(new Map());
 
@@ -33,19 +34,17 @@ export function RoutineList({ onSelect, reloadToken }: Props) {
     };
   }, [db, reloadToken]);
 
-  function confirmDelete(routine: Routine) {
-    Alert.alert(t('routines.deleteTitle', { name: routine.name }), t('routines.deleteBody'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('common.delete'),
-        style: 'destructive',
-        onPress: () => {
-          void createRoutineRepository(db)
-            .remove(routine.id)
-            .then(() => setRoutines((cur) => cur?.filter((r) => r.id !== routine.id) ?? null));
-        },
-      },
-    ]);
+  async function confirmDelete(routine: Routine) {
+    const ok = await dialog({
+      title: t('routines.deleteTitle', { name: routine.name }),
+      message: t('routines.deleteBody'),
+      confirmLabel: t('common.delete'),
+      cancelLabel: t('common.cancel'),
+      destructive: true,
+    });
+    if (!ok) return;
+    await createRoutineRepository(db).remove(routine.id);
+    setRoutines((cur) => cur?.filter((r) => r.id !== routine.id) ?? null);
   }
 
   if (!routines) return null;
@@ -59,10 +58,10 @@ export function RoutineList({ onSelect, reloadToken }: Props) {
         <Card
           key={routine.id}
           onPress={() => onSelect(routine)}
-          onLongPress={() => confirmDelete(routine)}
+          onLongPress={() => void confirmDelete(routine)}
           accessibilityLabel={routine.name}
         >
-          <AppText style={{ fontSize: 18, fontWeight: '600' }}>{routine.name}</AppText>
+          <AppText variant="heading">{routine.name}</AppText>
           <AppText variant="muted" numberOfLines={2}>
             {routine.exerciseIds.map((id) => names.get(id)).join(' · ')}
           </AppText>

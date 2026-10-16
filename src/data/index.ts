@@ -9,6 +9,8 @@ export { createRoutineRepository, type Routine, type RoutineRepository } from '.
 export { createSettingsRepository, type SettingsRepository } from './settingsRepository';
 export {
   createWorkoutRepository,
+  type ExerciseSession,
+  type LoggedExercise,
   type LoggedSet,
   type SetInput,
   type Workout,

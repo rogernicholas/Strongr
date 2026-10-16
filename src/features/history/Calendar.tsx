@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Pressable, View } from 'react-native';
 
 import {
   formatLongDate,
@@ -8,14 +8,18 @@ import {
   monthGrid,
   monthRange,
   parseDateKey,
+  weekStartKey,
 } from '@/core/dates';
 import { useDb } from '@/core/db';
 import { formatSetShort } from '@/core/format';
 import { useTranslation } from '@/core/i18n';
 import { useSettings } from '@/core/settings';
 import { useTheme } from '@/core/theme';
-import { createWorkoutRepository, type Workout } from '@/data';
-import { AppText, Card, Screen } from '@/ui';
+import { formatNumber, fromDisplayWeight, toDisplayWeight } from '@/core/units';
+import { createBodyweightRepository, createWorkoutRepository, type Workout } from '@/data';
+import { AppText, Card, Screen, useDialog } from '@/ui';
+
+import { BodyweightDialog } from './BodyweightDialog';
 
 /** Monday-first short weekday names, e.g. ["Mon", …, "Sun"]. */
 function weekdayNames(language: string): string[] {
@@ -23,16 +27,44 @@ function weekdayNames(language: string): string[] {
   return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2026, 9, 12 + i)));
 }
 
-export function Calendar() {
+interface Props {
+  /** Shown under the day's workouts, e.g. the export link. */
+  footer?: ReactNode;
+  /** Change this to reload, e.g. when the screen regains focus. */
+  reloadToken?: number;
+  /** Pad for the status bar; for use without a header. */
+  top?: boolean;
+  /** Called after a workout or bodyweight was changed here, so other pages can refresh. */
+  onChanged?(): void;
+}
+
+const WEEK_CELL = 48;
+
+export function Calendar({ footer, reloadToken, top, onChanged }: Props) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const dialog = useDialog();
   const db = useDb();
   const { settings } = useSettings();
   const today = new Date();
   const [month, setMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selected, setSelected] = useState(localDateKey(today));
+  // The calendar stays mounted in the pager; jump back to today once the date rolls over.
+  const [openedOn, setOpenedOn] = useState(localDateKey(today));
+  if (localDateKey(today) !== openedOn) {
+    setOpenedOn(localDateKey(today));
+    setMonth({ year: today.getFullYear(), month: today.getMonth() });
+    setSelected(localDateKey(today));
+  }
+  const weekdays = useMemo(() => weekdayNames(i18n.language), [i18n.language]);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [version, setVersion] = useState(0);
+  const [bodyweightVersion, setBodyweightVersion] = useState(0);
+  const [bodyweights, setBodyweights] = useState<Map<string, number>>(new Map());
+  const [editingWeek, setEditingWeek] = useState<string | null>(null);
+  // Bumped on open so the dialog remounts with fresh text but still fades out on close.
+  const [dialogKey, setDialogKey] = useState(0);
+  const unit = settings.weightUnit;
 
   useEffect(() => {
     let active = true;
@@ -43,7 +75,31 @@ export function Calendar() {
     return () => {
       active = false;
     };
-  }, [db, month, version]);
+  }, [db, month, version, reloadToken]);
+
+  useEffect(() => {
+    let active = true;
+    void createBodyweightRepository(db)
+      .list()
+      .then(
+        (list) => active && setBodyweights(new Map(list.map((b) => [b.weekStart, b.weightKg]))),
+      );
+    return () => {
+      active = false;
+    };
+  }, [db, bodyweightVersion, reloadToken]);
+
+  async function changeBodyweight(change: (week: string) => Promise<unknown>) {
+    if (!editingWeek) return;
+    try {
+      await change(editingWeek);
+      setEditingWeek(null);
+      setBodyweightVersion((v) => v + 1);
+      onChanged?.();
+    } catch {
+      await dialog({ title: t('common.saveFailed'), confirmLabel: t('common.ok') });
+    }
+  }
 
   const byDay = useMemo(() => {
     const map = new Map<string, Workout[]>();
@@ -60,18 +116,18 @@ export function Calendar() {
       return { year: d.getFullYear(), month: d.getMonth() };
     });
 
-  function confirmDelete(workout: Workout) {
-    Alert.alert(t('history.deleteTitle'), t('history.deleteBody'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('common.delete'),
-        style: 'destructive',
-        onPress: () =>
-          void createWorkoutRepository(db)
-            .remove(workout.id)
-            .then(() => setVersion((v) => v + 1)),
-      },
-    ]);
+  async function confirmDelete(workout: Workout) {
+    const ok = await dialog({
+      title: t('history.deleteTitle'),
+      message: t('history.deleteBody'),
+      confirmLabel: t('common.delete'),
+      cancelLabel: t('common.cancel'),
+      destructive: true,
+    });
+    if (!ok) return;
+    await createWorkoutRepository(db).remove(workout.id);
+    setVersion((v) => v + 1);
+    onChanged?.();
   }
 
   const todayKey = localDateKey(today);
@@ -87,11 +143,49 @@ export function Calendar() {
     </Pressable>
   );
 
+  function weekCell(week: (Date | null)[]) {
+    const firstDay = week.find((d): d is Date => d !== null);
+    if (!firstDay) return <View style={{ width: WEEK_CELL }} />;
+    const weekStart = weekStartKey(firstDay);
+    const kg = bodyweights.get(weekStart);
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('history.bodyweightTitle')}
+        onPress={() => {
+          setDialogKey((k) => k + 1);
+          setEditingWeek(weekStart);
+        }}
+        style={({ pressed }) => ({
+          width: WEEK_CELL,
+          height: 40,
+          marginLeft: 4,
+          borderRadius: theme.radius.sm,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderWidth: 1,
+          borderColor: theme.colors.border,
+          backgroundColor: theme.colors.surface,
+          opacity: pressed ? 0.6 : 1,
+        })}
+      >
+        <AppText
+          style={{
+            fontSize: 13,
+            color: kg === undefined ? theme.colors.textMuted : theme.colors.text,
+          }}
+        >
+          {kg === undefined ? '+' : formatNumber(toDisplayWeight(kg, unit), 1)}
+        </AppText>
+      </Pressable>
+    );
+  }
+
   return (
-    <Screen>
+    <Screen top={top}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         {arrow(-1, t('history.previousMonth'))}
-        <AppText style={{ fontSize: 18, fontWeight: '600' }}>
+        <AppText variant="heading">
           {formatMonth(new Date(month.year, month.month, 1), i18n.language)}
         </AppText>
         {arrow(1, t('history.nextMonth'))}
@@ -99,14 +193,17 @@ export function Calendar() {
 
       <View>
         <View style={{ flexDirection: 'row' }}>
-          {weekdayNames(i18n.language).map((name) => (
+          {weekdays.map((name) => (
             <AppText key={name} variant="label" style={{ flex: 1, textAlign: 'center' }}>
               {name}
             </AppText>
           ))}
+          <AppText variant="label" style={{ width: WEEK_CELL, textAlign: 'center' }}>
+            {unit}
+          </AppText>
         </View>
         {monthGrid(month.year, month.month).map((week, wi) => (
-          <View key={wi} style={{ flexDirection: 'row' }}>
+          <View key={wi} style={{ flexDirection: 'row', alignItems: 'center' }}>
             {week.map((day, di) => {
               if (!day) return <View key={di} style={{ flex: 1, height: 48 }} />;
               const key = localDateKey(day);
@@ -123,16 +220,16 @@ export function Calendar() {
                     flex: 1,
                     height: 48,
                     margin: 1,
-                    borderRadius: 10,
+                    borderRadius: theme.radius.sm,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: isSelected ? theme.colors.primary : 'transparent',
+                    backgroundColor: isSelected ? theme.colors.accent : 'transparent',
                     borderWidth: key === todayKey ? 1 : 0,
-                    borderColor: theme.colors.primary,
+                    borderColor: theme.colors.accent,
                   }}
                 >
                   <AppText
-                    style={{ color: isSelected ? theme.colors.onPrimary : theme.colors.text }}
+                    style={{ color: isSelected ? theme.colors.onAccent : theme.colors.text }}
                   >
                     {day.getDate()}
                   </AppText>
@@ -144,14 +241,15 @@ export function Calendar() {
                       marginTop: 2,
                       backgroundColor: hasWorkout
                         ? isSelected
-                          ? theme.colors.onPrimary
-                          : theme.colors.primary
+                          ? theme.colors.onAccent
+                          : theme.colors.accent
                         : 'transparent',
                     }}
                   />
                 </Pressable>
               );
             })}
+            {weekCell(week)}
           </View>
         ))}
       </View>
@@ -163,23 +261,37 @@ export function Calendar() {
         <AppText variant="muted">{t('history.restDay')}</AppText>
       ) : (
         dayWorkouts.map((workout) => (
-          <Card key={workout.id} onLongPress={() => confirmDelete(workout)}>
-            {workout.name ? (
-              <AppText style={{ fontSize: 18, fontWeight: '600' }}>{workout.name}</AppText>
-            ) : null}
+          <Card key={workout.id} onLongPress={() => void confirmDelete(workout)}>
+            {workout.name ? <AppText variant="heading">{workout.name}</AppText> : null}
             {workout.exercises
               .filter((e) => e.sets.length > 0)
               .map((e) => (
                 <AppText key={e.id}>
                   <AppText style={{ fontWeight: '600' }}>{e.exerciseName}</AppText>
                   {'  '}
-                  {e.sets.map((s) => formatSetShort(s, settings.weightUnit)).join(', ')}
+                  {e.sets.map((s) => formatSetShort(s, unit)).join(', ')}
                 </AppText>
               ))}
             <AppText variant="muted">{t('history.longPressHint')}</AppText>
           </Card>
         ))
       )}
+      {footer}
+      <BodyweightDialog
+        key={dialogKey}
+        weekStart={editingWeek}
+        currentKg={editingWeek ? (bodyweights.get(editingWeek) ?? null) : null}
+        unit={unit}
+        onSave={(value) =>
+          void changeBodyweight((week) =>
+            createBodyweightRepository(db).set(week, fromDisplayWeight(value, unit)),
+          )
+        }
+        onRemove={() =>
+          void changeBodyweight((week) => createBodyweightRepository(db).remove(week))
+        }
+        onCancel={() => setEditingWeek(null)}
+      />
     </Screen>
   );
 }

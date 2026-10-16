@@ -1,6 +1,6 @@
 import { Pressable, TextInput, View } from 'react-native';
 
-import { useTheme } from '@/core/theme';
+import { fonts, useTheme } from '@/core/theme';
 
 import { AppText } from './AppText';
 
@@ -18,7 +18,7 @@ function bump(text: string, delta: number): string {
   return String(Math.round(next * 100) / 100);
 }
 
-/** Big −/+ buttons around a numeric field, sized for mid-workout thumbs. */
+/** One row: label, then −, a wide numeric field and +. The field gets most of the width. */
 export function NumberStepper({ label, value, onChangeText, step, decimals = false }: Props) {
   const theme = useTheme();
   const button = (sign: -1 | 1) => (
@@ -26,50 +26,47 @@ export function NumberStepper({ label, value, onChangeText, step, decimals = fal
       accessibilityRole="button"
       accessibilityLabel={`${sign < 0 ? '−' : '+'}${step} ${label}`}
       onPress={() => onChangeText(bump(value, sign * step))}
+      hitSlop={6}
       style={({ pressed }) => ({
-        width: 56,
-        height: 56,
-        borderRadius: 14,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: theme.colors.background,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
         opacity: pressed ? 0.6 : 1,
       })}
     >
-      <AppText style={{ fontSize: 26, fontWeight: '600' }}>{sign < 0 ? '−' : '+'}</AppText>
+      <AppText style={{ fontSize: 22, color: theme.colors.accent }}>{sign < 0 ? '−' : '+'}</AppText>
     </Pressable>
   );
 
   return (
-    <View style={{ flex: 1, gap: 4 }}>
-      <AppText variant="label" style={{ textAlign: 'center' }}>
-        {label}
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+      <AppText variant="label" style={{ width: 52 }}>
+        {label.toUpperCase()}
       </AppText>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        {button(-1)}
-        <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          keyboardType={decimals ? 'decimal-pad' : 'number-pad'}
-          selectTextOnFocus
-          accessibilityLabel={label}
-          style={{
-            flex: 1,
-            height: 56,
-            textAlign: 'center',
-            fontSize: 24,
-            fontWeight: '700',
-            borderRadius: 14,
-            borderWidth: 1,
-            color: theme.colors.text,
-            borderColor: theme.colors.border,
-            backgroundColor: theme.colors.surface,
-          }}
-        />
-        {button(1)}
-      </View>
+      {button(-1)}
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={decimals ? 'decimal-pad' : 'number-pad'}
+        selectTextOnFocus
+        accessibilityLabel={label}
+        style={{
+          flex: 1,
+          height: 52,
+          paddingVertical: 0,
+          paddingHorizontal: 4,
+          textAlign: 'center',
+          fontSize: 26,
+          fontFamily: fonts.bold,
+          borderBottomWidth: 2,
+          color: theme.colors.text,
+          borderColor: theme.colors.subtle,
+        }}
+      />
+      {button(1)}
     </View>
   );
 }
