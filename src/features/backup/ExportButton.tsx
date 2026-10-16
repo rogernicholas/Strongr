@@ -7,7 +7,7 @@ import { useTranslation } from '@/core/i18n';
 import { track } from '@/core/services';
 import { useSettings } from '@/core/settings';
 import { createBodyweightRepository, createWorkoutRepository } from '@/data';
-import { Button } from '@/ui';
+import { LinkButton } from '@/ui';
 
 import { buildTxtExport } from './buildTxtExport';
 import { shareTextFile } from './exportTxt';
@@ -49,11 +49,6 @@ export function ExportButton() {
   }
 
   return (
-    <Button
-      label={t('backup.exportTxt')}
-      variant="secondary"
-      disabled={busy}
-      onPress={() => void exportAll()}
-    />
+    <LinkButton label={t('backup.exportTxt')} disabled={busy} onPress={() => void exportAll()} />
   );
 }

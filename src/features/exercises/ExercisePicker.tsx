@@ -13,12 +13,14 @@ import { groupExercises } from './groupExercises';
 
 interface Props {
   initialSelectedIds?: readonly string[];
+  /** Shown above the search field, e.g. routine shortcuts. */
+  header?: ReactNode;
   /** Actions shown under the list; receives the selection in tap order. */
   renderFooter(selectedIds: string[]): ReactNode;
 }
 
 /** Choose exercises for today or for a routine. Order of selection is the workout order. */
-export function ExercisePicker({ initialSelectedIds = [], renderFooter }: Props) {
+export function ExercisePicker({ initialSelectedIds = [], header, renderFooter }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
   const db = useDb();
@@ -52,6 +54,7 @@ export function ExercisePicker({ initialSelectedIds = [], renderFooter }: Props)
       style={{ flex: 1, backgroundColor: theme.colors.background }}
     >
       <View style={{ padding: 16, gap: 12 }}>
+        {header}
         <TextField
           value={query}
           onChangeText={setQuery}

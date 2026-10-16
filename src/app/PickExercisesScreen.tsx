@@ -6,7 +6,7 @@ import { useDb } from '@/core/db';
 import { useTranslation } from '@/core/i18n';
 import { createRoutineRepository, createWorkoutRepository } from '@/data';
 import { ExercisePicker } from '@/features/exercises';
-import { SaveRoutineDialog, suggestRoutineName } from '@/features/templates';
+import { RoutineChips, SaveRoutineDialog, suggestRoutineName } from '@/features/templates';
 import { Button } from '@/ui';
 
 import type { RootStackParamList } from './navigation';
@@ -74,7 +74,22 @@ export function PickExercisesScreen({ route, navigation }: Props) {
   return (
     <>
       <ExercisePicker
+        // Remount when a routine is picked so its exercises become the selection.
+        key={routineId ?? 'new'}
         initialSelectedIds={exerciseIds}
+        header={
+          <RoutineChips
+            selectedId={routineId}
+            reloadToken={routineId}
+            onSelect={(routine) =>
+              navigation.setParams({
+                routineId: routine.id,
+                routineName: routine.name,
+                exerciseIds: routine.exerciseIds,
+              })
+            }
+          />
+        }
         renderFooter={(ids) => (
           <View style={{ gap: 8 }}>
             <View style={{ flexDirection: 'row', gap: 8 }}>

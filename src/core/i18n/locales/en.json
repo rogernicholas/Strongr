@@ -8,12 +8,10 @@
   },
   "home": {
     "newWorkout": "New workout",
-    "routines": "Routines",
     "settings": "Settings",
     "about": "About",
     "resume": "Resume workout",
-    "resumeHint": "You have a workout in progress.",
-    "history": "Calendar"
+    "resumeHint": "You have a workout in progress."
   },
   "settings": {
     "title": "Settings",
@@ -57,11 +55,11 @@
     "saveAs": "Save as routine",
     "update": "Update routine {{name}}",
     "saved": "Routine {{name}} saved",
-    "empty": "No routines yet. Start a new workout, pick exercises, and save them as a routine.",
     "deleteTitle": "Delete routine {{name}}?",
     "deleteBody": "Your logged workouts are not affected.",
-    "longPressHint": "Tap a routine to start from it. Long-press to delete.",
-    "startWorkout": "Start workout"
+    "startWorkout": "Start workout",
+    "chipsLabel": "Saved routines",
+    "chipHint": "Tap to load its exercises. Long-press to delete."
   },
   "logging": {
     "title": "Workout",
@@ -94,11 +92,9 @@
     "restDay": "No workout this day.",
     "deleteTitle": "Delete this workout?",
     "deleteBody": "It will be removed from your calendar and exports.",
-    "longPressHint": "Long-press to delete"
-  },
-  "progress": {
-    "bodyweightThisWeek": "Bodyweight this week",
-    "bodyweightAdd": "Tap to add"
+    "longPressHint": "Long-press to delete",
+    "bodyweightTitle": "Bodyweight",
+    "weekOf": "Week of {{date}}"
   },
   "backup": {
     "exportTxt": "Export all workouts (.txt)",
@@ -108,5 +104,8 @@
     "nothingTitle": "Nothing to export yet",
     "nothingBody": "Finish a workout first.",
     "failed": "Export failed. Please try again."
+  },
+  "stats": {
+    "title": "Stats"
   }
 }

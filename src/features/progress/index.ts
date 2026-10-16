@@ -1,1 +1,1 @@
-export { WeeklyBodyweight } from './WeeklyBodyweight';
+export {};

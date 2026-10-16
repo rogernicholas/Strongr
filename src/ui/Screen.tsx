@@ -1,16 +1,20 @@
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/core/theme';
 
-export function Screen({ children }: { children: ReactNode }) {
+interface Props {
+  children: ReactNode;
+  /** Pad for the status bar too; for pages shown without a header. */
+  top?: boolean;
+}
+
+export function Screen({ children, top = false }: Props) {
   const theme = useTheme();
+  const edges: Edge[] = top ? ['top', 'bottom', 'left', 'right'] : ['bottom', 'left', 'right'];
   return (
-    <SafeAreaView
-      edges={['bottom', 'left', 'right']}
-      style={[styles.root, { backgroundColor: theme.colors.background }]}
-    >
+    <SafeAreaView edges={edges} style={[styles.root, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={{ padding: theme.spacing(4), gap: theme.spacing(3) }}>
         {children}
       </ScrollView>

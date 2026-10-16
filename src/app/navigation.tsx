@@ -5,13 +5,13 @@ import { useTranslation } from '@/core/i18n';
 import { useTheme } from '@/core/theme';
 import { AboutScreen, SettingsScreen } from '@/features/settings';
 
-import { CalendarScreen } from './CalendarScreen';
-import { HomeScreen } from './HomeScreen';
 import { LogWorkoutScreen } from './LogWorkoutScreen';
+import { MainScreen } from './MainScreen';
 import { PickExercisesScreen } from './PickExercisesScreen';
 
 export type RootStackParamList = {
-  Home: undefined;
+  /** Pager with Home, Calendar and Stats. */
+  Main: undefined;
   PickExercises: {
     routineId?: string;
     routineName?: string;
@@ -20,7 +20,6 @@ export type RootStackParamList = {
     addToWorkoutId?: string;
   };
   LogWorkout: { workoutId: string; title?: string };
-  Calendar: undefined;
   Settings: undefined;
   About: undefined;
 };
@@ -47,7 +46,7 @@ export function RootNavigation() {
       }}
     >
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen
           name="PickExercises"
           component={PickExercisesScreen}
@@ -61,11 +60,6 @@ export function RootNavigation() {
           name="LogWorkout"
           component={LogWorkoutScreen}
           options={({ route }) => ({ title: route.params.title ?? t('logging.title') })}
-        />
-        <Stack.Screen
-          name="Calendar"
-          component={CalendarScreen}
-          options={{ title: t('history.title') }}
         />
         <Stack.Screen
           name="Settings"
