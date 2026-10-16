@@ -52,7 +52,7 @@ export function SetEditor(props: Props) {
   return (
     <View style={{ gap: 12 }}>
       {tracks.weight || tracks.reps ? (
-        <View style={{ flexDirection: 'row', gap: 12 }}>
+        <View style={{ gap: 8 }}>
           {tracks.weight ? (
             <NumberStepper
               label={unit}
@@ -68,7 +68,7 @@ export function SetEditor(props: Props) {
         </View>
       ) : null}
       {tracks.time || tracks.distance ? (
-        <View style={{ flexDirection: 'row', gap: 12 }}>
+        <View style={{ gap: 8 }}>
           {tracks.time ? (
             <NumberStepper
               label={t('logging.seconds')}
