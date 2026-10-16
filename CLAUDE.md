@@ -64,6 +64,7 @@ src/
 - The database is reached through the small `Db` interface in `src/core/db/types.ts`. The app uses an expo-sqlite adapter; tests use Node's built-in `node:sqlite` (`test/helpers/nodeDb.ts`), so migrations and repositories are tested against real SQLite. Requires Node 22.13+.
 - Timestamps are epoch milliseconds (UTC) in INTEGER columns. Workouts also store the device timezone.
 - Adding migration N: add `src/core/db/migrations/00N_name.ts`, append it to the list in `migrations/index.ts`, and add `test/migrations/fixtures/vN.ts` with sample data. The tests fail until the fixture exists.
+- Installable APK: `npx eas-cli build -p android --profile preview` (config in `eas.json`; the build runs in Expo's cloud under Roger's Expo account, so it runs on his PC after he has signed in with `npx eas-cli login` himself). Bump `version` and `android.versionCode` in `app.json` for each build that is shared.
 - Migration 001 has not shipped in an APK yet, so it may still be edited until the first APK (Phase 3). After that, forward-only.
 
 ## Data rules (cheap now, expensive later)
