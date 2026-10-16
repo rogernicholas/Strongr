@@ -2,6 +2,7 @@ export { AppText } from './AppText';
 export { Button } from './Button';
 export { Card } from './Card';
 export { Chips } from './Chips';
+export { LineChart } from './LineChart';
 export { LinkButton } from './LinkButton';
 export { NumberStepper } from './NumberStepper';
 export { PageDots } from './PageDots';

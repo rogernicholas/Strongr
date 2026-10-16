@@ -3,11 +3,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useTranslation } from '@/core/i18n';
 import { useTheme } from '@/core/theme';
+import type { StatsTarget } from '@/features/progress';
 import { AboutScreen, SettingsScreen } from '@/features/settings';
 
 import { LogWorkoutScreen } from './LogWorkoutScreen';
 import { MainScreen } from './MainScreen';
 import { PickExercisesScreen } from './PickExercisesScreen';
+import { StatsDetailScreen } from './StatsDetailScreen';
 
 export type RootStackParamList = {
   /** Pager with Home, Calendar and Stats. */
@@ -20,6 +22,7 @@ export type RootStackParamList = {
     addToWorkoutId?: string;
   };
   LogWorkout: { workoutId: string; title?: string };
+  StatsDetail: { target: StatsTarget };
   Settings: undefined;
   About: undefined;
 };
@@ -60,6 +63,16 @@ export function RootNavigation() {
           name="LogWorkout"
           component={LogWorkoutScreen}
           options={({ route }) => ({ title: route.params.title ?? t('logging.title') })}
+        />
+        <Stack.Screen
+          name="StatsDetail"
+          component={StatsDetailScreen}
+          options={({ route }) => ({
+            title:
+              route.params.target.kind === 'exercise'
+                ? route.params.target.name
+                : t('stats.bodyweight'),
+          })}
         />
         <Stack.Screen
           name="Settings"

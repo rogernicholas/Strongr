@@ -157,3 +157,34 @@ describe('workoutRepository history', () => {
     expect((await repo.listFinished()).map((w) => w.id)).toEqual([b]);
   });
 });
+
+describe('workoutRepository stats queries', () => {
+  it('lists logged exercises and their sessions, ignoring unfinished and deleted workouts', async () => {
+    const { repo, id } = await setup();
+    const bench = id('Bench press');
+    const row = id('Row machine');
+
+    const log = async (exerciseId: string, sets: SetInput[]) => {
+      const workoutId = await repo.start({ exerciseIds: [exerciseId] });
+      const we = (await repo.get(workoutId))!.exercises[0]!.id;
+      for (const s of sets) await repo.addSet(we, s);
+      return workoutId;
+    };
+
+    const first = await log(bench, [set(50, 8), set(55, 5)]);
+    await repo.finish(first);
+    const second = await log(bench, [set(57.5, 5)]);
+    await repo.finish(second);
+    const deleted = await log(row, [set(40, 10)]);
+    await repo.finish(deleted);
+    await repo.remove(deleted);
+    await log(row, [set(45, 10)]); // still open
+
+    expect(await repo.loggedExercises()).toEqual([
+      expect.objectContaining({ exerciseId: bench, name: 'Bench press', sessions: 2 }),
+    ]);
+    const sessions = await repo.exerciseSessions(bench);
+    expect(sessions.map((s) => s.workoutId)).toEqual([first, second]);
+    expect(sessions[0]!.sets.map((s) => s.weightKg)).toEqual([50, 55]);
+  });
+});

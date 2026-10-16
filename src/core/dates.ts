@@ -8,6 +8,15 @@ export function formatLongDate(date: Date, language: string): string {
   }).format(date);
 }
 
+/** "14 Oct", or "14 Oct 2025" when not in the current year. */
+export function formatShortDate(date: Date, language: string, now = new Date()): string {
+  return new Intl.DateTimeFormat(language, {
+    day: 'numeric',
+    month: 'short',
+    ...(date.getFullYear() === now.getFullYear() ? {} : { year: 'numeric' }),
+  }).format(date);
+}
+
 /** "October 2026". */
 export function formatMonth(date: Date, language: string): string {
   return new Intl.DateTimeFormat(language, { month: 'long', year: 'numeric' }).format(date);

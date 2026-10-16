@@ -8,7 +8,8 @@ import { useTranslation } from '@/core/i18n';
 import { useTheme } from '@/core/theme';
 import { ExportButton } from '@/features/backup';
 import { Calendar } from '@/features/history';
-import { AppText, PageDots } from '@/ui';
+import { StatsList } from '@/features/progress';
+import { AppText, PageDots, Screen } from '@/ui';
 
 import { HomePage } from './HomeScreen';
 import type { RootStackParamList } from './navigation';
@@ -56,9 +57,13 @@ export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParam
           <Calendar top reloadToken={focusCount} footer={<ExportButton />} />
         </View>
         <View style={{ width }}>
-          <SafeAreaView edges={['top']} style={{ flex: 1, padding: 16 }}>
+          <Screen top>
             <AppText variant="title">{t('stats.title')}</AppText>
-          </SafeAreaView>
+            <StatsList
+              reloadToken={focusCount}
+              onOpen={(target) => navigation.navigate('StatsDetail', { target })}
+            />
+          </Screen>
         </View>
       </ScrollView>
       <SafeAreaView edges={['bottom']}>

@@ -106,6 +106,29 @@
     "failed": "Export failed. Please try again."
   },
   "stats": {
-    "title": "Stats"
+    "title": "Stats",
+    "bodyweight": "Bodyweight",
+    "noBodyweight": "No entries yet. Add one per week in the calendar.",
+    "exercises": "Exercises",
+    "noExercises": "Finish a workout and your exercises show up here.",
+    "sessionsLast_one": "{{count}} session · last {{date}}",
+    "sessionsLast_other": "{{count}} sessions · last {{date}}",
+    "metric": "Graph shows",
+    "topSet": "Top set",
+    "range": "Time range",
+    "range3m": "3M",
+    "range1y": "1Y",
+    "rangeAll": "All",
+    "bestSet": "Best set",
+    "e1rm": "Est. 1RM",
+    "sessions": "Sessions",
+    "lastSession": "Last session",
+    "change4w": "4-week change",
+    "current": "Current",
+    "lowest": "Lowest",
+    "highest": "Highest",
+    "noChartData": "Nothing to graph in this time range.",
+    "chartLabel_one": "Graph with {{count}} point, latest {{latest}}",
+    "chartLabel_other": "Graph with {{count}} points, latest {{latest}}"
   }
 }

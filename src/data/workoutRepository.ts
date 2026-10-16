@@ -50,6 +50,20 @@ interface SetRow {
 const SET_COLUMNS =
   's.id, s.workout_exercise_id, s.position, s.weight_kg, s.reps, s.duration_s, s.distance_m, s.rpe, s.is_warmup';
 
+/** One finished workout's sets for a single exercise. */
+export interface ExerciseSession {
+  workoutId: string;
+  startedAt: number;
+  sets: LoggedSet[];
+}
+
+export interface LoggedExercise {
+  exerciseId: string;
+  name: string;
+  sessions: number;
+  lastAt: number;
+}
+
 function toSet(row: SetRow): LoggedSet {
   return {
     id: row.id,
@@ -287,6 +301,57 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
         now,
         workoutId,
       ]);
+    },
+
+    /** Exercises with at least one set in a finished workout, most recently trained first. */
+    async loggedExercises(): Promise<LoggedExercise[]> {
+      const rows = await db.getAll<{
+        exercise_id: string;
+        name: string;
+        sessions: number;
+        last_at: number;
+      }>(
+        `SELECT e.id AS exercise_id, e.name, COUNT(DISTINCT w.id) AS sessions,
+           MAX(w.started_at) AS last_at
+         FROM sets s
+         JOIN workout_exercises we ON we.id = s.workout_exercise_id AND we.deleted_at IS NULL
+         JOIN workouts w ON w.id = we.workout_id
+           AND w.deleted_at IS NULL AND w.ended_at IS NOT NULL
+         JOIN exercises e ON e.id = we.exercise_id
+         WHERE s.deleted_at IS NULL
+         GROUP BY e.id
+         ORDER BY last_at DESC`,
+      );
+      return rows.map((r) => ({
+        exerciseId: r.exercise_id,
+        name: r.name,
+        sessions: r.sessions,
+        lastAt: r.last_at,
+      }));
+    },
+
+    /** Every finished workout's sets for one exercise, oldest first. */
+    async exerciseSessions(exerciseId: string): Promise<ExerciseSession[]> {
+      const rows = await db.getAll<SetRow & { workout_id: string; started_at: number }>(
+        `SELECT ${SET_COLUMNS}, w.id AS workout_id, w.started_at
+         FROM sets s
+         JOIN workout_exercises we ON we.id = s.workout_exercise_id AND we.deleted_at IS NULL
+         JOIN workouts w ON w.id = we.workout_id
+           AND w.deleted_at IS NULL AND w.ended_at IS NOT NULL
+         WHERE we.exercise_id = ? AND s.deleted_at IS NULL
+         ORDER BY w.started_at, we.position, s.position`,
+        [exerciseId],
+      );
+      const sessions: ExerciseSession[] = [];
+      for (const row of rows) {
+        let session = sessions[sessions.length - 1];
+        if (session?.workoutId !== row.workout_id) {
+          session = { workoutId: row.workout_id, startedAt: row.started_at, sets: [] };
+          sessions.push(session);
+        }
+        session.sets.push(toSet(row));
+      }
+      return sessions;
     },
 
     /** Sets from the most recent other workout that logged this exercise. */
