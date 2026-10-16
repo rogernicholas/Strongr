@@ -11,6 +11,7 @@ import { MainScreen } from './MainScreen';
 import { PickExercisesScreen } from './PickExercisesScreen';
 import { RoutinesScreen } from './RoutinesScreen';
 import { StatsDetailScreen } from './StatsDetailScreen';
+import { WorkoutDoneScreen } from './WorkoutDoneScreen';
 
 export type RootStackParamList = {
   /** Pager with Home, Calendar and Stats. */
@@ -23,6 +24,8 @@ export type RootStackParamList = {
     addToWorkoutId?: string;
   };
   LogWorkout: { workoutId: string; title?: string };
+  /** "Good job" summary after a saved workout. */
+  WorkoutDone: { workoutId: string };
   Routines: undefined;
   StatsDetail: { target: StatsTarget };
   Settings: undefined;
@@ -70,6 +73,11 @@ export function RootNavigation() {
           name="LogWorkout"
           component={LogWorkoutScreen}
           options={({ route }) => ({ title: route.params.title ?? t('logging.title') })}
+        />
+        <Stack.Screen
+          name="WorkoutDone"
+          component={WorkoutDoneScreen}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Routines"

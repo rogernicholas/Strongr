@@ -86,7 +86,6 @@
     "finish": "Finish workout",
     "finishTitle": "Finish workout?",
     "finishBody": "It will be saved to your history. A workout with no sets is discarded.",
-    "saved": "Workout saved",
     "discarded": "Empty workout discarded",
     "addToWorkout": "Add to workout"
   },
@@ -135,5 +134,28 @@
     "noChartData": "Nothing to graph in this time range.",
     "chartLabel_one": "Graph with {{count}} point, latest {{latest}}",
     "chartLabel_other": "Graph with {{count}} points, latest {{latest}}"
+  },
+  "done": {
+    "phrase1": "Good job!",
+    "phrase2": "Nailed it.",
+    "phrase3": "Stronger than yesterday.",
+    "phrase4": "That’s how it’s done.",
+    "phrase5": "Another one in the books.",
+    "phrase6": "Beast mode: complete.",
+    "phrase7": "You showed up. That counts.",
+    "phrase8": "Solid work today.",
+    "phrase9": "Gains loading…",
+    "phrase10": "Crushed it!",
+    "phrase11": "Consistency wins.",
+    "phrase12": "One step closer.",
+    "phrase13": "Strong work.",
+    "phrase14": "Proud of that one.",
+    "phrase15": "Rest up. You earned it.",
+    "duration": "Duration",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "exercises": "Exercises",
+    "sets": "Sets",
+    "button": "Done"
   }
 }

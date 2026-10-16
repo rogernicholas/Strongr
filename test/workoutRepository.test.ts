@@ -180,6 +180,7 @@ describe('workoutRepository stats queries', () => {
     await repo.remove(deleted);
     await log(row, [set(45, 10)]); // still open
 
+    expect(await repo.countFinished()).toBe(2);
     expect(await repo.loggedExercises()).toEqual([
       expect.objectContaining({ exerciseId: bench, name: 'Bench press', sessions: 2 }),
     ]);

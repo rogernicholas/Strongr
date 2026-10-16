@@ -303,6 +303,14 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       ]);
     },
 
+    /** How many workouts have been finished and kept. */
+    async countFinished(): Promise<number> {
+      const row = await db.getFirst<{ n: number }>(
+        'SELECT COUNT(*) AS n FROM workouts WHERE deleted_at IS NULL AND ended_at IS NOT NULL',
+      );
+      return row?.n ?? 0;
+    },
+
     /** Exercises with at least one set in a finished workout, most recently trained first. */
     async loggedExercises(): Promise<LoggedExercise[]> {
       const rows = await db.getAll<{
