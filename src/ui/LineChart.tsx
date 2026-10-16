@@ -55,7 +55,7 @@ export function LineChart({ points, formatX, formatY, height = 200, accessibilit
                   x2={width}
                   y1={PAD + f * (height - 2 * PAD)}
                   y2={PAD + f * (height - 2 * PAD)}
-                  stroke={theme.colors.border}
+                  stroke={theme.colors.subtle}
                   strokeWidth={1}
                 />
               ))}

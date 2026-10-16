@@ -63,7 +63,7 @@ export function NumberStepper({ label, value, onChangeText, step, decimals = fal
           fontFamily: fonts.bold,
           borderBottomWidth: 2,
           color: theme.colors.text,
-          borderColor: theme.colors.border,
+          borderColor: theme.colors.subtle,
         }}
       />
       {button(1)}

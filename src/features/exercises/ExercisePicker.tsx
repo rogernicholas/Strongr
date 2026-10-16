@@ -122,7 +122,7 @@ export function ExercisePicker({ initialSelectedIds = [], header, renderFooter }
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderWidth: 2,
-                  borderColor: isSelected ? theme.colors.accent : theme.colors.border,
+                  borderColor: isSelected ? theme.colors.accent : theme.colors.subtle,
                   backgroundColor: isSelected ? theme.colors.accent : 'transparent',
                 }}
               >

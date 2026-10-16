@@ -6,6 +6,7 @@ import {
 } from '@expo-google-fonts/noto-sans';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -31,6 +32,11 @@ export default function App() {
     NotoSans_600SemiBold,
     NotoSans_700Bold,
   });
+
+  useEffect(() => {
+    // The native window shows through during screen transitions; keep it dark, not white.
+    void SystemUI.setBackgroundColorAsync(darkTheme.colors.background);
+  }, []);
 
   useEffect(() => {
     bootstrap(() => openExpoDb())

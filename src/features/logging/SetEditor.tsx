@@ -103,7 +103,7 @@ export function SetEditor(props: Props) {
             height: 24,
             borderRadius: 6,
             borderWidth: 2,
-            borderColor: isWarmup ? theme.colors.accent : theme.colors.border,
+            borderColor: isWarmup ? theme.colors.accent : theme.colors.subtle,
             backgroundColor: isWarmup ? theme.colors.accent : 'transparent',
           }}
         />

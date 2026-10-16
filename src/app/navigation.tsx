@@ -43,14 +43,19 @@ export function RootNavigation() {
         colors: {
           ...base.colors,
           background: theme.colors.background,
-          card: theme.colors.surface,
+          card: theme.colors.background,
           text: theme.colors.text,
           border: theme.colors.border,
           primary: theme.colors.primary,
         },
       }}
     >
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          contentStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+        }}
+      >
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen
           name="PickExercises"

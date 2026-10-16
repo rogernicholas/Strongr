@@ -11,7 +11,10 @@ export interface Theme {
     /** Highlights: today, selection, dots, graph lines (teal). */
     accent: string;
     onAccent: string;
+    /** Borders are off in the night theme (transparent). */
     border: string;
+    /** Faint lines that must stay visible: chart grid, page dots, empty checkboxes. */
+    subtle: string;
     danger: string;
   };
   spacing: (n: number) => number;
@@ -45,20 +48,23 @@ const brand = {
   teal: '#41D2EF',
   black: '#03020C',
   navy: '#1D2180',
+  /** Buttons and containers. */
+  navyDark: '#11135A',
 };
 
 export const darkTheme: Theme = {
   dark: true,
   colors: {
-    background: '#11135A',
-    surface: '#08092E',
+    background: '#0C0E17',
+    surface: brand.navyDark,
     text: '#FFFFFF',
     textMuted: '#B4B7E0',
     primary: brand.red,
     onPrimary: '#FFFFFF',
     accent: brand.teal,
     onAccent: brand.black,
-    border: '#2A2E85',
+    border: 'transparent',
+    subtle: '#2A2E6E',
     danger: '#FF6B70',
   },
   spacing,

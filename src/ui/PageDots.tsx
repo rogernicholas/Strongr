@@ -18,7 +18,7 @@ export function PageDots({ count, active }: { count: number; active: number }) {
             width: i === active ? 20 : 8,
             height: 8,
             borderRadius: 4,
-            backgroundColor: i === active ? theme.colors.accent : theme.colors.border,
+            backgroundColor: i === active ? theme.colors.accent : theme.colors.subtle,
           }}
         />
       ))}
