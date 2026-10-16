@@ -17,11 +17,7 @@
   },
   "settings": {
     "title": "Settings",
-    "weightUnit": "Weight unit",
-    "theme": "Theme",
-    "themeSystem": "System",
-    "themeLight": "Light",
-    "themeDark": "Dark"
+    "weightUnit": "Weight unit"
   },
   "about": {
     "title": "About",

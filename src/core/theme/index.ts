@@ -1,7 +1,3 @@
-import { useColorScheme } from 'react-native';
-
-import { useSettings } from '@/core/settings';
-
 export interface Theme {
   dark: boolean;
   colors: {
@@ -51,45 +47,25 @@ const brand = {
   navy: '#1D2180',
 };
 
-export const lightTheme: Theme = {
-  dark: false,
-  colors: {
-    background: '#F4F5FB',
-    surface: '#FFFFFF',
-    text: brand.black,
-    textMuted: '#55576E',
-    primary: brand.red,
-    onPrimary: '#FFFFFF',
-    accent: brand.navy,
-    onAccent: '#FFFFFF',
-    border: '#D9DBEA',
-    danger: '#C62828',
-  },
-  spacing,
-  minTouch: 48,
-};
-
 export const darkTheme: Theme = {
   dark: true,
   colors: {
-    background: brand.navy,
-    surface: '#101146',
+    background: '#11135A',
+    surface: '#08092E',
     text: '#FFFFFF',
     textMuted: '#B4B7E0',
     primary: brand.red,
     onPrimary: '#FFFFFF',
     accent: brand.teal,
     onAccent: brand.black,
-    border: '#3A3E9E',
+    border: '#2A2E85',
     danger: '#FF6B70',
   },
   spacing,
   minTouch: 48,
 };
 
+/** Strongr has one look for now: the night theme. */
 export function useTheme(): Theme {
-  const system = useColorScheme();
-  const { settings } = useSettings();
-  const mode = settings.theme === 'system' ? (system ?? 'dark') : settings.theme;
-  return mode === 'dark' ? darkTheme : lightTheme;
+  return darkTheme;
 }

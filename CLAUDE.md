@@ -89,7 +89,7 @@ Create these interfaces in `core/` with no-op implementations, and make all feat
 
 ## Settings and feature flags
 
-- All user-facing options live in one settings object: units, theme (light/dark/system), RPE on/off, rest timer on/off, plate calculator on/off, social on/off.
+- All user-facing options live in one settings object: units, RPE on/off, rest timer on/off, plate calculator on/off, social on/off.
 - All feature flags live in one config object.
 - Ship the app with an About screen showing the version number.
 
@@ -221,4 +221,9 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-15: Bodyweight is a weekly input, not per workout.
 - 2026-10-15: RPE off by default; rest timer off by default. Both toggle in Settings.
 - 2026-10-15: No import of old paper notes; start fresh.
+- 2026-10-16: Look: logo "Strongr." in Changa One; all other text Noto Sans (bundled via @expo-google-fonts). Brand colours red #F61C24 (main actions), teal #41D2EF (highlights), black #03020C, navy #1D2180; background a darker navy.
+- 2026-10-16: Night theme only for now; the light/system theme setting is removed.
+- 2026-10-16: Layout: three swipeable pages, Home -> Calendar -> Stats, with page dots. Home is just New workout (or Resume), with Settings and About as small links at the bottom. Routines appear as chips at the top of the exercise picker.
+- 2026-10-16: Calendar page: small Export link underneath; each week row has a bodyweight cell (tap to add or edit that week).
+- 2026-10-16: Stats page: bodyweight pinned first, then logged exercises. Exercise graph: heaviest working set per session (warm-ups excluded), toggle to estimated 1RM (Epley). Stats: best set, e1RM, sessions, last session, 4-week change. Bodyweight: current, lowest, highest, 4-week change. Ranges 3M / 1Y / All. Charts drawn with react-native-svg.
 - Open: scoreboard metric and caps, sign-in method.

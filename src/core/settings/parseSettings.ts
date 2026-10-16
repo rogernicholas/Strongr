@@ -1,7 +1,6 @@
 import { defaultSettings, type Settings } from '@/config/defaults';
 
 const WEIGHT_UNITS = ['kg', 'lb'] as const;
-const THEMES = ['system', 'light', 'dark'] as const;
 
 function pick<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
   return allowed.includes(value as T) ? (value as T) : fallback;
@@ -21,7 +20,6 @@ export function parseSettings(raw: unknown): Settings {
   const d = defaultSettings;
   return {
     weightUnit: pick(input.weightUnit, WEIGHT_UNITS, d.weightUnit),
-    theme: pick(input.theme, THEMES, d.theme),
     rpeEnabled: bool(input.rpeEnabled, d.rpeEnabled),
     restTimerEnabled: bool(input.restTimerEnabled, d.restTimerEnabled),
     plateCalculatorEnabled: bool(input.plateCalculatorEnabled, d.plateCalculatorEnabled),
