@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Alert } from 'react-native';
 
 import { formatLongDate, localDateKey } from '@/core/dates';
 import { useDb } from '@/core/db';
@@ -7,7 +6,7 @@ import { useTranslation } from '@/core/i18n';
 import { track } from '@/core/services';
 import { useSettings } from '@/core/settings';
 import { createBodyweightRepository, createWorkoutRepository } from '@/data';
-import { LinkButton } from '@/ui';
+import { LinkButton, useDialog } from '@/ui';
 
 import { buildTxtExport } from './buildTxtExport';
 import { shareTextFile } from './exportTxt';
@@ -15,6 +14,7 @@ import { shareTextFile } from './exportTxt';
 export function ExportButton() {
   const { t, i18n } = useTranslation();
   const db = useDb();
+  const dialog = useDialog();
   const { settings } = useSettings();
   const [busy, setBusy] = useState(false);
 
@@ -26,7 +26,11 @@ export function ExportButton() {
         createBodyweightRepository(db).list(),
       ]);
       if (workouts.length === 0) {
-        Alert.alert(t('backup.nothingTitle'), t('backup.nothingBody'));
+        void dialog({
+          title: t('backup.nothingTitle'),
+          message: t('backup.nothingBody'),
+          confirmLabel: t('common.ok'),
+        });
         return;
       }
       const unit = settings.weightUnit;
@@ -42,7 +46,7 @@ export function ExportButton() {
       await shareTextFile(`strongr-${localDateKey(new Date())}.txt`, text, t('backup.exportTxt'));
       track('export_txt', { workouts: workouts.length });
     } catch {
-      Alert.alert(t('backup.failed'));
+      void dialog({ title: t('backup.failed'), confirmLabel: t('common.ok') });
     } finally {
       setBusy(false);
     }

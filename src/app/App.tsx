@@ -16,6 +16,7 @@ import { openExpoDb } from '@/core/db/expoDb';
 import { useTranslation } from '@/core/i18n';
 import { SettingsProvider } from '@/core/settings';
 import { darkTheme, useTheme } from '@/core/theme';
+import { DialogProvider } from '@/ui';
 
 import { bootstrap, type AppContext } from './bootstrap';
 import { RootNavigation } from './navigation';
@@ -57,8 +58,10 @@ export default function App() {
     <SafeAreaProvider>
       <DbProvider db={ctx.db}>
         <SettingsProvider initial={ctx.settings} save={ctx.settingsRepository.save}>
-          <ThemedStatusBar />
-          <RootNavigation />
+          <DialogProvider>
+            <ThemedStatusBar />
+            <RootNavigation />
+          </DialogProvider>
         </SettingsProvider>
       </DbProvider>
     </SafeAreaProvider>

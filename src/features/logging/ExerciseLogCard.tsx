@@ -36,7 +36,7 @@ export function ExerciseLogCard(props: Props) {
   return (
     <View
       style={{
-        borderRadius: 16,
+        borderRadius: theme.radius.md,
         borderWidth: 1,
         borderColor: expanded ? theme.colors.accent : theme.colors.border,
         backgroundColor: theme.colors.surface,
@@ -50,7 +50,7 @@ export function ExerciseLogCard(props: Props) {
         style={{ padding: 16, gap: 4 }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
-          <AppText style={{ fontSize: 18, fontWeight: '700', flex: 1 }}>
+          <AppText variant="heading" style={{ flex: 1 }}>
             {exercise.exerciseName}
           </AppText>
           <AppText variant="muted">
@@ -76,14 +76,14 @@ export function ExerciseLogCard(props: Props) {
                 gap: 12,
                 minHeight: 40,
                 paddingHorizontal: 8,
-                borderRadius: 8,
+                borderRadius: theme.radius.sm,
                 backgroundColor: set.id === editingId ? theme.colors.background : 'transparent',
               }}
             >
               <AppText variant="muted" style={{ width: 20 }}>
                 {i + 1}
               </AppText>
-              <AppText style={{ fontSize: 17, fontWeight: '600', flex: 1 }}>
+              <AppText variant="heading" style={{ flex: 1 }}>
                 {formatSetShort(set, unit)}
                 {set.weightKg !== null && set.reps !== null ? ` ${unit}` : ''}
                 {set.rpe !== null ? `  @${set.rpe}` : ''}

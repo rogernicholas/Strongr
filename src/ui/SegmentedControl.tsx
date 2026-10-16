@@ -27,7 +27,7 @@ export function SegmentedControl<T extends string>({
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel={accessibilityLabel}
-      style={[styles.row, { borderColor: theme.colors.border }]}
+      style={[styles.row, { borderRadius: theme.radius.md }]}
     >
       {options.map((option) => {
         const selected = option.value === value;
@@ -40,7 +40,7 @@ export function SegmentedControl<T extends string>({
             style={[
               styles.item,
               {
-                minHeight: theme.minTouch,
+                minHeight: theme.buttonHeight,
                 backgroundColor: selected ? theme.colors.accent : theme.colors.surface,
               },
             ]}
@@ -61,6 +61,6 @@ export function SegmentedControl<T extends string>({
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', borderWidth: 1, borderRadius: 12, overflow: 'hidden' },
+  row: { flexDirection: 'row', overflow: 'hidden' },
   item: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

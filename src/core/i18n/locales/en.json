@@ -27,7 +27,8 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
-    "saveFailed": "Couldn't save. Please try again."
+    "saveFailed": "Couldn't save. Please try again.",
+    "ok": "OK"
   },
   "exercises": {
     "title": "Choose exercises",

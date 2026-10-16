@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import {
   formatLongDate,
@@ -17,7 +17,7 @@ import { useSettings } from '@/core/settings';
 import { useTheme } from '@/core/theme';
 import { formatNumber, fromDisplayWeight, toDisplayWeight } from '@/core/units';
 import { createBodyweightRepository, createWorkoutRepository, type Workout } from '@/data';
-import { AppText, Card, Screen } from '@/ui';
+import { AppText, Card, Screen, useDialog } from '@/ui';
 
 import { BodyweightDialog } from './BodyweightDialog';
 
@@ -41,6 +41,7 @@ const WEEK_CELL = 48;
 export function Calendar({ footer, reloadToken, top }: Props) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const dialog = useDialog();
   const db = useDb();
   const { settings } = useSettings();
   const today = new Date();
@@ -97,18 +98,17 @@ export function Calendar({ footer, reloadToken, top }: Props) {
       return { year: d.getFullYear(), month: d.getMonth() };
     });
 
-  function confirmDelete(workout: Workout) {
-    Alert.alert(t('history.deleteTitle'), t('history.deleteBody'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('common.delete'),
-        style: 'destructive',
-        onPress: () =>
-          void createWorkoutRepository(db)
-            .remove(workout.id)
-            .then(() => setVersion((v) => v + 1)),
-      },
-    ]);
+  async function confirmDelete(workout: Workout) {
+    const ok = await dialog({
+      title: t('history.deleteTitle'),
+      message: t('history.deleteBody'),
+      confirmLabel: t('common.delete'),
+      cancelLabel: t('common.cancel'),
+      destructive: true,
+    });
+    if (!ok) return;
+    await createWorkoutRepository(db).remove(workout.id);
+    setVersion((v) => v + 1);
   }
 
   const todayKey = localDateKey(today);
@@ -138,7 +138,7 @@ export function Calendar({ footer, reloadToken, top }: Props) {
           width: WEEK_CELL,
           height: 40,
           marginLeft: 4,
-          borderRadius: 10,
+          borderRadius: theme.radius.sm,
           alignItems: 'center',
           justifyContent: 'center',
           borderWidth: 1,
@@ -163,7 +163,7 @@ export function Calendar({ footer, reloadToken, top }: Props) {
     <Screen top={top}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         {arrow(-1, t('history.previousMonth'))}
-        <AppText style={{ fontSize: 18, fontWeight: '600' }}>
+        <AppText variant="heading">
           {formatMonth(new Date(month.year, month.month, 1), i18n.language)}
         </AppText>
         {arrow(1, t('history.nextMonth'))}
@@ -198,7 +198,7 @@ export function Calendar({ footer, reloadToken, top }: Props) {
                     flex: 1,
                     height: 48,
                     margin: 1,
-                    borderRadius: 10,
+                    borderRadius: theme.radius.sm,
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: isSelected ? theme.colors.accent : 'transparent',
@@ -239,10 +239,8 @@ export function Calendar({ footer, reloadToken, top }: Props) {
         <AppText variant="muted">{t('history.restDay')}</AppText>
       ) : (
         dayWorkouts.map((workout) => (
-          <Card key={workout.id} onLongPress={() => confirmDelete(workout)}>
-            {workout.name ? (
-              <AppText style={{ fontSize: 18, fontWeight: '600' }}>{workout.name}</AppText>
-            ) : null}
+          <Card key={workout.id} onLongPress={() => void confirmDelete(workout)}>
+            {workout.name ? <AppText variant="heading">{workout.name}</AppText> : null}
             {workout.exercises
               .filter((e) => e.sets.length > 0)
               .map((e) => (

@@ -108,7 +108,7 @@ export function ExercisePicker({ initialSelectedIds = [], header, renderFooter }
                 gap: 12,
                 paddingHorizontal: 12,
                 marginBottom: 6,
-                borderRadius: 12,
+                borderRadius: theme.radius.md,
                 borderWidth: 1,
                 borderColor: isSelected ? theme.colors.accent : theme.colors.border,
                 backgroundColor: theme.colors.surface,

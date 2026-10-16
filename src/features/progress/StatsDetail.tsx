@@ -35,7 +35,7 @@ function StatTile({ label, value }: { label: string; value: string }) {
     <View style={{ width: '48.5%' }}>
       <Card>
         <AppText variant="label">{label.toUpperCase()}</AppText>
-        <AppText style={{ fontSize: 20, fontWeight: '700' }}>{value}</AppText>
+        <AppText variant="stat">{value}</AppText>
       </Card>
     </View>
   );

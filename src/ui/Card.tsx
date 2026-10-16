@@ -14,7 +14,7 @@ export function Card({ children, onPress, onLongPress, accessibilityLabel }: Pro
   const theme = useTheme();
   const style = {
     padding: theme.spacing(4),
-    borderRadius: 14,
+    borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,

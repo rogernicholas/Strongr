@@ -1,6 +1,6 @@
 import { useKeepAwake } from 'expo-keep-awake';
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useDb, type Db } from '@/core/db';
@@ -8,7 +8,7 @@ import { useTranslation } from '@/core/i18n';
 import { useSettings } from '@/core/settings';
 import { useTheme } from '@/core/theme';
 import { createWorkoutRepository, type LoggedSet, type Workout } from '@/data';
-import { AppText, Button } from '@/ui';
+import { AppText, Button, useDialog } from '@/ui';
 
 import { ExerciseLogCard } from './ExerciseLogCard';
 
@@ -36,6 +36,7 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
   useKeepAwake();
   const { t } = useTranslation();
   const theme = useTheme();
+  const dialog = useDialog();
   const db = useDb();
   const { settings } = useSettings();
   const [workout, setWorkout] = useState<Workout | null>(null);
@@ -66,16 +67,16 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
   const run = (action: Promise<unknown>) =>
     void action
       .then(() => setVersion((v) => v + 1))
-      .catch(() => Alert.alert(t('common.saveFailed')));
+      .catch(() => dialog({ title: t('common.saveFailed'), confirmLabel: t('common.ok') }));
 
-  function finish() {
-    Alert.alert(t('logging.finishTitle'), t('logging.finishBody'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('logging.finish'),
-        onPress: () => void repo.finish(workoutId).then(onFinished),
-      },
-    ]);
+  async function finish() {
+    const ok = await dialog({
+      title: t('logging.finishTitle'),
+      message: t('logging.finishBody'),
+      confirmLabel: t('logging.finish'),
+      cancelLabel: t('common.cancel'),
+    });
+    if (ok) onFinished(await repo.finish(workoutId));
   }
 
   if (!workout) return null;
@@ -120,7 +121,7 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
             backgroundColor: theme.colors.surface,
           }}
         >
-          <Button label={t('logging.finish')} onPress={finish} />
+          <Button label={t('logging.finish')} onPress={() => void finish()} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

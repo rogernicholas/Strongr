@@ -115,12 +115,12 @@ export function SetEditor(props: Props) {
         <View style={{ flexDirection: 'row', gap: 8 }}>
           {onCancel ? (
             <View style={{ flex: 1 }}>
-              <Button label={t('common.cancel')} variant="secondary" onPress={onCancel} />
+              <Button label={t('common.cancel')} variant="quiet" onPress={onCancel} />
             </View>
           ) : null}
           {onDelete ? (
             <View style={{ flex: 1 }}>
-              <Button label={t('logging.deleteSet')} variant="secondary" onPress={onDelete} />
+              <Button label={t('logging.deleteSet')} variant="quiet" onPress={onDelete} />
             </View>
           ) : null}
         </View>

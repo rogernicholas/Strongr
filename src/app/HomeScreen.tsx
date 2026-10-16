@@ -53,7 +53,7 @@ export function HomePage({ navigation, reloadToken }: Props) {
               accessibilityLabel={t('home.resume')}
               onPress={() => navigation.navigate('LogWorkout', { workoutId: activeWorkoutId })}
             >
-              <AppText style={{ fontSize: 18, fontWeight: '600' }}>{t('home.resume')}</AppText>
+              <AppText variant="heading">{t('home.resume')}</AppText>
               <AppText variant="muted">{t('home.resumeHint')}</AppText>
             </Card>
           ) : (

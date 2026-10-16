@@ -68,7 +68,7 @@ export function RoutineCarousel({ selectedId, onSelect, reloadToken }: Props) {
                 width: cardWidth,
                 padding: 14,
                 gap: 4,
-                borderRadius: 14,
+                borderRadius: theme.radius.md,
                 borderWidth: selected ? 2 : 1,
                 borderColor: selected ? theme.colors.accent : theme.colors.border,
                 backgroundColor: theme.colors.surface,
@@ -76,7 +76,7 @@ export function RoutineCarousel({ selectedId, onSelect, reloadToken }: Props) {
               })}
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <AppText style={{ fontSize: 18, fontWeight: '700' }}>{routine.name}</AppText>
+                <AppText variant="heading">{routine.name}</AppText>
                 <AppText variant="label" style={selected ? { color: theme.colors.accent } : {}}>
                   {selected ? t('routines.selected') : t('routines.tapToUse')}
                 </AppText>

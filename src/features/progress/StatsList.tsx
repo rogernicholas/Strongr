@@ -54,7 +54,7 @@ export function StatsList({ onOpen, reloadToken }: Props) {
         accessibilityLabel={t('stats.bodyweight')}
         onPress={() => onOpen({ kind: 'bodyweight' })}
       >
-        <AppText style={{ fontSize: 18, fontWeight: '600' }}>{t('stats.bodyweight')}</AppText>
+        <AppText variant="heading">{t('stats.bodyweight')}</AppText>
         <AppText variant="muted">
           {latest
             ? `${formatNumber(toDisplayWeight(latest.weightKg, unit), 1)} ${unit}`
@@ -74,7 +74,7 @@ export function StatsList({ onOpen, reloadToken }: Props) {
             accessibilityLabel={e.name}
             onPress={() => onOpen({ kind: 'exercise', exerciseId: e.exerciseId, name: e.name })}
           >
-            <AppText style={{ fontSize: 17, fontWeight: '600' }}>{e.name}</AppText>
+            <AppText variant="heading">{e.name}</AppText>
             <AppText variant="muted">
               {t('stats.sessionsLast', {
                 count: e.sessions,

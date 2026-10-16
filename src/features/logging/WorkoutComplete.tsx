@@ -55,7 +55,9 @@ export function WorkoutComplete({ workoutId, onDone }: Props) {
   const stat = (value: string, label: string) => (
     <View style={{ flex: 1 }}>
       <Card>
-        <AppText style={{ fontSize: 22, fontWeight: '700', textAlign: 'center' }}>{value}</AppText>
+        <AppText variant="stat" style={{ textAlign: 'center' }}>
+          {value}
+        </AppText>
         <AppText variant="label" style={{ textAlign: 'center' }}>
           {label.toUpperCase()}
         </AppText>

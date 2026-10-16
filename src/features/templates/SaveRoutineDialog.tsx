@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, View } from 'react-native';
+import { View } from 'react-native';
 
 import { useTranslation } from '@/core/i18n';
-import { useTheme } from '@/core/theme';
-import { AppText, Button, TextField } from '@/ui';
+import { Button, ModalCard, TextField } from '@/ui';
 
 interface Props {
   visible: boolean;
@@ -14,52 +13,32 @@ interface Props {
 
 export function SaveRoutineDialog({ visible, initialName, onSave, onCancel }: Props) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const [name, setName] = useState(initialName);
 
   return (
-    <Modal
+    <ModalCard
       visible={visible}
-      transparent
-      animationType="fade"
+      title={t('routines.saveTitle')}
       onRequestClose={onCancel}
       onShow={() => setName(initialName)}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          padding: 24,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-        }}
-      >
-        <View
-          style={{ gap: 12, padding: 20, borderRadius: 16, backgroundColor: theme.colors.surface }}
-        >
-          <AppText style={{ fontSize: 18, fontWeight: '600' }}>{t('routines.saveTitle')}</AppText>
-          <TextField
-            value={name}
-            onChangeText={setName}
-            placeholder={t('routines.namePlaceholder')}
-            autoFocus
-            selectTextOnFocus
-            onSubmitEditing={() => name.trim() && onSave(name)}
-          />
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <View style={{ flex: 1 }}>
-              <Button label={t('common.cancel')} variant="secondary" onPress={onCancel} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Button
-                label={t('common.save')}
-                onPress={() => onSave(name)}
-                disabled={!name.trim()}
-              />
-            </View>
-          </View>
+      <TextField
+        value={name}
+        onChangeText={setName}
+        placeholder={t('routines.namePlaceholder')}
+        autoFocus
+        selectTextOnFocus
+        inset
+        onSubmitEditing={() => name.trim() && onSave(name)}
+      />
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        <View style={{ flex: 1 }}>
+          <Button label={t('common.cancel')} variant="quiet" onPress={onCancel} />
         </View>
-      </KeyboardAvoidingView>
-    </Modal>
+        <View style={{ flex: 1 }}>
+          <Button label={t('common.save')} onPress={() => onSave(name)} disabled={!name.trim()} />
+        </View>
+      </View>
+    </ModalCard>
   );
 }

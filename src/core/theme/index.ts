@@ -16,8 +16,14 @@ export interface Theme {
     /** Faint lines that must stay visible: chart grid, page dots, empty checkboxes. */
     subtle: string;
     danger: string;
+    /** Dims the screen behind dialogs. */
+    backdrop: string;
   };
   spacing: (n: number) => number;
+  /** Corner radii: sm for small cells, md for buttons, cards and fields, lg for dialogs. */
+  radius: { sm: number; md: number; lg: number; pill: number };
+  /** Height of every standard button. */
+  buttonHeight: number;
   /** Minimum tap target; the logging screen uses larger ones. */
   minTouch: number;
 }
@@ -66,8 +72,11 @@ export const darkTheme: Theme = {
     border: 'transparent',
     subtle: '#2A2E6E',
     danger: '#FF6B70',
+    backdrop: 'rgba(3, 2, 12, 0.78)',
   },
   spacing,
+  radius: { sm: 10, md: 14, lg: 22, pill: 999 },
+  buttonHeight: 52,
   minTouch: 48,
 };
 
