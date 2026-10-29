@@ -3,19 +3,26 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback, useState } from 'react';
 
 import { RoutineList } from '@/features/templates';
-import { Screen } from '@/ui';
+import { useTranslation } from '@/core/i18n';
+import { Button, Screen } from '@/ui';
 
 import type { RootStackParamList } from './navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Routines'>;
 
-/** "My routines": view saved routines, tap one to start from it. */
+/** "My routines": make a new routine, or tap a saved one to start from it. */
 export function RoutinesScreen({ navigation }: Props) {
+  const { t } = useTranslation();
   const [focusCount, setFocusCount] = useState(0);
   useFocusEffect(useCallback(() => setFocusCount((n) => n + 1), []));
 
   return (
     <Screen>
+      <Button
+        label={t('routines.new')}
+        variant="secondary"
+        onPress={() => navigation.navigate('PickExercises', { newRoutine: true })}
+      />
       <RoutineList
         reloadToken={focusCount}
         onSelect={(routine) =>

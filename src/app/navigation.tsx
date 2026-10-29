@@ -22,6 +22,8 @@ export type RootStackParamList = {
     exerciseIds?: string[];
     /** Picking exercises to add to a workout in progress. */
     addToWorkoutId?: string;
+    /** Building a new routine from My routines: save it, no workout. */
+    newRoutine?: boolean;
   };
   /** `edit` opens a finished workout from the calendar. */
   LogWorkout: { workoutId: string; title?: string; mode?: 'live' | 'edit' };
@@ -68,7 +70,11 @@ export function RootNavigation() {
             route.params.addToWorkoutId
               ? // Adding mid-workout slides up over the workout like a sheet.
                 { title: t('logging.addExercise'), animation: 'slide_from_bottom' }
-              : { title: route.params.routineName ?? t('exercises.title') }
+              : {
+                  title: route.params.newRoutine
+                    ? t('routines.newTitle')
+                    : (route.params.routineName ?? t('exercises.title')),
+                }
           }
         />
         <Stack.Screen
