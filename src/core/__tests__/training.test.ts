@@ -8,6 +8,7 @@ import {
   sessionChange,
   sessionVolume,
   workingSets,
+  workoutCalories,
   workoutLengthMs,
 } from '@/core/training';
 
@@ -50,6 +51,8 @@ describe('training maths', () => {
     expect(sessionChange([set(null, 12)], [set(null, 10)])).toBeCloseTo(0.2);
     expect(sessionChange([set(60, 8)], [set(null, 10)])).toBeNull();
     expect(sessionChange([set(60, 8)], [])).toBeNull();
+    const run = (distanceM: number) => ({ ...set(null, null), distanceM, durationS: 1800 });
+    expect(sessionChange([run(5500)], [run(5000)])).toBeCloseTo(0.1);
   });
 
   it('measures workout length from first to last logged set', () => {
@@ -76,5 +79,36 @@ describe('training maths', () => {
     expect(bodyweightFor(entries, '2026-10-26')).toBe(79);
     expect(bodyweightFor(entries, '2026-09-28')).toBe(80); // before any entry: the first one
     expect(bodyweightFor([], '2026-10-12')).toBeNull();
+  });
+
+  it('counts cardio with its own MET and the rest of the workout as lifting', () => {
+    const HOUR = 3_600_000;
+    const timed = (at: number) => ({ durationS: null, distanceM: null, completedAt: at });
+    const cardio = (
+      seedKey: string | null,
+      durationS: number | null,
+      distanceM: number | null,
+    ) => ({
+      seedKey,
+      muscleGroup: 'cardio',
+      sets: [{ durationS, distanceM, completedAt: null }],
+    });
+    const lifting = { seedKey: null, muscleGroup: 'chest', sets: [timed(0), timed(HOUR)] };
+    const workout = (...exercises: Parameters<typeof workoutCalories>[1]['exercises']) => ({
+      startedAt: 0,
+      endedAt: HOUR,
+      exercises,
+    });
+
+    // 1 h lifting at MET 5, 80 kg.
+    expect(workoutCalories(80, workout(lifting))).toBe(400);
+    // 15 min of bike (MET 7) takes 15 min off the lifting part.
+    expect(workoutCalories(80, workout(lifting, cardio('stationary_bike', 900, null)))).toBeCloseTo(
+      140 + 300,
+    );
+    // A run with distance uses 1 kcal per kg per km; a cardio-only workout has no lifting part.
+    expect(workoutCalories(80, workout(cardio('treadmill_run', 1800, 5000)))).toBe(400);
+    // Custom cardio without a seed: MET 7.
+    expect(workoutCalories(80, workout(cardio(null, 1800, null)))).toBeCloseTo(280);
   });
 });

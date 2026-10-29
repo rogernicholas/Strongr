@@ -25,6 +25,8 @@ export interface WorkoutExercise {
   id: string;
   exerciseId: string;
   exerciseName: string;
+  seedKey: string | null;
+  muscleGroup: string | null;
   tracks: { weight: boolean; reps: boolean; time: boolean; distance: boolean };
   position: number;
   sets: LoggedSet[];
@@ -127,13 +129,15 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       workout_id: string;
       exercise_id: string;
       name: string;
+      seed_key: string | null;
+      muscle_group: string | null;
       position: number;
       tracks_weight: number;
       tracks_reps: number;
       tracks_time: number;
       tracks_distance: number;
     }>(
-      `SELECT we.id, we.workout_id, we.exercise_id, e.name, we.position,
+      `SELECT we.id, we.workout_id, we.exercise_id, e.name, e.seed_key, e.muscle_group, we.position,
          e.tracks_weight, e.tracks_reps, e.tracks_time, e.tracks_distance
        FROM workout_exercises we JOIN exercises e ON e.id = we.exercise_id
        WHERE we.workout_id IN (SELECT w.id ${match}) AND we.deleted_at IS NULL
@@ -161,6 +165,8 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
         id: e.id,
         exerciseId: e.exercise_id,
         exerciseName: e.name,
+        seedKey: e.seed_key,
+        muscleGroup: e.muscle_group,
         tracks: {
           weight: e.tracks_weight === 1,
           reps: e.tracks_reps === 1,

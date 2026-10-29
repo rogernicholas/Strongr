@@ -58,6 +58,8 @@ describe('buildTxtExport', () => {
     id: name,
     exerciseId: name,
     exerciseName: name,
+    seedKey: null,
+    muscleGroup: null,
     tracks,
     position: 0,
     sets,

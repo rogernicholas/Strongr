@@ -36,6 +36,8 @@ const workout = (day: number, exercises: [string, LoggedSet[]][]): Workout => ({
     id: `${day}-${i}`,
     exerciseId: name,
     exerciseName: name,
+    seedKey: null,
+    muscleGroup: null,
     tracks,
     position: i,
     sets,

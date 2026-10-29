@@ -1,5 +1,5 @@
 import { weekStartKey } from '@/core/dates';
-import { bodyweightFor, estimateCalories, workingSets, workoutLengthMs } from '@/core/training';
+import { bodyweightFor, workingSets, workoutCalories, workoutLengthMs } from '@/core/training';
 import type { Bodyweight, ExerciseSession, Workout } from '@/data';
 
 import { defaultMetric, sessionValue } from './stats';
@@ -87,8 +87,7 @@ export function summarizeOverview(
 
   const calories = workouts.flatMap((w) => {
     const kg = bodyweightFor(bodyweights, weekStartKey(new Date(w.startedAt)));
-    const ms = lengthOf(w);
-    return kg === null || ms === null ? [] : [estimateCalories(kg, ms)];
+    return kg === null ? [] : [workoutCalories(kg, w)];
   });
 
   return {

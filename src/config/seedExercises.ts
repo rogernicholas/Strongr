@@ -7,7 +7,14 @@ export interface SeedExercise {
   muscleGroup: MuscleGroup;
   /** Defaults to weight + reps. */
   tracks?: { weight?: boolean; reps?: boolean; time?: boolean; distance?: boolean };
+  /**
+   * Cardio energy for calorie estimates: MET from the Compendium of Physical Activities,
+   * and for running, kcal per kg per km (used when a distance is logged).
+   */
+  energy?: { met: number; kcalPerKgKm?: number };
 }
+
+const CARDIO_TRACKS = { weight: false, reps: false, time: true, distance: true };
 
 /**
  * Exercises every install starts with. New entries are added on the next app
@@ -77,4 +84,32 @@ export const seedExercises: readonly SeedExercise[] = [
   },
   { key: 'cable_crunch', name: 'Cable crunch', muscleGroup: 'core' },
   { key: 'ab_wheel', name: 'Ab wheel', muscleGroup: 'core', tracks: { weight: false } },
+
+  // Cardio
+  ...(
+    [
+      ['treadmill_run', 'Running (treadmill)', { met: 9.8, kcalPerKgKm: 1 }],
+      ['outdoor_run', 'Running (outdoor)', { met: 9.8, kcalPerKgKm: 1 }],
+      ['walking', 'Walking', { met: 3.5 }],
+      ['incline_walk', 'Incline walk', { met: 6 }],
+      ['stationary_bike', 'Stationary bike', { met: 7 }],
+      ['rowing_erg', 'Rowing (erg)', { met: 7 }],
+      ['elliptical', 'Elliptical', { met: 5 }],
+      ['stair_climber', 'Stair climber', { met: 9 }],
+      ['jump_rope', 'Jump rope', { met: 11.8 }],
+    ] as const
+  ).map(([key, name, energy]): SeedExercise => ({
+    key,
+    name,
+    muscleGroup: 'cardio',
+    tracks: CARDIO_TRACKS,
+    energy,
+  })),
 ];
+
+const ENERGY = new Map(seedExercises.flatMap((s) => (s.energy ? [[s.key, s.energy]] : [])));
+
+/** Cardio energy of a seeded exercise, if it has one. */
+export function seedEnergy(key: string | null): SeedExercise['energy'] {
+  return key === null ? undefined : ENERGY.get(key);
+}

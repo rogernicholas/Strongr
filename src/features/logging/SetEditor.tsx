@@ -20,6 +20,7 @@ interface Props {
 }
 
 const text = (value: number | null) => (value === null ? '' : formatNumber(value, 2));
+const scaled = (value: number | null, unit: number) => (value === null ? null : value * unit);
 
 export function SetEditor(props: Props) {
   const { tracks, unit, rpeEnabled, initial, submitLabel, onSubmit, onDelete, onCancel } = props;
@@ -28,8 +29,16 @@ export function SetEditor(props: Props) {
     initial.weightKg === null ? '' : text(toDisplayWeight(initial.weightKg, unit)),
   );
   const [reps, setReps] = useState(text(initial.reps));
-  const [duration, setDuration] = useState(text(initial.durationS));
-  const [distance, setDistance] = useState(text(initial.distanceM));
+  // Cardio (time and distance) is entered in minutes and km; timed holds like a plank in seconds.
+  const cardio = tracks.time && tracks.distance;
+  const timeUnit = cardio ? 60 : 1;
+  const distanceUnit = cardio ? 1000 : 1;
+  const [duration, setDuration] = useState(
+    initial.durationS === null ? '' : text(initial.durationS / timeUnit),
+  );
+  const [distance, setDistance] = useState(
+    initial.distanceM === null ? '' : text(initial.distanceM / distanceUnit),
+  );
   const [rpe, setRpe] = useState(text(initial.rpe));
   const [isWarmup, setIsWarmup] = useState(initial.isWarmup);
 
@@ -38,8 +47,8 @@ export function SetEditor(props: Props) {
   const input: SetInput = {
     weightKg: tracks.weight && weightValue !== null ? fromDisplayWeight(weightValue, unit) : null,
     reps: tracks.reps ? parseWholeNumber(reps) : null,
-    durationS: tracks.time ? parseDecimal(duration) : null,
-    distanceM: tracks.distance ? parseDecimal(distance) : null,
+    durationS: tracks.time ? scaled(parseDecimal(duration), timeUnit) : null,
+    distanceM: tracks.distance ? scaled(parseDecimal(distance), distanceUnit) : null,
     rpe: rpeEnabled && rpeValue !== null && rpeValue >= 1 && rpeValue <= 10 ? rpeValue : null,
     isWarmup,
   };
@@ -69,18 +78,20 @@ export function SetEditor(props: Props) {
         <View style={{ gap: 8 }}>
           {tracks.time ? (
             <NumberStepper
-              label={t('logging.seconds')}
+              label={cardio ? t('logging.minutes') : t('logging.seconds')}
               value={duration}
               onChangeText={setDuration}
-              step={15}
+              step={cardio ? 1 : 15}
+              decimals={cardio}
             />
           ) : null}
           {tracks.distance ? (
             <NumberStepper
-              label={t('logging.meters')}
+              label={cardio ? 'km' : t('logging.meters')}
               value={distance}
               onChangeText={setDistance}
-              step={100}
+              step={cardio ? 0.5 : 100}
+              decimals
             />
           ) : null}
         </View>

@@ -26,6 +26,8 @@ const workout = (...exercises: [string, LoggedSet[]][]): Workout => ({
     id: `we${i}`,
     exerciseId: name,
     exerciseName: name,
+    seedKey: null,
+    muscleGroup: null,
     tracks: { weight: true, reps: true, time: false, distance: false },
     position: i,
     sets,

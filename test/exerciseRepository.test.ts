@@ -48,6 +48,9 @@ describe('exerciseRepository', () => {
     const plank = (await repo.list()).find((e) => e.name === 'Plank')!;
     expect(plank.tracks).toEqual({ weight: false, reps: false, time: true, distance: false });
     expect(plank.muscleGroup).toBe('core');
+    const run = (await repo.list()).find((e) => e.name === 'Running (treadmill)')!;
+    expect(run.tracks).toEqual({ weight: false, reps: false, time: true, distance: true });
+    expect(run.muscleGroup).toBe('cardio');
   });
 
   it('creates custom exercises and rejects duplicate names', async () => {
@@ -59,5 +62,9 @@ describe('exerciseRepository', () => {
       DuplicateExerciseError,
     );
     await expect(repo.create({ name: '  ', muscleGroup: 'chest' })).rejects.toThrow();
+    expect(created.tracks).toEqual({ weight: true, reps: true, time: false, distance: false });
+    // Custom cardio logs time and distance instead.
+    const swim = await repo.create({ name: 'Swimming', muscleGroup: 'cardio' });
+    expect(swim.tracks).toEqual({ weight: false, reps: false, time: true, distance: true });
   });
 });

@@ -1,4 +1,4 @@
-import { estimateCalories, sessionChange, workingSets, workoutLengthMs } from '@/core/training';
+import { sessionChange, workingSets, workoutCalories, workoutLengthMs } from '@/core/training';
 import type { LoggedSet, Workout } from '@/data';
 
 /** i18n keys of the "good job" phrases; add or remove entries freely. */
@@ -50,7 +50,7 @@ export function summarizeWorkout(workout: Workout, bodyweightKg: number | null):
     ) ?? 0;
   return {
     durationMs,
-    calories: bodyweightKg === null ? null : estimateCalories(bodyweightKg, durationMs),
+    calories: bodyweightKg === null ? null : workoutCalories(bodyweightKg, workout),
     exercises: done.length,
     workingSets: done.reduce((n, e) => n + e.sets.filter((s) => !s.isWarmup).length, 0),
   };
