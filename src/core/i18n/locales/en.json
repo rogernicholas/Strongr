@@ -192,6 +192,8 @@
     "minutes_other": "{{count}} min",
     "exercises": "Exercises",
     "sets": "Sets",
+    "readyForMore": "Ready for more?",
+    "suggestion": "{{name}}: try {{weight}} next time",
     "button": "Done"
   }
 }
