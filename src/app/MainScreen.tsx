@@ -1,7 +1,13 @@
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback, useRef, useState } from 'react';
-import { BackHandler, ScrollView, useWindowDimensions, View } from 'react-native';
+import {
+  BackHandler,
+  ScrollView,
+  useWindowDimensions,
+  View,
+  type ScrollViewInstance,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTranslation } from '@/core/i18n';
@@ -21,7 +27,7 @@ export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParam
   const { t } = useTranslation();
   const theme = useTheme();
   const { width } = useWindowDimensions();
-  const pager = useRef<ScrollView>(null);
+  const pager = useRef<ScrollViewInstance>(null);
   const [page, setPage] = useState(0);
   const [focusCount, setFocusCount] = useState(0);
   // Edits on one page (e.g. bodyweight on Calendar) refresh the others.
