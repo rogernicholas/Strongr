@@ -1,13 +1,18 @@
 import { useKeepAwake } from 'expo-keep-awake';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, LayoutAnimation, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useDb, type Db } from '@/core/db';
 import { useTranslation } from '@/core/i18n';
 import { useSettings } from '@/core/settings';
 import { useTheme } from '@/core/theme';
-import { createWorkoutRepository, type LoggedSet, type Workout } from '@/data';
+import {
+  createWorkoutRepository,
+  type LoggedSet,
+  type Workout,
+  type WorkoutExercise,
+} from '@/data';
 import { AppText, Button, useDialog } from '@/ui';
 
 import { ExerciseLogCard } from './ExerciseLogCard';
@@ -22,6 +27,13 @@ interface Props {
 }
 
 type Previous = Record<string, LoggedSet[]>;
+
+/** Cards slide and fade when exercises are added or removed. */
+const listAnimation = LayoutAnimation.create(
+  220,
+  LayoutAnimation.Types.easeInEaseOut,
+  LayoutAnimation.Properties.opacity,
+);
 
 /**
  * Loads the workout plus last session's sets. Previous sessions can't change mid-workout,
@@ -52,21 +64,29 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
   const previousRef = useRef<Previous>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
+  // Card ids from the last load, to spot exercises that were just added or removed.
+  const shownIds = useRef<string[] | null>(null);
 
   useEffect(() => {
     let active = true;
     void loadWorkout(db, workoutId, previousRef.current).then((data) => {
       if (!active) return;
+      const exercises = data.workout?.exercises ?? [];
+      const before = shownIds.current;
+      const ids = exercises.map((e) => e.id);
+      const added = before ? ids.filter((id) => !before.includes(id)) : [];
+      if (before && (added.length > 0 || ids.length !== before.length)) {
+        LayoutAnimation.configureNext(listAnimation);
+      }
+      shownIds.current = ids;
       setWorkout(data.workout);
       previousRef.current = data.previous;
       setPrevious(data.previous);
-      setExpandedId(
-        (current) =>
-          current ??
-          data.workout?.exercises.find((e) => e.sets.length === 0)?.id ??
-          data.workout?.exercises[0]?.id ??
-          null,
-      );
+      setExpandedId((current) => {
+        if (added[0]) return added[0];
+        if (current && ids.includes(current)) return current;
+        return exercises.find((e) => e.sets.length === 0)?.id ?? ids[0] ?? null;
+      });
     });
     return () => {
       active = false;
@@ -92,6 +112,20 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
     } catch {
       await dialog({ title: t('common.saveFailed'), confirmLabel: t('common.ok') });
     }
+  }
+
+  async function removeExercise(exercise: WorkoutExercise) {
+    if (exercise.sets.length > 0) {
+      const ok = await dialog({
+        title: t('logging.removeTitle', { name: exercise.exerciseName }),
+        message: t('logging.removeBody', { count: exercise.sets.length }),
+        confirmLabel: t('logging.remove'),
+        cancelLabel: t('common.cancel'),
+        destructive: true,
+      });
+      if (!ok) return;
+    }
+    run(repo.removeExercise(exercise.id));
   }
 
   async function cancel() {
@@ -136,6 +170,7 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
               onAddSet={(input) => run(repo.addSet(exercise.id, input))}
               onUpdateSet={(setId, input) => run(repo.updateSet(setId, input))}
               onDeleteSet={(setId) => run(repo.deleteSet(setId))}
+              onRemove={() => void removeExercise(exercise)}
             />
           ))}
           {workout.exercises.length === 0 ? (

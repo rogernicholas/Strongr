@@ -63,11 +63,12 @@ export function RootNavigation() {
         <Stack.Screen
           name="PickExercises"
           component={PickExercisesScreen}
-          options={({ route }) => ({
-            title: route.params.addToWorkoutId
-              ? t('logging.addExercise')
-              : (route.params.routineName ?? t('exercises.title')),
-          })}
+          options={({ route }) =>
+            route.params.addToWorkoutId
+              ? // Adding mid-workout slides up over the workout like a sheet.
+                { title: t('logging.addExercise'), animation: 'slide_from_bottom' }
+              : { title: route.params.routineName ?? t('exercises.title') }
+          }
         />
         <Stack.Screen
           name="LogWorkout"

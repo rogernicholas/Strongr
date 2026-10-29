@@ -221,6 +221,23 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       await db.transaction(() => addExercises(workoutId, exerciseIds, row?.next ?? 0));
     },
 
+    /** Takes an exercise out of a workout, with its sets (soft delete). */
+    async removeExercise(workoutExerciseId: string): Promise<void> {
+      const now = clock();
+      await db.transaction(async () => {
+        await db.run(
+          `UPDATE sets SET deleted_at = ?, updated_at = ?
+           WHERE workout_exercise_id = ? AND deleted_at IS NULL`,
+          [now, now, workoutExerciseId],
+        );
+        await db.run('UPDATE workout_exercises SET deleted_at = ?, updated_at = ? WHERE id = ?', [
+          now,
+          now,
+          workoutExerciseId,
+        ]);
+      });
+    },
+
     async addSet(workoutExerciseId: string, input: SetInput): Promise<LoggedSet> {
       if (!hasValue(input)) throw new Error('A set needs at least one value.');
       const id = newId();

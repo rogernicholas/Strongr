@@ -21,6 +21,7 @@ interface Props {
   onAddSet(input: SetInput): void;
   onUpdateSet(setId: string, input: SetInput): void;
   onDeleteSet(setId: string): void;
+  onRemove(): void;
 }
 
 export function ExerciseLogCard(props: Props) {
@@ -50,13 +51,32 @@ export function ExerciseLogCard(props: Props) {
         onPress={props.onToggle}
         style={{ padding: 16, gap: 4 }}
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppText variant="heading" style={{ flex: 1 }}>
             {exercise.exerciseName}
           </AppText>
           <AppText variant="muted">
             {t('logging.setCount', { count: exercise.sets.length })}
           </AppText>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('logging.removeExercise', { name: exercise.exerciseName })}
+            onPress={props.onRemove}
+            hitSlop={12}
+            style={({ pressed }) => ({
+              width: 32,
+              height: 32,
+              marginRight: -6,
+              borderRadius: 16,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: pressed ? theme.colors.raised : 'transparent',
+            })}
+          >
+            <AppText variant="muted" style={{ fontSize: 20, lineHeight: 24 }}>
+              ×
+            </AppText>
+          </Pressable>
         </View>
         <AppText variant="muted">
           {lastTime ? t('logging.lastTime', { sets: lastTime }) : t('logging.firstTime')}

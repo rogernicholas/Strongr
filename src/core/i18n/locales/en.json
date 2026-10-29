@@ -98,7 +98,12 @@
     "cancelBody_other": "All {{count}} sets you logged will be deleted.",
     "cancelConfirm": "Delete workout",
     "keepGoing": "Keep going",
-    "cancelled": "Workout cancelled"
+    "cancelled": "Workout cancelled",
+    "removeExercise": "Remove {{name}}",
+    "removeTitle": "Remove {{name}}?",
+    "removeBody_one": "Its {{count}} set will be deleted.",
+    "removeBody_other": "Its {{count}} sets will be deleted.",
+    "remove": "Remove"
   },
   "history": {
     "previousMonth": "Previous month",
