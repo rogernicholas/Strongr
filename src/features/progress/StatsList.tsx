@@ -14,6 +14,7 @@ import {
 } from '@/data';
 import { AppText, Card } from '@/ui';
 
+import { summarizeOverview, type Overview } from './overview';
 import type { StatsTarget } from './types';
 
 interface Props {
@@ -30,16 +31,19 @@ export function StatsList({ onOpen, reloadToken }: Props) {
   const unit = settings.weightUnit;
   const [exercises, setExercises] = useState<LoggedExercise[]>([]);
   const [bodyweights, setBodyweights] = useState<Bodyweight[]>([]);
+  const [overview, setOverview] = useState<Overview | null>(null);
 
   useEffect(() => {
     let active = true;
     void Promise.all([
       createWorkoutRepository(db).loggedExercises(),
       createBodyweightRepository(db).list(),
-    ]).then(([e, b]) => {
+      createWorkoutRepository(db).listFinished(),
+    ]).then(([e, b, w]) => {
       if (!active) return;
       setExercises(e);
       setBodyweights(b);
+      setOverview(summarizeOverview(w, b, 0, Date.now()));
     });
     return () => {
       active = false;
@@ -52,7 +56,16 @@ export function StatsList({ onOpen, reloadToken }: Props) {
     <View style={{ gap: 8 }}>
       <Card accessibilityLabel={t('stats.overview')} onPress={() => onOpen({ kind: 'overview' })}>
         <AppText variant="heading">{t('stats.overview')}</AppText>
-        <AppText variant="muted">{t('stats.overviewHint')}</AppText>
+        <AppText variant="muted">
+          {!overview || overview.workouts === 0
+            ? t('stats.overviewHint')
+            : overview.avgCalories === null
+              ? t('stats.overviewCount', { count: overview.workouts })
+              : t('stats.overviewSummary', {
+                  count: overview.workouts,
+                  kcal: Math.round(overview.avgCalories),
+                })}
+        </AppText>
       </Card>
       <Card
         accessibilityLabel={t('stats.bodyweight')}

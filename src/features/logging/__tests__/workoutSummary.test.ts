@@ -1,6 +1,6 @@
 import type { LoggedSet, Workout } from '@/data';
 
-import { PHRASES, phraseIndex, summarizeWorkout } from '../workoutSummary';
+import { exerciseProgression, PHRASES, phraseIndex, summarizeWorkout } from '../workoutSummary';
 
 const PHRASE_COUNT = PHRASES.length;
 
@@ -51,10 +51,42 @@ describe('workout summary', () => {
       timezone: 'Europe/Prague',
       exercises: [exercise([set(true), set(), set()]), exercise([set()]), exercise([])],
     };
-    expect(summarizeWorkout(workout)).toEqual({
+    expect(summarizeWorkout(workout, 80)).toEqual({
       durationMs: 45 * 60_000,
+      calories: 300,
       exercises: 2,
       workingSets: 3,
     });
+    expect(summarizeWorkout(workout, null).calories).toBeNull();
+
+    // With two or more live sets, length runs from the first to the last one.
+    const timed = { ...workout, exercises: [exercise([set(), set()])] };
+    timed.exercises[0]!.sets[0]!.completedAt = 60_000;
+    timed.exercises[0]!.sets[1]!.completedAt = 31 * 60_000;
+    expect(summarizeWorkout(timed, null).durationMs).toBe(30 * 60_000);
+  });
+
+  it('compares each exercise with its previous session', () => {
+    const at = (weightKg: number, reps: number) => ({ ...set(), weightKg, reps });
+    const workout: Workout = {
+      id: 'w',
+      templateId: null,
+      name: null,
+      startedAt: 0,
+      endedAt: 1,
+      timezone: 'UTC',
+      exercises: ['bench', 'row', 'curl'].map((id, i) => ({
+        id: `we${i}`,
+        exerciseId: id,
+        exerciseName: id,
+        tracks: { weight: true, reps: true, time: false, distance: false },
+        position: i,
+        sets: id === 'curl' ? [] : [at(60, 12), at(60, 12)],
+      })),
+    };
+    expect(exerciseProgression(workout, { bench: [at(60, 12), at(60, 8)] })).toEqual([
+      { name: 'bench', change: expect.closeTo(84 / 80 - 1, 5), first: false },
+      { name: 'row', change: null, first: true },
+    ]);
   });
 });

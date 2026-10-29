@@ -169,7 +169,15 @@
     "avgSets": "Avg sets",
     "avgRest": "Avg rest",
     "biggestProgress": "Biggest progress",
-    "smallestProgress": "Smallest progress"
+    "smallestProgress": "Smallest progress",
+    "avgCalories": "Avg calories",
+    "totalCalories": "Total calories",
+    "kcal": "{{value}} kcal",
+    "caloriesNeedBodyweight": "Log your bodyweight in the calendar to see calories.",
+    "overviewSummary_one": "{{count}} workout · {{kcal}} kcal avg",
+    "overviewSummary_other": "{{count}} workouts · {{kcal}} kcal avg",
+    "overviewCount_one": "{{count}} workout",
+    "overviewCount_other": "{{count}} workouts"
   },
   "done": {
     "phrase1": "Good job!",
@@ -194,6 +202,12 @@
     "sets": "Sets",
     "readyForMore": "Ready for more?",
     "suggestion": "{{name}}: try {{weight}} next time",
-    "button": "Done"
+    "button": "Done",
+    "calories": "Calories",
+    "kcal": "{{value}} kcal",
+    "caloriesNeedBodyweight": "Log your bodyweight in the calendar to see calories.",
+    "progress": "Since last time",
+    "firstSession": "first session",
+    "change": "{{change}}%"
   }
 }

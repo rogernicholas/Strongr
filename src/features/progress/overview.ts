@@ -1,5 +1,6 @@
-import { workingSets } from '@/core/training';
-import type { ExerciseSession, Workout } from '@/data';
+import { weekStartKey } from '@/core/dates';
+import { bodyweightFor, estimateCalories, workingSets, workoutLengthMs } from '@/core/training';
+import type { Bodyweight, ExerciseSession, Workout } from '@/data';
 
 import { defaultMetric, sessionValue } from './stats';
 
@@ -17,8 +18,11 @@ export interface ExerciseProgress {
 export interface Overview {
   workouts: number;
   perWeek: number | null;
-  /** First to last logged set; workouts edited in later have no times and are skipped. */
+  /** First to last logged set (start to Finish for one-set workouts). */
   avgDurationMs: number | null;
+  /** Estimated kcal, from the bodyweight logged for each workout's week. */
+  avgCalories: number | null;
+  totalCalories: number | null;
   avgWorkingSets: number | null;
   /** From rests saved with Log rest. */
   avgRestS: number | null;
@@ -29,12 +33,11 @@ export interface Overview {
 const mean = (values: readonly number[]) =>
   values.length ? values.reduce((a, b) => a + b, 0) / values.length : null;
 
-function durationMs(workout: Workout): number | null {
-  const times = workout.exercises
-    .flatMap((e) => e.sets)
-    .flatMap((s) => (s.completedAt === null ? [] : [s.completedAt]));
-  return times.length >= 2 ? Math.max(...times) - Math.min(...times) : null;
-}
+const lengthOf = (w: Workout) =>
+  workoutLengthMs(
+    w,
+    w.exercises.flatMap((e) => e.sets),
+  );
 
 /**
  * Change in the exercise's chart metric (All sets score, or reps without weight)
@@ -54,7 +57,12 @@ export function exerciseProgress(sessions: readonly ExerciseSession[]): number |
 }
 
 /** Workout-wide stats for finished workouts (oldest first) started at or after `from`. */
-export function summarizeOverview(all: readonly Workout[], from: number, now: number): Overview {
+export function summarizeOverview(
+  all: readonly Workout[],
+  bodyweights: readonly Bodyweight[],
+  from: number,
+  now: number,
+): Overview {
   const workouts = all.filter((w) => w.startedAt >= from);
   const sets = workouts.flatMap((w) => w.exercises.flatMap((e) => e.sets));
 
@@ -77,10 +85,18 @@ export function summarizeOverview(all: readonly Workout[], from: number, now: nu
     })
     .sort((a, b) => b.change - a.change);
 
+  const calories = workouts.flatMap((w) => {
+    const kg = bodyweightFor(bodyweights, weekStartKey(new Date(w.startedAt)));
+    const ms = lengthOf(w);
+    return kg === null || ms === null ? [] : [estimateCalories(kg, ms)];
+  });
+
   return {
     workouts: workouts.length,
     perWeek: weeks === null ? null : workouts.length / weeks,
-    avgDurationMs: mean(workouts.flatMap((w) => durationMs(w) ?? [])),
+    avgDurationMs: mean(workouts.flatMap((w) => lengthOf(w) ?? [])),
+    avgCalories: mean(calories),
+    totalCalories: calories.length ? calories.reduce((a, b) => a + b, 0) : null,
     avgWorkingSets: mean(
       workouts.map((w) => workingSets(w.exercises.flatMap((e) => e.sets)).length),
     ),

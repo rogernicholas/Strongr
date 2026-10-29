@@ -56,16 +56,27 @@ describe('summarizeOverview', () => {
           ],
         ],
       ]),
-      // Edited in later: no times, so it doesn't count for length.
+      // One untimed set: its length is start to Finish (60 min).
       workout(12, [['Bench', [set(60, 8)]]]),
     ];
-    const o = summarizeOverview(workouts, 0, 24 * DAY);
+    const o = summarizeOverview(workouts, [], 0, 24 * DAY);
     expect(o.workouts).toBe(2);
     expect(o.perWeek).toBeCloseTo(1); // 2 workouts over 2 weeks
-    expect(o.avgDurationMs).toBe(40 * MIN);
+    expect(o.avgDurationMs).toBe(50 * MIN);
+    expect(o.avgCalories).toBeNull(); // no bodyweight logged
     expect(o.avgWorkingSets).toBe(1.5);
     expect(o.avgRestS).toBe(120);
-    expect(summarizeOverview(workouts, 11 * DAY, 24 * DAY).workouts).toBe(1);
+    expect(summarizeOverview(workouts, [], 11 * DAY, 24 * DAY).workouts).toBe(1);
+
+    // 80 kg: 40 min = 5 × 80 × 2/3 ≈ 266.7 kcal, 60 min = 400 kcal.
+    const withWeight = summarizeOverview(
+      workouts,
+      [{ weekStart: '1970-01-05', weightKg: 80 }],
+      0,
+      24 * DAY,
+    );
+    expect(withWeight.totalCalories).toBeCloseTo(666.67, 1);
+    expect(withWeight.avgCalories).toBeCloseTo(333.33, 1);
   });
 
   it('ranks exercises by progress in their chart metric', () => {
@@ -81,17 +92,19 @@ describe('summarizeOverview', () => {
       if (d < 4) exercises.push(['Curl', [set(10, 10)]]);
       return workout(d, exercises);
     });
-    const o = summarizeOverview(workouts, 0, 5 * DAY);
+    const o = summarizeOverview(workouts, [], 0, 5 * DAY);
     expect(o.biggest?.name).toBe('Bench');
     expect(o.biggest?.change).toBeCloseTo(84 / 77.333 - 1, 3);
     expect(o.smallest).toEqual({ name: 'Pull-up', change: -0.2 });
   });
 
   it('is empty without workouts', () => {
-    expect(summarizeOverview([], 0, DAY)).toEqual({
+    expect(summarizeOverview([], [], 0, DAY)).toEqual({
       workouts: 0,
       perWeek: null,
       avgDurationMs: null,
+      avgCalories: null,
+      totalCalories: null,
       avgWorkingSets: null,
       avgRestS: null,
       biggest: null,
