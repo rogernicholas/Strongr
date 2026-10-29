@@ -12,6 +12,8 @@ const s = (weightKg: number | null, reps: number | null, extra: Partial<LoggedSe
   distanceM: null,
   rpe: null,
   isWarmup: false,
+  completedAt: null,
+  restS: null,
   ...extra,
 });
 
@@ -56,6 +58,8 @@ describe('buildTxtExport', () => {
     id: name,
     exerciseId: name,
     exerciseName: name,
+    seedKey: null,
+    muscleGroup: null,
     tracks,
     position: 0,
     sets,

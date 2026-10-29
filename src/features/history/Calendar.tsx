@@ -11,10 +11,10 @@ import {
   weekStartKey,
 } from '@/core/dates';
 import { useDb } from '@/core/db';
-import { formatSetShort } from '@/core/format';
 import { useTranslation } from '@/core/i18n';
 import { useSettings } from '@/core/settings';
 import { useTheme } from '@/core/theme';
+import { useFormatSet } from '@/core/useFormatSet';
 import { formatNumber, fromDisplayWeight, toDisplayWeight } from '@/core/units';
 import { createBodyweightRepository, createWorkoutRepository, type Workout } from '@/data';
 import { AppText, Card, Screen, useDialog } from '@/ui';
@@ -36,16 +36,19 @@ interface Props {
   top?: boolean;
   /** Called after a workout or bodyweight was changed here, so other pages can refresh. */
   onChanged?(): void;
+  /** Tap on a logged workout, to edit it. */
+  onOpenWorkout?(workout: Workout): void;
 }
 
 const WEEK_CELL = 48;
 
-export function Calendar({ footer, reloadToken, top, onChanged }: Props) {
+export function Calendar({ footer, reloadToken, top, onChanged, onOpenWorkout }: Props) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const dialog = useDialog();
   const db = useDb();
   const { settings } = useSettings();
+  const formatSet = useFormatSet();
   const today = new Date();
   const [month, setMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selected, setSelected] = useState(localDateKey(today));
@@ -261,15 +264,31 @@ export function Calendar({ footer, reloadToken, top, onChanged }: Props) {
         <AppText variant="muted">{t('history.restDay')}</AppText>
       ) : (
         dayWorkouts.map((workout) => (
-          <Card key={workout.id} onLongPress={() => void confirmDelete(workout)}>
-            {workout.name ? <AppText variant="heading">{workout.name}</AppText> : null}
+          <Card
+            key={workout.id}
+            accessibilityLabel={workout.name ?? t('logging.editTitle')}
+            onPress={onOpenWorkout ? () => onOpenWorkout(workout) : undefined}
+            onLongPress={() => void confirmDelete(workout)}
+          >
+            <AppText
+              accessibilityRole="header"
+              style={{
+                fontSize: 22,
+                lineHeight: 28,
+                fontWeight: '700',
+                color: theme.colors.accent,
+                marginBottom: 6,
+              }}
+            >
+              {workout.name ?? t('logging.title')}
+            </AppText>
             {workout.exercises
               .filter((e) => e.sets.length > 0)
               .map((e) => (
                 <AppText key={e.id}>
                   <AppText style={{ fontWeight: '600' }}>{e.exerciseName}</AppText>
                   {'  '}
-                  {e.sets.map((s) => formatSetShort(s, unit)).join(', ')}
+                  {e.sets.map(formatSet).join(', ')}
                 </AppText>
               ))}
             <AppText variant="muted">{t('history.longPressHint')}</AppText>

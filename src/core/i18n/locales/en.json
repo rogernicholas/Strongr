@@ -16,7 +16,13 @@
   },
   "settings": {
     "title": "Settings",
-    "weightUnit": "Weight unit"
+    "weightUnit": "Weight unit",
+    "workout": "Workout",
+    "restTimer": "Rest timer",
+    "restTimerHint": "Counts up after each set. Tap Log rest to save it for your stats.",
+    "suggestions": "Weight suggestions",
+    "suggestionsHint": "After a workout, suggests more weight where you hit your rep target.",
+    "suggestAt": "Suggest more weight when every working set reaches"
   },
   "about": {
     "title": "About",
@@ -28,7 +34,9 @@
     "save": "Save",
     "delete": "Delete",
     "saveFailed": "Couldn't save. Please try again.",
-    "ok": "OK"
+    "ok": "OK",
+    "repCount_one": "{{count}} rep",
+    "repCount_other": "{{count}} reps"
   },
   "exercises": {
     "title": "Choose exercises",
@@ -49,6 +57,7 @@
     "arms": "Arms",
     "legs": "Legs",
     "core": "Core",
+    "cardio": "Cardio",
     "other": "Other"
   },
   "routines": {
@@ -60,17 +69,20 @@
     "deleteBody": "Your logged workouts are not affected.",
     "startWorkout": "Start workout",
     "title": "My routines",
-    "empty": "No routines yet. Tap New workout, pick exercises and save them as a routine.",
+    "empty": "No routines yet. Tap New routine and pick its exercises.",
     "longPressHint": "Tap a routine to start from it. Long-press to delete.",
     "useHint": "Loads this routine’s exercises.",
     "selected": "Selected",
     "tapToUse": "Tap to use",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "new": "+ New routine",
+    "newTitle": "New routine"
   },
   "logging": {
     "title": "Workout",
     "reps": "reps",
     "seconds": "seconds",
+    "minutes": "min",
     "meters": "meters",
     "warmup": "Warm-up set",
     "warmupShort": "warm-up",
@@ -88,7 +100,24 @@
     "finishTitle": "Finish workout?",
     "finishBody": "It will be saved to your history. A workout with no sets is discarded.",
     "discarded": "Empty workout discarded",
-    "addToWorkout": "Add to workout"
+    "addToWorkout": "Add to workout",
+    "cancelWorkout": "Cancel",
+    "cancelTitle": "Cancel this workout?",
+    "cancelBody_zero": "Nothing has been logged yet.",
+    "cancelBody_one": "The {{count}} set you logged will be deleted.",
+    "cancelBody_other": "All {{count}} sets you logged will be deleted.",
+    "cancelConfirm": "Delete workout",
+    "keepGoing": "Keep going",
+    "cancelled": "Workout cancelled",
+    "removeExercise": "Remove {{name}}",
+    "removeTitle": "Remove {{name}}?",
+    "removeBody_one": "Its {{count}} set will be deleted.",
+    "removeBody_other": "Its {{count}} sets will be deleted.",
+    "remove": "Remove",
+    "done": "Done",
+    "editTitle": "Edit workout",
+    "rest": "Rest",
+    "logRest": "Log rest"
   },
   "history": {
     "previousMonth": "Previous month",
@@ -96,7 +125,7 @@
     "restDay": "No workout this day.",
     "deleteTitle": "Delete this workout?",
     "deleteBody": "It will be removed from your calendar and exports.",
-    "longPressHint": "Long-press to delete",
+    "longPressHint": "Tap to edit · long-press to delete",
     "bodyweightTitle": "Bodyweight",
     "weekOf": "Week of {{date}}",
     "bodyweightRemoveHint": "Clear it or enter 0 to remove."
@@ -119,7 +148,8 @@
     "sessionsLast_one": "{{count}} session · last {{date}}",
     "sessionsLast_other": "{{count}} sessions · last {{date}}",
     "metric": "Graph shows",
-    "topSet": "Top set",
+    "allSets": "All sets",
+    "volume": "Volume",
     "range": "Time range",
     "range3m": "3M",
     "range1y": "1Y",
@@ -134,7 +164,24 @@
     "highest": "Highest",
     "noChartData": "Nothing to graph in this time range.",
     "chartLabel_one": "Graph with {{count}} point, latest {{latest}}",
-    "chartLabel_other": "Graph with {{count}} points, latest {{latest}}"
+    "chartLabel_other": "Graph with {{count}} points, latest {{latest}}",
+    "overview": "Overview",
+    "overviewHint": "Averages, rest and progress across workouts",
+    "workouts": "Workouts",
+    "perWeek": "Per week",
+    "avgLength": "Avg length",
+    "avgSets": "Avg sets",
+    "avgRest": "Avg rest",
+    "biggestProgress": "Biggest progress",
+    "smallestProgress": "Smallest progress",
+    "avgCalories": "Avg calories",
+    "totalCalories": "Total calories",
+    "kcal": "{{value}} kcal",
+    "caloriesNeedBodyweight": "Log your bodyweight in the calendar to see calories.",
+    "overviewSummary_one": "{{count}} workout · {{kcal}} kcal avg",
+    "overviewSummary_other": "{{count}} workouts · {{kcal}} kcal avg",
+    "overviewCount_one": "{{count}} workout",
+    "overviewCount_other": "{{count}} workouts"
   },
   "done": {
     "phrase1": "Good job!",
@@ -157,6 +204,14 @@
     "minutes_other": "{{count}} min",
     "exercises": "Exercises",
     "sets": "Sets",
-    "button": "Done"
+    "readyForMore": "Ready for more?",
+    "suggestion": "{{name}}: try {{weight}} next time",
+    "button": "Done",
+    "calories": "Calories",
+    "kcal": "{{value}} kcal",
+    "caloriesNeedBodyweight": "Log your bodyweight in the calendar to see calories.",
+    "progress": "Since last time",
+    "firstSession": "first session",
+    "change": "{{change}}%"
   }
 }

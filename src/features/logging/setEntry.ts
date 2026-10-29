@@ -21,8 +21,15 @@ export function suggestNextSet(
   const source =
     sessionSets.at(-1) ?? previousSets.filter((s) => !s.isWarmup)[0] ?? previousSets[0];
   if (!source) return EMPTY_SET;
-  const { id: _id, position: _position, ...values } = source;
-  return { ...values, isWarmup: sessionSets.length === 0 ? false : values.isWarmup };
+  const { weightKg, reps, durationS, distanceM, rpe, isWarmup } = source;
+  return {
+    weightKg,
+    reps,
+    durationS,
+    distanceM,
+    rpe,
+    isWarmup: sessionSets.length === 0 ? false : isWarmup,
+  };
 }
 
 /** Accepts "52.5" and "52,5". Returns null for empty or invalid input. */

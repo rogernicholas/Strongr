@@ -1,4 +1,5 @@
-import type { Workout } from '@/data';
+import { sessionChange, workingSets, workoutCalories, workoutLengthMs } from '@/core/training';
+import type { LoggedSet, Workout } from '@/data';
 
 /** i18n keys of the "good job" phrases; add or remove entries freely. */
 export const PHRASES = [
@@ -34,15 +35,47 @@ export function phraseIndex(finishedCount: number, count: number = PHRASES.lengt
 
 export interface WorkoutSummary {
   durationMs: number;
+  /** Estimate from bodyweight and length; null without a bodyweight entry. */
+  calories: number | null;
   exercises: number;
   workingSets: number;
 }
 
-export function summarizeWorkout(workout: Workout): WorkoutSummary {
+export function summarizeWorkout(workout: Workout, bodyweightKg: number | null): WorkoutSummary {
   const done = workout.exercises.filter((e) => e.sets.length > 0);
+  const durationMs =
+    workoutLengthMs(
+      workout,
+      done.flatMap((e) => e.sets),
+    ) ?? 0;
   return {
-    durationMs: Math.max(0, (workout.endedAt ?? workout.startedAt) - workout.startedAt),
+    durationMs,
+    calories: bodyweightKg === null ? null : workoutCalories(bodyweightKg, workout),
     exercises: done.length,
     workingSets: done.reduce((n, e) => n + e.sets.filter((s) => !s.isWarmup).length, 0),
   };
+}
+
+export interface ExerciseProgression {
+  name: string;
+  /** Change against the previous session as a fraction; null for a first session or no match. */
+  change: number | null;
+  first: boolean;
+}
+
+/** One line per exercise with working sets: how it compares with its previous session. */
+export function exerciseProgression(
+  workout: Workout,
+  previous: Readonly<Record<string, readonly LoggedSet[]>>,
+): ExerciseProgression[] {
+  return workout.exercises
+    .filter((e) => workingSets(e.sets).length > 0)
+    .map((e) => {
+      const before = previous[e.exerciseId] ?? [];
+      return {
+        name: e.exerciseName,
+        change: sessionChange(e.sets, before),
+        first: workingSets(before).length === 0,
+      };
+    });
 }

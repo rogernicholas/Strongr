@@ -38,14 +38,14 @@ export interface Theme {
 /** Font family names, as registered by useFonts in App.tsx. */
 export const fonts = {
   logo: 'ChangaOne_400Regular',
-  regular: 'NotoSans_400Regular',
-  semibold: 'NotoSans_600SemiBold',
-  bold: 'NotoSans_700Bold',
+  regular: 'InstrumentSans_400Regular',
+  semibold: 'InstrumentSans_600SemiBold',
+  bold: 'InstrumentSans_700Bold',
 } as const;
 
 /**
  * Android ignores fontWeight for custom fonts, so each weight is its own family.
- * Maps a fontWeight to the matching Noto Sans family.
+ * Maps a fontWeight to the matching Instrument Sans family.
  */
 export function fontFamilyFor(weight: string | number | undefined): string {
   const w = Number(weight === 'bold' ? 700 : (weight ?? 400));

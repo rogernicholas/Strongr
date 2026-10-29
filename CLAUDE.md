@@ -21,7 +21,7 @@ Owner: Roger. He makes the decisions; Claude writes the code.
 
 ## Stack
 
-- Expo (React Native), TypeScript in strict mode
+- Expo SDK 58 (React Native), TypeScript in strict mode
 - expo-sqlite for local storage, numbered forward-only migrations
 - React Navigation
 - i18next for all user-facing strings
@@ -65,7 +65,7 @@ src/
 - Timestamps are epoch milliseconds (UTC) in INTEGER columns. Workouts also store the device timezone.
 - Adding migration N: add `src/core/db/migrations/00N_name.ts`, append it to the list in `migrations/index.ts`, and add `test/migrations/fixtures/vN.ts` with sample data. The tests fail until the fixture exists.
 - Installable APK: `npx eas-cli build -p android --profile preview` (config in `eas.json`; the build runs in Expo's cloud under Roger's Expo account, so it runs on his PC after he has signed in with `npx eas-cli login` himself). Bump `version` and `android.versionCode` in `app.json` for each build that is shared.
-- The first APK (0.1.0, schema version 3) shipped on 2026-10-16, so every existing migration is frozen: schema changes need a new numbered migration.
+- The first APK (0.1.0, schema version 3) shipped on 2026-10-16, so every existing migration is frozen: schema changes need a new numbered migration. Migration 004 (`sets.rest_s`, schema version 4) ships in 0.2.0.
 
 ## Data rules (cheap now, expensive later)
 
@@ -234,4 +234,19 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-16: A week's bodyweight is removed by saving it empty or as 0 (button reads Delete).
 - 2026-10-16: Popups with a text field open in the upper part of the screen, clear of the keyboard; taps work on the first try while the keyboard is open.
 - 2026-10-16: First APK (0.1.0) built with EAS preview profile and installed by direct download; the Expo project is owned by Roger's `rozero_n` account. Workouts logged in Expo Go are not carried over.
+- 2026-10-29: Sets read "20 kg × 15 reps" everywhere (weight and reps were easy to mix up).
+- 2026-10-29: Cancel sits next to Finish on the workout screen and deletes the whole workout after a confirm.
+- 2026-10-29: Exercises can be added and removed during a workout; removing one with sets asks first.
+- 2026-10-29: Tapping a workout in the calendar opens it for editing (same screen as logging); long-press still deletes. Date and time are not editable.
+- 2026-10-29: Exercise chart plots the "All sets" score (average Epley e1RM over working sets) by default, Volume as the second option. Best set and best e1RM stay as record tiles. Bodyweight exercises keep the reps chart.
+- 2026-10-29: Rest timer is on by default (Settings switch). It counts up after each set; rest is saved only when Roger taps Log rest (sets.rest_s, migration 004), not guessed from gaps, because he switches machines quickly.
+- 2026-10-29: Overview stats page: workouts, per week, average length (first to last set), average working sets, average logged rest, biggest and smallest progress (change in the chart metric, first two vs last two sessions, at least four sessions). Follows 3M / 1Y / All.
+- 2026-10-29: Weight suggestions on the good-job screen, on by default: when every working set at the top weight reaches the rep target (default 14, editable in Settings), suggest one step more (2.5 kg / 5 lb), at most two lines.
+- 2026-10-29: Calories are estimated per workout as MET 5 × bodyweight (kg) × workout length (first to last set), using the weekly bodyweight for that week (or the earliest entry). No height. Calculated, not stored. Shown on the good-job screen and as average and total on the Overview. Later, for cardio logging: a MET per exercise (lifts 5, running 8-11, rowing 7), summed per exercise.
+- 2026-10-29: The good-job screen lists each exercise's change against its previous session (All sets score, or reps for bodyweight exercises), "first session" when new.
+- 2026-10-29: Cardio is in: nine cardio seeds (runs, incline walk, bike, rowing erg, elliptical, stair climber, jump rope, swimming) (muscle group Cardio, time + distance, entered in minutes and km), each with its own MET; running uses 1 kcal/kg/km when a distance is logged; custom cardio uses MET 7. Workout calories = each cardio set at its rate + the remaining length as lifting at MET 5.
+- 2026-10-29: My routines has a New routine button: pick exercises, save, back to the list.
+- 2026-10-29: Body font is now Instrument Sans (replacing Noto Sans); the logo stays Changa One.
+- 2026-10-29: Calendar workout cards lead with the routine name (or "Workout") as a large teal title.
+- 2026-10-29: Upgraded to Expo SDK 58 (React Native 0.88) so the Play Store Expo Go opens the project. Check the current Expo SDK before starting any new project.
 - Open: scoreboard metric and caps, sign-in method.

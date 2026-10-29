@@ -20,11 +20,8 @@ export function AppText({ variant = 'body', style, ...rest }: TextProps & { vari
   const theme = useTheme();
   const color =
     variant === 'muted' || variant === 'label' ? theme.colors.textMuted : theme.colors.text;
-  const { fontWeight, fontFamily, ...flat }: TextStyle = StyleSheet.flatten([
-    sizes[variant],
-    { color },
-    style,
-  ]);
+  const { fontWeight, fontFamily, ...flat }: TextStyle =
+    StyleSheet.flatten([sizes[variant], { color }, style]) ?? {};
   const family =
     fontFamily ?? (variant === 'logo' ? fonts.logo : fontFamilyFor(fontWeight ?? undefined));
   return <Text {...rest} style={{ ...flat, fontFamily: family }} />;

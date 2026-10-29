@@ -22,7 +22,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'PickExercises'>;
 export function PickExercisesScreen({ route, navigation }: Props) {
   const { t } = useTranslation();
   const db = useDb();
-  const { routineId, routineName, exerciseIds, addToWorkoutId } = route.params;
+  const { routineId, routineName, exerciseIds, addToWorkoutId, newRoutine } = route.params;
   const [saveDialog, setSaveDialog] = useState<{ ids: string[]; suggestion: string } | null>(null);
   // Bumped on open so the dialog remounts with the new suggestion but still fades out on close.
   const [dialogKey, setDialogKey] = useState(0);
@@ -41,6 +41,10 @@ export function PickExercisesScreen({ route, navigation }: Props) {
     setSaveDialog(null);
     setRoutinesVersion((v) => v + 1);
     ToastAndroid.show(t('routines.saved', { name: routine.name }), ToastAndroid.SHORT);
+    if (newRoutine) {
+      navigation.goBack();
+      return;
+    }
     navigation.setParams({
       routineId: routine.id,
       routineName: routine.name,
@@ -82,6 +86,33 @@ export function PickExercisesScreen({ route, navigation }: Props) {
           />
         )}
       />
+    );
+  }
+
+  const saveDialogNode = (
+    <SaveRoutineDialog
+      key={dialogKey}
+      visible={saveDialog !== null}
+      initialName={saveDialog?.suggestion ?? ''}
+      onCancel={() => setSaveDialog(null)}
+      onSave={(name) => void saveNew(name)}
+    />
+  );
+
+  if (newRoutine) {
+    return (
+      <>
+        <ExercisePicker
+          renderFooter={(ids) => (
+            <Button
+              label={t('routines.saveAs')}
+              disabled={ids.length === 0}
+              onPress={() => void openSaveDialog(ids)}
+            />
+          )}
+        />
+        {saveDialogNode}
+      </>
     );
   }
 
@@ -129,13 +160,7 @@ export function PickExercisesScreen({ route, navigation }: Props) {
           </View>
         )}
       />
-      <SaveRoutineDialog
-        key={dialogKey}
-        visible={saveDialog !== null}
-        initialName={saveDialog?.suggestion ?? ''}
-        onCancel={() => setSaveDialog(null)}
-        onSave={(name) => void saveNew(name)}
-      />
+      {saveDialogNode}
     </>
   );
 }

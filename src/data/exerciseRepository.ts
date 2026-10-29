@@ -1,4 +1,4 @@
-import { isMuscleGroup, type MuscleGroup } from '@/config/muscleGroups';
+import { CARDIO, isMuscleGroup, type MuscleGroup } from '@/config/muscleGroups';
 import type { SeedExercise } from '@/config/seedExercises';
 import { systemClock, type Clock } from '@/core/clock';
 import type { Db } from '@/core/db';
@@ -70,10 +70,13 @@ export function createExerciseRepository(db: Db, clock: Clock = systemClock) {
 
       const id = newId();
       const now = clock();
+      // Cardio logs time and distance; everything else weight and reps.
+      const cardio = input.muscleGroup === CARDIO ? 1 : 0;
       await db.run(
-        `INSERT INTO exercises (id, name, source, muscle_group, created_at, updated_at)
-         VALUES (?, ?, 'custom', ?, ?, ?)`,
-        [id, name, input.muscleGroup, now, now],
+        `INSERT INTO exercises (id, name, source, muscle_group,
+           tracks_weight, tracks_reps, tracks_time, tracks_distance, created_at, updated_at)
+         VALUES (?, ?, 'custom', ?, ?, ?, ?, ?, ?, ?)`,
+        [id, name, input.muscleGroup, 1 - cardio, 1 - cardio, cardio, cardio, now, now],
       );
       const row = await db.getFirst<ExerciseRow>(`SELECT ${COLUMNS} FROM exercises WHERE id = ?`, [
         id,

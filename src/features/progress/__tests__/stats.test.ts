@@ -4,7 +4,6 @@ import {
   bodyweightPoints,
   changeOver,
   defaultMetric,
-  estimate1Rm,
   exercisePoints,
   inRange,
   summarizeBodyweight,
@@ -23,6 +22,8 @@ const set = (weightKg: number | null, reps: number | null, isWarmup = false): Lo
   distanceM: null,
   rpe: null,
   isWarmup,
+  completedAt: null,
+  restS: null,
 });
 
 const session = (day: number, sets: LoggedSet[]): ExerciseSession => ({
@@ -32,28 +33,23 @@ const session = (day: number, sets: LoggedSet[]): ExerciseSession => ({
 });
 
 describe('stats', () => {
-  it('estimates 1RM with Epley', () => {
-    expect(estimate1Rm(100, 1)).toBe(100);
-    expect(estimate1Rm(100, 5)).toBeCloseTo(116.67, 2);
-    expect(estimate1Rm(0, 5)).toBeNull();
-    expect(estimate1Rm(100, 0)).toBeNull();
-  });
-
-  it('plots the heaviest working set per session, ignoring warm-ups', () => {
+  it('plots the All sets score per session, ignoring warm-ups', () => {
     const sessions = [
-      session(1, [set(80, 5, true), set(60, 8)]),
-      session(8, [set(62.5, 8), set(65, 5)]),
+      session(1, [set(80, 5, true), set(60, 12), set(60, 8), set(60, 6)]),
+      session(8, [set(60, 12), set(60, 12), set(60, 12)]),
     ];
-    expect(defaultMetric(sessions)).toBe('topSet');
-    expect(exercisePoints(sessions, 'topSet').map((p) => p.value)).toEqual([60, 65]);
-    expect(exercisePoints(sessions, 'e1rm')[1]!.value).toBeCloseTo(62.5 * (1 + 8 / 30)); // 62.5 × 8 beats 65 × 5
+    expect(defaultMetric(sessions)).toBe('allSets');
+    const [before, after] = exercisePoints(sessions, 'allSets').map((p) => p.value);
+    expect(before).toBeCloseTo(77.33, 2);
+    expect(after).toBeCloseTo(84);
+    expect(exercisePoints(sessions, 'volume').map((p) => p.value)).toEqual([1560, 2160]);
   });
 
   it('falls back to reps for exercises logged without weight', () => {
     const sessions = [session(1, [set(null, 12), set(null, 15)])];
     expect(defaultMetric(sessions)).toBe('reps');
     expect(exercisePoints(sessions, 'reps')).toEqual([{ t: DAY, value: 15 }]);
-    expect(exercisePoints(sessions, 'topSet')).toEqual([]);
+    expect(exercisePoints(sessions, 'allSets')).toEqual([]);
   });
 
   it('summarizes best set, best e1RM and sessions', () => {

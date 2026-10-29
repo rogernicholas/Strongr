@@ -11,6 +11,8 @@ const logged = (weightKg: number, reps: number, isWarmup = false): LoggedSet => 
   distanceM: null,
   rpe: null,
   isWarmup,
+  completedAt: null,
+  restS: null,
 });
 
 describe('suggestNextSet', () => {

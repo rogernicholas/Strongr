@@ -3,10 +3,10 @@ import { View } from 'react-native';
 
 import { formatShortDate } from '@/core/dates';
 import { useDb } from '@/core/db';
-import { formatSetShort } from '@/core/format';
 import { useTranslation } from '@/core/i18n';
 import { useSettings } from '@/core/settings';
 import { formatNumber, toDisplayWeight } from '@/core/units';
+import { useFormatSet } from '@/core/useFormatSet';
 import {
   createBodyweightRepository,
   createWorkoutRepository,
@@ -28,25 +28,20 @@ import {
 } from './stats';
 import type { StatsTarget } from './types';
 
-const DASH = '–';
+import { OverviewDetail } from './OverviewDetail';
+import { DASH, RangeControl, StatTile } from './StatTiles';
 
-function StatTile({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ width: '48.5%' }}>
-      <Card>
-        <AppText variant="label">{label.toUpperCase()}</AppText>
-        <AppText variant="stat">{value}</AppText>
-      </Card>
-    </View>
-  );
+/** The overview, or a graph plus stats for one exercise or for bodyweight. */
+export function StatsDetail({ target }: { target: StatsTarget }) {
+  return target.kind === 'overview' ? <OverviewDetail /> : <ChartDetail target={target} />;
 }
 
-/** Graph plus stats for one exercise or for bodyweight. */
-export function StatsDetail({ target }: { target: StatsTarget }) {
+function ChartDetail({ target }: { target: Exclude<StatsTarget, { kind: 'overview' }> }) {
   const { t, i18n } = useTranslation();
   const db = useDb();
   const { settings } = useSettings();
   const unit = settings.weightUnit;
+  const formatSet = useFormatSet();
   const [sessions, setSessions] = useState<ExerciseSession[] | null>(null);
   const [bodyweights, setBodyweights] = useState<Bodyweight[] | null>(null);
   const [range, setRange] = useState<Range>('all');
@@ -93,7 +88,7 @@ export function StatsDetail({ target }: { target: StatsTarget }) {
   if (exerciseId) {
     const s = summarizeExercise(sessions ?? []);
     tiles = [
-      { label: t('stats.bestSet'), value: s.bestSet ? formatSetShort(s.bestSet, unit) : DASH },
+      { label: t('stats.bestSet'), value: s.bestSet ? formatSet(s.bestSet) : DASH },
       { label: t('stats.e1rm'), value: orDash(s.bestE1rm) },
       { label: t('stats.sessions'), value: String(s.sessions) },
       {
@@ -114,14 +109,14 @@ export function StatsDetail({ target }: { target: StatsTarget }) {
 
   return (
     <Screen>
-      {metric === 'topSet' || metric === 'e1rm' ? (
+      {metric === 'allSets' || metric === 'volume' ? (
         <SegmentedControl<Metric>
           accessibilityLabel={t('stats.metric')}
           value={metric}
           onChange={setMetric}
           options={[
-            { value: 'topSet', label: t('stats.topSet') },
-            { value: 'e1rm', label: t('stats.e1rm') },
+            { value: 'allSets', label: t('stats.allSets') },
+            { value: 'volume', label: t('stats.volume') },
           ]}
         />
       ) : null}
@@ -144,16 +139,7 @@ export function StatsDetail({ target }: { target: StatsTarget }) {
         )}
       </Card>
 
-      <SegmentedControl<Range>
-        accessibilityLabel={t('stats.range')}
-        value={range}
-        onChange={setRange}
-        options={[
-          { value: '3m', label: t('stats.range3m') },
-          { value: '1y', label: t('stats.range1y') },
-          { value: 'all', label: t('stats.rangeAll') },
-        ]}
-      />
+      <RangeControl value={range} onChange={setRange} />
 
       <View
         style={{

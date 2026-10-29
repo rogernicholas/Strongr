@@ -1,8 +1,8 @@
 // Per-weight imports: the package roots would bundle every weight (about 11 MB).
 import { ChangaOne_400Regular } from '@expo-google-fonts/changa-one/400Regular';
-import { NotoSans_400Regular } from '@expo-google-fonts/noto-sans/400Regular';
-import { NotoSans_600SemiBold } from '@expo-google-fonts/noto-sans/600SemiBold';
-import { NotoSans_700Bold } from '@expo-google-fonts/noto-sans/700Bold';
+import { InstrumentSans_400Regular } from '@expo-google-fonts/instrument-sans/400Regular';
+import { InstrumentSans_600SemiBold } from '@expo-google-fonts/instrument-sans/600SemiBold';
+import { InstrumentSans_700Bold } from '@expo-google-fonts/instrument-sans/700Bold';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
@@ -28,9 +28,9 @@ export default function App() {
   // If fonts fail to load the app still starts, with the system font.
   const [fontsLoaded, fontError] = useFonts({
     ChangaOne_400Regular,
-    NotoSans_400Regular,
-    NotoSans_600SemiBold,
-    NotoSans_700Bold,
+    InstrumentSans_400Regular,
+    InstrumentSans_600SemiBold,
+    InstrumentSans_700Bold,
   });
 
   useEffect(() => {

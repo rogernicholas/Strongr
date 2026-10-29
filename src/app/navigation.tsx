@@ -22,8 +22,11 @@ export type RootStackParamList = {
     exerciseIds?: string[];
     /** Picking exercises to add to a workout in progress. */
     addToWorkoutId?: string;
+    /** Building a new routine from My routines: save it, no workout. */
+    newRoutine?: boolean;
   };
-  LogWorkout: { workoutId: string; title?: string };
+  /** `edit` opens a finished workout from the calendar. */
+  LogWorkout: { workoutId: string; title?: string; mode?: 'live' | 'edit' };
   /** "Good job" summary after a saved workout. */
   WorkoutDone: { workoutId: string };
   Routines: undefined;
@@ -63,11 +66,16 @@ export function RootNavigation() {
         <Stack.Screen
           name="PickExercises"
           component={PickExercisesScreen}
-          options={({ route }) => ({
-            title: route.params.addToWorkoutId
-              ? t('logging.addExercise')
-              : (route.params.routineName ?? t('exercises.title')),
-          })}
+          options={({ route }) =>
+            route.params.addToWorkoutId
+              ? // Adding mid-workout slides up over the workout like a sheet.
+                { title: t('logging.addExercise'), animation: 'slide_from_bottom' }
+              : {
+                  title: route.params.newRoutine
+                    ? t('routines.newTitle')
+                    : (route.params.routineName ?? t('exercises.title')),
+                }
+          }
         />
         <Stack.Screen
           name="LogWorkout"
@@ -91,7 +99,9 @@ export function RootNavigation() {
             title:
               route.params.target.kind === 'exercise'
                 ? route.params.target.name
-                : t('stats.bodyweight'),
+                : t(
+                    route.params.target.kind === 'overview' ? 'stats.overview' : 'stats.bodyweight',
+                  ),
           })}
         />
         <Stack.Screen

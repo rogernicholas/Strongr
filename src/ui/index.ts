@@ -11,3 +11,4 @@ export { PageDots } from './PageDots';
 export { Screen } from './Screen';
 export { SegmentedControl } from './SegmentedControl';
 export { TextField } from './TextField';
+export { Toggle } from './Toggle';

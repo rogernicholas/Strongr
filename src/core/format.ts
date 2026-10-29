@@ -15,23 +15,33 @@ export function formatDuration(seconds: number): string {
   return `${m}:${String(s % 60).padStart(2, '0')}`;
 }
 
+/** Stopwatch style, "0:45", "12:05". */
+export function formatClock(seconds: number): string {
+  const s = Math.floor(seconds);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
 export function formatDistance(meters: number): string {
   return meters >= 1000 ? `${formatNumber(meters / 1000, 2)} km` : `${formatNumber(meters, 0)} m`;
 }
 
 /**
- * Compact text for one set, e.g. "50 × 7", "× 12" (bodyweight), "1:30",
- * "2 km in 8:00". Weight is shown in the user's unit without the unit label.
+ * Text for one set that says what each number is, e.g. "50 kg × 7 reps", "12 reps"
+ * (bodyweight), "1:30", "2 km · 8:00". `reps` words a rep count, e.g. via i18n plurals.
  */
-export function formatSetShort(set: SetValues, unit: WeightUnit): string {
+export function formatSetShort(
+  set: SetValues,
+  unit: WeightUnit,
+  reps: (count: number) => string,
+): string {
   const parts: string[] = [];
-  if (set.weightKg !== null && set.reps !== null) {
-    parts.push(`${formatNumber(toDisplayWeight(set.weightKg, unit), 2)} × ${set.reps}`);
-  } else if (set.reps !== null) {
-    parts.push(`× ${set.reps}`);
-  } else if (set.weightKg !== null) {
-    parts.push(`${formatNumber(toDisplayWeight(set.weightKg, unit), 2)} ${unit}`);
-  }
+  const weight =
+    set.weightKg === null
+      ? null
+      : `${formatNumber(toDisplayWeight(set.weightKg, unit), 2)} ${unit}`;
+  if (weight !== null && set.reps !== null) parts.push(`${weight} × ${reps(set.reps)}`);
+  else if (set.reps !== null) parts.push(reps(set.reps));
+  else if (weight !== null) parts.push(weight);
   if (set.distanceM !== null) parts.push(formatDistance(set.distanceM));
   if (set.durationS !== null) parts.push(formatDuration(set.durationS));
   return parts.join(' · ');

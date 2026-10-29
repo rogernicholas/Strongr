@@ -138,6 +138,8 @@ describe('migrations', () => {
     await expect(insert('rpe', 11)).rejects.toThrow();
     await expect(insert('rpe', 0)).rejects.toThrow();
     await expect(insert('rpe', 7.5)).resolves.toBeDefined();
+    await expect(insert('rest_s', -5)).rejects.toThrow();
+    await expect(insert('rest_s', 90)).resolves.toBeDefined();
     db.close();
   });
 });

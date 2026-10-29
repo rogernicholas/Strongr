@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { formatSetShort } from '@/core/format';
 import { useTranslation } from '@/core/i18n';
 import { useTheme } from '@/core/theme';
 import type { WeightUnit } from '@/core/units';
+import { useFormatSet } from '@/core/useFormatSet';
 import type { LoggedSet, SetInput, WorkoutExercise } from '@/data';
 import { AppText } from '@/ui';
 
@@ -21,16 +21,18 @@ interface Props {
   onAddSet(input: SetInput): void;
   onUpdateSet(setId: string, input: SetInput): void;
   onDeleteSet(setId: string): void;
+  onRemove(): void;
 }
 
 export function ExerciseLogCard(props: Props) {
   const { exercise, previousSets, unit, rpeEnabled, expanded } = props;
   const { t } = useTranslation();
   const theme = useTheme();
+  const formatSet = useFormatSet();
   const [editingId, setEditingId] = useState<string | null>(null);
   const editing = exercise.sets.find((s) => s.id === editingId) ?? null;
 
-  const lastTime = previousSets.map((s) => formatSetShort(s, unit)).join(', ');
+  const lastTime = previousSets.map(formatSet).join(', ');
   const suggestion = suggestNextSet(exercise.sets, previousSets);
 
   return (
@@ -49,13 +51,32 @@ export function ExerciseLogCard(props: Props) {
         onPress={props.onToggle}
         style={{ padding: 16, gap: 4 }}
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppText variant="heading" style={{ flex: 1 }}>
             {exercise.exerciseName}
           </AppText>
           <AppText variant="muted">
             {t('logging.setCount', { count: exercise.sets.length })}
           </AppText>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('logging.removeExercise', { name: exercise.exerciseName })}
+            onPress={props.onRemove}
+            hitSlop={12}
+            style={({ pressed }) => ({
+              width: 32,
+              height: 32,
+              marginRight: -6,
+              borderRadius: 16,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: pressed ? theme.colors.raised : 'transparent',
+            })}
+          >
+            <AppText variant="muted" style={{ fontSize: 20, lineHeight: 24 }}>
+              ×
+            </AppText>
+          </Pressable>
         </View>
         <AppText variant="muted">
           {lastTime ? t('logging.lastTime', { sets: lastTime }) : t('logging.firstTime')}
@@ -84,8 +105,7 @@ export function ExerciseLogCard(props: Props) {
                 {i + 1}
               </AppText>
               <AppText variant="heading" style={{ flex: 1 }}>
-                {formatSetShort(set, unit)}
-                {set.weightKg !== null && set.reps !== null ? ` ${unit}` : ''}
+                {formatSet(set)}
                 {set.rpe !== null ? `  @${set.rpe}` : ''}
               </AppText>
               {set.isWarmup ? <AppText variant="muted">{t('logging.warmupShort')}</AppText> : null}

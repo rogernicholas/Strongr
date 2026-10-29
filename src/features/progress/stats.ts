@@ -1,10 +1,14 @@
 import { parseDateKey } from '@/core/dates';
+import { allSetsScore, bestE1rm, sessionVolume, workingSets as working } from '@/core/training';
 import type { Bodyweight, ExerciseSession, LoggedSet } from '@/data';
 
 const DAY = 24 * 60 * 60 * 1000;
 
-/** What the exercise graph plots per session. */
-export type Metric = 'topSet' | 'e1rm' | 'reps';
+/**
+ * What the exercise graph plots per session: the All sets score (average e1RM over
+ * working sets), total volume, or most reps for exercises logged without weight.
+ */
+export type Metric = 'allSets' | 'volume' | 'reps';
 export type Range = '3m' | '1y' | 'all';
 
 export interface Point {
@@ -14,40 +18,27 @@ export interface Point {
   value: number;
 }
 
-/** Estimated one-rep max (Epley). A single rep is the weight itself. */
-export function estimate1Rm(weightKg: number, reps: number): number | null {
-  if (!(weightKg > 0) || !(reps > 0)) return null;
-  return reps === 1 ? weightKg : weightKg * (1 + reps / 30);
-}
-
-const working = (sets: readonly LoggedSet[]) => sets.filter((s) => !s.isWarmup);
-
 function maxOf(values: (number | null)[]): number | null {
   const real = values.filter((v): v is number => v !== null);
   return real.length ? Math.max(...real) : null;
 }
 
-/** The best value of one session for a metric; warm-ups never count. */
-function sessionValue(sets: readonly LoggedSet[], metric: Metric): number | null {
-  const w = working(sets);
+/** One session's value for a metric; warm-ups never count. */
+export function sessionValue(sets: readonly LoggedSet[], metric: Metric): number | null {
   switch (metric) {
-    case 'topSet':
-      return maxOf(w.map((s) => s.weightKg));
-    case 'e1rm':
-      return maxOf(
-        w.map((s) =>
-          s.weightKg !== null && s.reps !== null ? estimate1Rm(s.weightKg, s.reps) : null,
-        ),
-      );
+    case 'allSets':
+      return allSetsScore(sets);
+    case 'volume':
+      return sessionVolume(sets);
     case 'reps':
-      return maxOf(w.map((s) => s.reps));
+      return maxOf(working(sets).map((s) => s.reps));
   }
 }
 
-/** Weighted exercises graph weight; bodyweight ones (no weight logged) graph reps. */
+/** Weighted exercises graph the All sets score; bodyweight ones (no weight logged) graph reps. */
 export function defaultMetric(sessions: readonly ExerciseSession[]): Metric | null {
   const sets = sessions.flatMap((s) => working(s.sets));
-  if (sets.some((s) => s.weightKg !== null)) return 'topSet';
+  if (sets.some((s) => s.weightKg !== null && s.reps !== null)) return 'allSets';
   if (sets.some((s) => s.reps !== null)) return 'reps';
   return null;
 }
@@ -65,9 +56,13 @@ export function bodyweightPoints(entries: readonly Bodyweight[]): Point[] {
     .sort((a, b) => a.t - b.t);
 }
 
+/** Start of a range (epoch ms); 0 for all time. */
+export function rangeStart(range: Range, now: number): number {
+  return range === 'all' ? 0 : now - (range === '3m' ? 91 : 365) * DAY;
+}
+
 export function inRange(points: readonly Point[], range: Range, now: number): Point[] {
-  if (range === 'all') return [...points];
-  const from = now - (range === '3m' ? 91 : 365) * DAY;
+  const from = rangeStart(range, now);
   return points.filter((p) => p.t >= from);
 }
 
@@ -104,7 +99,7 @@ export function summarizeExercise(sessions: readonly ExerciseSession[]): Exercis
   }
   return {
     bestSet,
-    bestE1rm: maxOf(sessions.map((s) => sessionValue(s.sets, 'e1rm'))),
+    bestE1rm: maxOf(sessions.map((s) => bestE1rm(s.sets))),
     // Warm-up-only sessions have nothing to graph, so they don't count.
     sessions: sessions.filter((s) => working(s.sets).length > 0).length,
     lastAt: sessions[sessions.length - 1]?.startedAt ?? null,

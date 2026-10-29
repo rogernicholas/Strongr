@@ -59,6 +59,22 @@ describe('workoutRepository', () => {
     expect(sets).toEqual([expect.objectContaining({ weightKg: 52.5, reps: 6, isWarmup: true })]);
   });
 
+  it('logs rest after a set and leaves sets added to past workouts untimed', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });
+    const we = (await repo.get(workoutId))!.exercises[0]!.id;
+    const live = await repo.addSet(we, set(50, 7));
+    const later = await repo.addSet(we, set(50, 6), false);
+    expect(live.completedAt).not.toBeNull();
+    expect(later.completedAt).toBeNull();
+    await repo.logRest(live.id, 92.4);
+    const sets = (await repo.get(workoutId))!.exercises[0]!.sets;
+    expect(sets.map((s) => [s.restS, s.completedAt === null])).toEqual([
+      [92, false],
+      [null, true],
+    ]);
+  });
+
   it('rejects empty sets', async () => {
     const { repo, id } = await setup();
     const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });
@@ -101,6 +117,20 @@ describe('workoutRepository', () => {
     expect(names).toEqual(['Bench press', 'Dips']);
   });
 
+  it('removes an exercise with its sets mid-workout', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press'), id('Row machine')] });
+    const [bench, row] = (await repo.get(workoutId))!.exercises;
+    await repo.addSet(bench!.id, set(50, 7));
+    await repo.addSet(row!.id, set(40, 10));
+    await repo.removeExercise(bench!.id);
+    const workout = (await repo.get(workoutId))!;
+    expect(workout.exercises.map((e) => e.exerciseName)).toEqual(['Row machine']);
+    expect(await repo.previousSets(id('Bench press'), 'none')).toEqual([]);
+    await repo.removeExercise(row!.id);
+    expect(await repo.finish(workoutId)).toBe('discarded');
+  });
+
   it('finds the previous session for an exercise, skipping workouts without it', async () => {
     const { repo, id } = await setup();
     const bench = id('Bench press');
@@ -127,6 +157,10 @@ describe('workoutRepository', () => {
       [40, 8],
     ]);
     expect(await repo.previousSets(id('Squat'), w4)).toEqual([]);
+
+    // Editing an old workout shows the session before it, not the newest one.
+    expect((await repo.previousSets(bench, w2)).map((s) => s.weightKg)).toEqual([45]);
+    expect(await repo.previousSets(bench, w1)).toEqual([]);
   });
 });
 
@@ -158,6 +192,11 @@ describe('workoutRepository history', () => {
     expect((await repo.listFinished(2_000, 6_000)).map((w) => w.id)).toEqual([b]);
     await repo.remove(a);
     expect((await repo.listFinished()).map((w) => w.id)).toEqual([b]);
+
+    // Deleting every set of a past workout while editing hides it from history.
+    const only = (await repo.get(b))!.exercises[0]!.sets[0]!;
+    await repo.deleteSet(only.id);
+    expect(await repo.listFinished()).toEqual([]);
   });
 });
 

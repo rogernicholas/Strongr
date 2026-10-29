@@ -34,7 +34,8 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 160
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "backgroundColor": "#0C0C1D",
     "extra": {
