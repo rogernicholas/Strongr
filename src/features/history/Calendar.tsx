@@ -270,7 +270,18 @@ export function Calendar({ footer, reloadToken, top, onChanged, onOpenWorkout }:
             onPress={onOpenWorkout ? () => onOpenWorkout(workout) : undefined}
             onLongPress={() => void confirmDelete(workout)}
           >
-            {workout.name ? <AppText variant="heading">{workout.name}</AppText> : null}
+            <AppText
+              accessibilityRole="header"
+              style={{
+                fontSize: 22,
+                lineHeight: 28,
+                fontWeight: '700',
+                color: theme.colors.accent,
+                marginBottom: 6,
+              }}
+            >
+              {workout.name ?? t('logging.title')}
+            </AppText>
             {workout.exercises
               .filter((e) => e.sets.length > 0)
               .map((e) => (

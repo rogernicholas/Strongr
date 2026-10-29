@@ -246,4 +246,6 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-29: The good-job screen lists each exercise's change against its previous session (All sets score, or reps for bodyweight exercises), "first session" when new.
 - 2026-10-29: Cardio is in: nine cardio seeds (runs, incline walk, bike, rowing erg, elliptical, stair climber, jump rope, swimming) (muscle group Cardio, time + distance, entered in minutes and km), each with its own MET; running uses 1 kcal/kg/km when a distance is logged; custom cardio uses MET 7. Workout calories = each cardio set at its rate + the remaining length as lifting at MET 5.
 - 2026-10-29: My routines has a New routine button: pick exercises, save, back to the list.
+- 2026-10-29: Body font is now Instrument Sans (replacing Noto Sans); the logo stays Changa One.
+- 2026-10-29: Calendar workout cards lead with the routine name (or "Workout") as a large teal title.
 - Open: scoreboard metric and caps, sign-in method.
