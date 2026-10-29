@@ -2,7 +2,7 @@
   "expo": {
     "name": "Strongr",
     "slug": "strongr",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -21,7 +21,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 3
+      "versionCode": 4
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,7 +35,7 @@
         {
           "backgroundColor": "#0C0C1D",
           "image": "./assets/splash-icon.png",
-          "imageWidth": 160
+          "imageWidth": 200
         }
       ],
       "expo-status-bar",
