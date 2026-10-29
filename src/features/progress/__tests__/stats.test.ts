@@ -22,6 +22,8 @@ const set = (weightKg: number | null, reps: number | null, isWarmup = false): Lo
   distanceM: null,
   rpe: null,
   isWarmup,
+  completedAt: null,
+  restS: null,
 });
 
 const session = (day: number, sets: LoggedSet[]): ExerciseSession => ({

@@ -59,6 +59,22 @@ describe('workoutRepository', () => {
     expect(sets).toEqual([expect.objectContaining({ weightKg: 52.5, reps: 6, isWarmup: true })]);
   });
 
+  it('logs rest after a set and leaves sets added to past workouts untimed', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });
+    const we = (await repo.get(workoutId))!.exercises[0]!.id;
+    const live = await repo.addSet(we, set(50, 7));
+    const later = await repo.addSet(we, set(50, 6), false);
+    expect(live.completedAt).not.toBeNull();
+    expect(later.completedAt).toBeNull();
+    await repo.logRest(live.id, 92.4);
+    const sets = (await repo.get(workoutId))!.exercises[0]!.sets;
+    expect(sets.map((s) => [s.restS, s.completedAt === null])).toEqual([
+      [92, false],
+      [null, true],
+    ]);
+  });
+
   it('rejects empty sets', async () => {
     const { repo, id } = await setup();
     const workoutId = await repo.start({ exerciseIds: [id('Bench press')] });

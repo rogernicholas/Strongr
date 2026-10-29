@@ -1,2 +1,2 @@
-export { parseSettings } from './parseSettings';
+export { parseSettings, SUGGEST_REPS_RANGE } from './parseSettings';
 export { SettingsProvider, useSettings } from './SettingsContext';

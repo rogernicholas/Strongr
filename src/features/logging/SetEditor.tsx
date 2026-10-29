@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
 import { useTranslation } from '@/core/i18n';
-import { useTheme } from '@/core/theme';
 import { formatNumber, fromDisplayWeight, toDisplayWeight, type WeightUnit } from '@/core/units';
 import type { SetInput, WorkoutExercise } from '@/data';
-import { AppText, Button, NumberStepper } from '@/ui';
+import { Button, NumberStepper, Toggle } from '@/ui';
 
 import { parseDecimal, parseWholeNumber, weightStep } from './setEntry';
 
@@ -25,7 +24,6 @@ const text = (value: number | null) => (value === null ? '' : formatNumber(value
 export function SetEditor(props: Props) {
   const { tracks, unit, rpeEnabled, initial, submitLabel, onSubmit, onDelete, onCancel } = props;
   const { t } = useTranslation();
-  const theme = useTheme();
   const [weight, setWeight] = useState(
     initial.weightKg === null ? '' : text(toDisplayWeight(initial.weightKg, unit)),
   );
@@ -91,24 +89,7 @@ export function SetEditor(props: Props) {
         <NumberStepper label="RPE" value={rpe} onChangeText={setRpe} step={0.5} decimals />
       ) : null}
 
-      <Pressable
-        accessibilityRole="switch"
-        accessibilityState={{ checked: isWarmup }}
-        onPress={() => setIsWarmup((w) => !w)}
-        style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 40 }}
-      >
-        <View
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: 6,
-            borderWidth: 2,
-            borderColor: isWarmup ? theme.colors.accent : theme.colors.subtle,
-            backgroundColor: isWarmup ? theme.colors.accent : 'transparent',
-          }}
-        />
-        <AppText>{t('logging.warmup')}</AppText>
-      </Pressable>
+      <Toggle label={t('logging.warmup')} value={isWarmup} onChange={setIsWarmup} />
 
       <Button label={submitLabel} onPress={() => onSubmit(input)} disabled={!valid} />
       {onDelete || onCancel ? (

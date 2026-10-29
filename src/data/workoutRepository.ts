@@ -12,9 +12,14 @@ export interface LoggedSet {
   distanceM: number | null;
   rpe: number | null;
   isWarmup: boolean;
+  /** When the set was logged live; null for sets added to a past workout. */
+  completedAt: number | null;
+  /** Rest after this set, from the rest timer's Log rest button. */
+  restS: number | null;
 }
 
-export type SetInput = Omit<LoggedSet, 'id' | 'position'>;
+/** What the user enters for a set. */
+export type SetInput = Omit<LoggedSet, 'id' | 'position' | 'completedAt' | 'restS'>;
 
 export interface WorkoutExercise {
   id: string;
@@ -45,10 +50,12 @@ interface SetRow {
   distance_m: number | null;
   rpe: number | null;
   is_warmup: number;
+  completed_at: number | null;
+  rest_s: number | null;
 }
 
-const SET_COLUMNS =
-  's.id, s.workout_exercise_id, s.position, s.weight_kg, s.reps, s.duration_s, s.distance_m, s.rpe, s.is_warmup';
+const SET_COLUMNS = `s.id, s.workout_exercise_id, s.position, s.weight_kg, s.reps, s.duration_s,
+  s.distance_m, s.rpe, s.is_warmup, s.completed_at, s.rest_s`;
 
 /** One finished workout's sets for a single exercise. */
 export interface ExerciseSession {
@@ -74,6 +81,8 @@ function toSet(row: SetRow): LoggedSet {
     distanceM: row.distance_m,
     rpe: row.rpe,
     isWarmup: row.is_warmup === 1,
+    completedAt: row.completed_at,
+    restS: row.rest_s,
   };
 }
 
@@ -270,7 +279,7 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
           now,
         ],
       );
-      return { id, position, ...input };
+      return { id, position, ...input, completedAt: timed ? now : null, restS: null };
     },
 
     async updateSet(setId: string, input: SetInput): Promise<void> {
@@ -289,6 +298,15 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
           setId,
         ],
       );
+    },
+
+    /** Saves the rest taken after a set, in seconds. */
+    async logRest(setId: string, seconds: number): Promise<void> {
+      await db.run('UPDATE sets SET rest_s = ?, updated_at = ? WHERE id = ?', [
+        Math.max(0, Math.round(seconds)),
+        clock(),
+        setId,
+      ]);
     },
 
     async deleteSet(setId: string): Promise<void> {

@@ -16,6 +16,7 @@ import {
 import { AppText, Button, useDialog } from '@/ui';
 
 import { ExerciseLogCard } from './ExerciseLogCard';
+import { RestTimer } from './RestTimer';
 
 interface Props {
   workoutId: string;
@@ -160,6 +161,16 @@ export function LogWorkout(props: Props) {
 
   if (!workout) return null;
 
+  // The rest timer runs from the most recently logged set until its rest is logged.
+  const lastSet = workout.exercises
+    .flatMap((e) => e.sets)
+    .reduce<LoggedSet | null>(
+      (last, s) =>
+        s.completedAt !== null && (last === null || s.completedAt > last.completedAt!) ? s : last,
+      null,
+    );
+  const resting = live && settings.showRestTimer && lastSet !== null && lastSet.restS === null;
+
   return (
     <SafeAreaView
       edges={['bottom', 'left', 'right']}
@@ -194,11 +205,19 @@ export function LogWorkout(props: Props) {
         <View
           style={{
             padding: 16,
+            gap: 8,
             borderTopWidth: 1,
             borderTopColor: theme.colors.border,
             backgroundColor: theme.colors.surface,
           }}
         >
+          {resting ? (
+            <RestTimer
+              key={lastSet.id}
+              since={lastSet.completedAt!}
+              onLog={(seconds) => run(repo.logRest(lastSet.id, seconds))}
+            />
+          ) : null}
           {live ? (
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <Button

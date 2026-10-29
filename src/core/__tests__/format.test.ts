@@ -1,4 +1,4 @@
-import { formatDuration, formatSetShort } from '@/core/format';
+import { formatClock, formatDuration, formatSetShort } from '@/core/format';
 
 const set = (weightKg: number | null, reps: number | null, durationS: number | null = null) => ({
   weightKg,
@@ -20,5 +20,7 @@ describe('formatSetShort', () => {
     expect(formatSetShort(set(null, 12), 'kg', reps)).toBe('12 reps');
     expect(formatSetShort(set(null, null, 90), 'kg', reps)).toBe('1:30');
     expect(formatDuration(45)).toBe('45 s');
+    expect(formatClock(45.9)).toBe('0:45');
+    expect(formatClock(725)).toBe('12:05');
   });
 });

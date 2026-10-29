@@ -4,7 +4,15 @@ import type { WeightUnit } from '@/core/units';
 export interface Settings {
   weightUnit: WeightUnit;
   rpeEnabled: boolean;
-  restTimerEnabled: boolean;
+  /**
+   * Count-up rest clock on the workout screen. Replaces the never-shown `restTimerEnabled`
+   * (stored as false on early installs), so the new default reaches everyone.
+   */
+  showRestTimer: boolean;
+  /** "Try more weight" lines on the good-job screen. */
+  weightSuggestions: boolean;
+  /** Reps every working set must reach before more weight is suggested. */
+  suggestAtReps: number;
   plateCalculatorEnabled: boolean;
   socialEnabled: boolean;
 }
@@ -12,7 +20,9 @@ export interface Settings {
 export const defaultSettings: Settings = {
   weightUnit: 'kg',
   rpeEnabled: false,
-  restTimerEnabled: false,
+  showRestTimer: true,
+  weightSuggestions: true,
+  suggestAtReps: 14,
   plateCalculatorEnabled: false,
   socialEnabled: false,
 };

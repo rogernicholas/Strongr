@@ -13,6 +13,8 @@ const set = (isWarmup = false): LoggedSet => ({
   distanceM: null,
   rpe: null,
   isWarmup,
+  completedAt: null,
+  restS: null,
 });
 
 describe('workout summary', () => {

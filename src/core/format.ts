@@ -15,6 +15,12 @@ export function formatDuration(seconds: number): string {
   return `${m}:${String(s % 60).padStart(2, '0')}`;
 }
 
+/** Stopwatch style, "0:45", "12:05". */
+export function formatClock(seconds: number): string {
+  const s = Math.floor(seconds);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
 export function formatDistance(meters: number): string {
   return meters >= 1000 ? `${formatNumber(meters / 1000, 2)} km` : `${formatNumber(meters, 0)} m`;
 }

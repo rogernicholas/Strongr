@@ -16,7 +16,13 @@
   },
   "settings": {
     "title": "Settings",
-    "weightUnit": "Weight unit"
+    "weightUnit": "Weight unit",
+    "workout": "Workout",
+    "restTimer": "Rest timer",
+    "restTimerHint": "Counts up after each set. Tap Log rest to save it for your stats.",
+    "suggestions": "Weight suggestions",
+    "suggestionsHint": "After a workout, suggests more weight where you hit your rep target.",
+    "suggestAt": "Suggest more weight when every working set reaches"
   },
   "about": {
     "title": "About",
@@ -105,7 +111,9 @@
     "removeBody_other": "Its {{count}} sets will be deleted.",
     "remove": "Remove",
     "done": "Done",
-    "editTitle": "Edit workout"
+    "editTitle": "Edit workout",
+    "rest": "Rest",
+    "logRest": "Log rest"
   },
   "history": {
     "previousMonth": "Previous month",
