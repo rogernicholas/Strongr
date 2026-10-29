@@ -21,7 +21,7 @@ Owner: Roger. He makes the decisions; Claude writes the code.
 
 ## Stack
 
-- Expo (React Native), TypeScript in strict mode
+- Expo SDK 58 (React Native), TypeScript in strict mode
 - expo-sqlite for local storage, numbered forward-only migrations
 - React Navigation
 - i18next for all user-facing strings
@@ -248,4 +248,5 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-29: My routines has a New routine button: pick exercises, save, back to the list.
 - 2026-10-29: Body font is now Instrument Sans (replacing Noto Sans); the logo stays Changa One.
 - 2026-10-29: Calendar workout cards lead with the routine name (or "Workout") as a large teal title.
+- 2026-10-29: Upgraded to Expo SDK 58 (React Native 0.88) so the Play Store Expo Go opens the project. Check the current Expo SDK before starting any new project.
 - Open: scoreboard metric and caps, sign-in method.
