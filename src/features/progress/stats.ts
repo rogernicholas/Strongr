@@ -1,4 +1,5 @@
 import { parseDateKey } from '@/core/dates';
+import { bestE1rm, workingSets as working } from '@/core/training';
 import type { Bodyweight, ExerciseSession, LoggedSet } from '@/data';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -14,14 +15,6 @@ export interface Point {
   value: number;
 }
 
-/** Estimated one-rep max (Epley). A single rep is the weight itself. */
-export function estimate1Rm(weightKg: number, reps: number): number | null {
-  if (!(weightKg > 0) || !(reps > 0)) return null;
-  return reps === 1 ? weightKg : weightKg * (1 + reps / 30);
-}
-
-const working = (sets: readonly LoggedSet[]) => sets.filter((s) => !s.isWarmup);
-
 function maxOf(values: (number | null)[]): number | null {
   const real = values.filter((v): v is number => v !== null);
   return real.length ? Math.max(...real) : null;
@@ -34,11 +27,7 @@ function sessionValue(sets: readonly LoggedSet[], metric: Metric): number | null
     case 'topSet':
       return maxOf(w.map((s) => s.weightKg));
     case 'e1rm':
-      return maxOf(
-        w.map((s) =>
-          s.weightKg !== null && s.reps !== null ? estimate1Rm(s.weightKg, s.reps) : null,
-        ),
-      );
+      return bestE1rm(w);
     case 'reps':
       return maxOf(w.map((s) => s.reps));
   }

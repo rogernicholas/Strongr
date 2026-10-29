@@ -4,7 +4,6 @@ import {
   bodyweightPoints,
   changeOver,
   defaultMetric,
-  estimate1Rm,
   exercisePoints,
   inRange,
   summarizeBodyweight,
@@ -32,13 +31,6 @@ const session = (day: number, sets: LoggedSet[]): ExerciseSession => ({
 });
 
 describe('stats', () => {
-  it('estimates 1RM with Epley', () => {
-    expect(estimate1Rm(100, 1)).toBe(100);
-    expect(estimate1Rm(100, 5)).toBeCloseTo(116.67, 2);
-    expect(estimate1Rm(0, 5)).toBeNull();
-    expect(estimate1Rm(100, 0)).toBeNull();
-  });
-
   it('plots the heaviest working set per session, ignoring warm-ups', () => {
     const sessions = [
       session(1, [set(80, 5, true), set(60, 8)]),
