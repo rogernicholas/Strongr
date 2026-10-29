@@ -3,10 +3,10 @@ import { View } from 'react-native';
 
 import { formatShortDate } from '@/core/dates';
 import { useDb } from '@/core/db';
-import { formatSetShort } from '@/core/format';
 import { useTranslation } from '@/core/i18n';
 import { useSettings } from '@/core/settings';
 import { formatNumber, toDisplayWeight } from '@/core/units';
+import { useFormatSet } from '@/core/useFormatSet';
 import {
   createBodyweightRepository,
   createWorkoutRepository,
@@ -47,6 +47,7 @@ export function StatsDetail({ target }: { target: StatsTarget }) {
   const db = useDb();
   const { settings } = useSettings();
   const unit = settings.weightUnit;
+  const formatSet = useFormatSet();
   const [sessions, setSessions] = useState<ExerciseSession[] | null>(null);
   const [bodyweights, setBodyweights] = useState<Bodyweight[] | null>(null);
   const [range, setRange] = useState<Range>('all');
@@ -93,7 +94,7 @@ export function StatsDetail({ target }: { target: StatsTarget }) {
   if (exerciseId) {
     const s = summarizeExercise(sessions ?? []);
     tiles = [
-      { label: t('stats.bestSet'), value: s.bestSet ? formatSetShort(s.bestSet, unit) : DASH },
+      { label: t('stats.bestSet'), value: s.bestSet ? formatSet(s.bestSet) : DASH },
       { label: t('stats.e1rm'), value: orDash(s.bestE1rm) },
       { label: t('stats.sessions'), value: String(s.sessions) },
       {

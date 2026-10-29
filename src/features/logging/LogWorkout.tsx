@@ -17,7 +17,8 @@ interface Props {
   /** Changes when exercises were added elsewhere, to reload. */
   reloadToken?: number;
   onAddExercises(): void;
-  onFinished(result: 'saved' | 'discarded'): void;
+  /** `cancelled`: the user threw the workout away, sets and all. */
+  onFinished(result: 'saved' | 'discarded' | 'cancelled'): void;
 }
 
 type Previous = Record<string, LoggedSet[]>;
@@ -93,6 +94,24 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
     }
   }
 
+  async function cancel() {
+    const sets = workout?.exercises.reduce((n, e) => n + e.sets.length, 0) ?? 0;
+    const ok = await dialog({
+      title: t('logging.cancelTitle'),
+      message: t('logging.cancelBody', { count: sets }),
+      confirmLabel: t('logging.cancelConfirm'),
+      cancelLabel: t('logging.keepGoing'),
+      destructive: true,
+    });
+    if (!ok) return;
+    try {
+      await repo.remove(workoutId);
+      onFinished('cancelled');
+    } catch {
+      await dialog({ title: t('common.saveFailed'), confirmLabel: t('common.ok') });
+    }
+  }
+
   if (!workout) return null;
 
   return (
@@ -132,7 +151,16 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
             backgroundColor: theme.colors.surface,
           }}
         >
-          <Button label={t('logging.finish')} onPress={() => void finish()} />
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Button
+              label={t('logging.cancelWorkout')}
+              variant="quiet"
+              onPress={() => void cancel()}
+            />
+            <View style={{ flex: 1 }}>
+              <Button label={t('logging.finish')} onPress={() => void finish()} />
+            </View>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

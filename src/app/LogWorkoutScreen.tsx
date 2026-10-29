@@ -24,8 +24,9 @@ export function LogWorkoutScreen({ route, navigation }: Props) {
       reloadToken={focusCount}
       onAddExercises={() => navigation.navigate('PickExercises', { addToWorkoutId: workoutId })}
       onFinished={(result) => {
-        if (result === 'discarded') {
-          ToastAndroid.show(t('logging.discarded'), ToastAndroid.SHORT);
+        if (result !== 'saved') {
+          const message = result === 'cancelled' ? t('logging.cancelled') : t('logging.discarded');
+          ToastAndroid.show(message, ToastAndroid.SHORT);
           navigation.popToTop();
           return;
         }

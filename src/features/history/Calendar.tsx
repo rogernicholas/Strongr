@@ -11,10 +11,10 @@ import {
   weekStartKey,
 } from '@/core/dates';
 import { useDb } from '@/core/db';
-import { formatSetShort } from '@/core/format';
 import { useTranslation } from '@/core/i18n';
 import { useSettings } from '@/core/settings';
 import { useTheme } from '@/core/theme';
+import { useFormatSet } from '@/core/useFormatSet';
 import { formatNumber, fromDisplayWeight, toDisplayWeight } from '@/core/units';
 import { createBodyweightRepository, createWorkoutRepository, type Workout } from '@/data';
 import { AppText, Card, Screen, useDialog } from '@/ui';
@@ -46,6 +46,7 @@ export function Calendar({ footer, reloadToken, top, onChanged }: Props) {
   const dialog = useDialog();
   const db = useDb();
   const { settings } = useSettings();
+  const formatSet = useFormatSet();
   const today = new Date();
   const [month, setMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selected, setSelected] = useState(localDateKey(today));
@@ -269,7 +270,7 @@ export function Calendar({ footer, reloadToken, top, onChanged }: Props) {
                 <AppText key={e.id}>
                   <AppText style={{ fontWeight: '600' }}>{e.exerciseName}</AppText>
                   {'  '}
-                  {e.sets.map((s) => formatSetShort(s, unit)).join(', ')}
+                  {e.sets.map(formatSet).join(', ')}
                 </AppText>
               ))}
             <AppText variant="muted">{t('history.longPressHint')}</AppText>

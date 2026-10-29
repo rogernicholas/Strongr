@@ -28,7 +28,9 @@
     "save": "Save",
     "delete": "Delete",
     "saveFailed": "Couldn't save. Please try again.",
-    "ok": "OK"
+    "ok": "OK",
+    "repCount_one": "{{count}} rep",
+    "repCount_other": "{{count}} reps"
   },
   "exercises": {
     "title": "Choose exercises",
@@ -88,7 +90,15 @@
     "finishTitle": "Finish workout?",
     "finishBody": "It will be saved to your history. A workout with no sets is discarded.",
     "discarded": "Empty workout discarded",
-    "addToWorkout": "Add to workout"
+    "addToWorkout": "Add to workout",
+    "cancelWorkout": "Cancel",
+    "cancelTitle": "Cancel this workout?",
+    "cancelBody_zero": "Nothing has been logged yet.",
+    "cancelBody_one": "The {{count}} set you logged will be deleted.",
+    "cancelBody_other": "All {{count}} sets you logged will be deleted.",
+    "cancelConfirm": "Delete workout",
+    "keepGoing": "Keep going",
+    "cancelled": "Workout cancelled"
   },
   "history": {
     "previousMonth": "Previous month",
