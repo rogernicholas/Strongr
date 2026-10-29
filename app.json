@@ -3,6 +3,9 @@
     "name": "Strongr",
     "slug": "strongr",
     "version": "0.2.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -51,6 +54,11 @@
         "projectId": "16b0cd94-1c33-48f7-bd51-e16a6f996efe"
       }
     },
-    "owner": "rozero_n"
+    "owner": "rozero_n",
+    "updates": {
+      "url": "https://u.expo.dev/16b0cd94-1c33-48f7-bd51-e16a6f996efe",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }

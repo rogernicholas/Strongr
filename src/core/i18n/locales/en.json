@@ -27,7 +27,9 @@
   "about": {
     "title": "About",
     "version": "Version",
-    "schemaVersion": "Database version"
+    "schemaVersion": "Database version",
+    "update": "Update",
+    "builtIn": "Built-in"
   },
   "common": {
     "cancel": "Cancel",

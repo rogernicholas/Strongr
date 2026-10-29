@@ -65,6 +65,7 @@ src/
 - Timestamps are epoch milliseconds (UTC) in INTEGER columns. Workouts also store the device timezone.
 - Adding migration N: add `src/core/db/migrations/00N_name.ts`, append it to the list in `migrations/index.ts`, and add `test/migrations/fixtures/vN.ts` with sample data. The tests fail until the fixture exists.
 - Installable APK: `npx eas-cli build -p android --profile preview` (config in `eas.json`; the build runs in Expo's cloud under Roger's Expo account, so it runs on his PC after he has signed in with `npx eas-cli login` himself). Bump `version` and `android.versionCode` in `app.json` for each build that is shared.
+- Over-the-air updates (expo-updates, from 0.3.0): after `npm run check`, publish JavaScript changes from Roger's PC with `npx eas-cli update --channel preview --message "<what changed>"`, and only when Roger says so. `runtimeVersion` follows the app `version`, so an update reaches only builds with the same `version`: bump `version` only for a new APK. Native changes (new native package, SDK upgrade, icon, splash, permissions, app.json plugins) need a new APK.
 - The first APK (0.1.0, schema version 3) shipped on 2026-10-16, so every existing migration is frozen: schema changes need a new numbered migration. Migration 004 (`sets.rest_s`, schema version 4) ships in 0.2.0.
 
 ## Data rules (cheap now, expensive later)

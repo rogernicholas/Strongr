@@ -277,21 +277,25 @@ export function Calendar({ footer, reloadToken, top, onChanged, onOpenWorkout }:
                 lineHeight: 28,
                 fontWeight: '700',
                 color: theme.colors.accent,
-                marginBottom: 6,
+                marginBottom: 10,
               }}
             >
               {workout.name ?? t('logging.title')}
             </AppText>
-            {workout.exercises
-              .filter((e) => e.sets.length > 0)
-              .map((e) => (
-                <AppText key={e.id}>
-                  <AppText style={{ fontWeight: '600' }}>{e.exerciseName}</AppText>
-                  {'  '}
-                  {e.sets.map(formatSet).join(', ')}
-                </AppText>
-              ))}
-            <AppText variant="muted">{t('history.longPressHint')}</AppText>
+            <View style={{ gap: 8 }}>
+              {workout.exercises
+                .filter((e) => e.sets.length > 0)
+                .map((e) => (
+                  <AppText key={e.id} style={{ lineHeight: 23 }}>
+                    <AppText style={{ fontWeight: '600' }}>{e.exerciseName}</AppText>
+                    {'  '}
+                    {e.sets.map(formatSet).join(', ')}
+                  </AppText>
+                ))}
+            </View>
+            <AppText variant="muted" style={{ marginTop: 8 }}>
+              {t('history.longPressHint')}
+            </AppText>
           </Card>
         ))
       )}
