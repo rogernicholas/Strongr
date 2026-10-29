@@ -90,13 +90,13 @@ export const seedExercises: readonly SeedExercise[] = [
     [
       ['treadmill_run', 'Running (treadmill)', { met: 9.8, kcalPerKgKm: 1 }],
       ['outdoor_run', 'Running (outdoor)', { met: 9.8, kcalPerKgKm: 1 }],
-      ['walking', 'Walking', { met: 3.5 }],
       ['incline_walk', 'Incline walk', { met: 6 }],
       ['stationary_bike', 'Stationary bike', { met: 7 }],
       ['rowing_erg', 'Rowing (erg)', { met: 7 }],
       ['elliptical', 'Elliptical', { met: 5 }],
       ['stair_climber', 'Stair climber', { met: 9 }],
       ['jump_rope', 'Jump rope', { met: 11.8 }],
+      ['swimming', 'Swimming', { met: 5.8 }],
     ] as const
   ).map(([key, name, energy]): SeedExercise => ({
     key,

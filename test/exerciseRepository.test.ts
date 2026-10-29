@@ -64,7 +64,7 @@ describe('exerciseRepository', () => {
     await expect(repo.create({ name: '  ', muscleGroup: 'chest' })).rejects.toThrow();
     expect(created.tracks).toEqual({ weight: true, reps: true, time: false, distance: false });
     // Custom cardio logs time and distance instead.
-    const swim = await repo.create({ name: 'Swimming', muscleGroup: 'cardio' });
-    expect(swim.tracks).toEqual({ weight: false, reps: false, time: true, distance: true });
+    const kayak = await repo.create({ name: 'Kayak', muscleGroup: 'cardio' });
+    expect(kayak.tracks).toEqual({ weight: false, reps: false, time: true, distance: true });
   });
 });
