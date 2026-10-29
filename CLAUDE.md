@@ -249,4 +249,5 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-29: Body font is now Instrument Sans (replacing Noto Sans); the logo stays Changa One.
 - 2026-10-29: Calendar workout cards lead with the routine name (or "Workout") as a large teal title.
 - 2026-10-29: Upgraded to Expo SDK 58 (React Native 0.88) so the Play Store Expo Go opens the project. Check the current Expo SDK before starting any new project.
+- 2026-10-29: APK 0.2.0 (versionCode 3, schema 4, SDK 58) is built for 64-bit ARM phones only (expo-build-properties `buildArchs: arm64-v8a`, from PR #7). It installs as an update over 0.1.0: never uninstall first, because that wipes the data.
 - Open: scoreboard metric and caps, sign-in method.
