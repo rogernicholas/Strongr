@@ -28,21 +28,15 @@ import {
 } from './stats';
 import type { StatsTarget } from './types';
 
-const DASH = '–';
+import { OverviewDetail } from './OverviewDetail';
+import { DASH, RangeControl, StatTile } from './StatTiles';
 
-function StatTile({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ width: '48.5%' }}>
-      <Card>
-        <AppText variant="label">{label.toUpperCase()}</AppText>
-        <AppText variant="stat">{value}</AppText>
-      </Card>
-    </View>
-  );
+/** The overview, or a graph plus stats for one exercise or for bodyweight. */
+export function StatsDetail({ target }: { target: StatsTarget }) {
+  return target.kind === 'overview' ? <OverviewDetail /> : <ChartDetail target={target} />;
 }
 
-/** Graph plus stats for one exercise or for bodyweight. */
-export function StatsDetail({ target }: { target: StatsTarget }) {
+function ChartDetail({ target }: { target: Exclude<StatsTarget, { kind: 'overview' }> }) {
   const { t, i18n } = useTranslation();
   const db = useDb();
   const { settings } = useSettings();
@@ -145,16 +139,7 @@ export function StatsDetail({ target }: { target: StatsTarget }) {
         )}
       </Card>
 
-      <SegmentedControl<Range>
-        accessibilityLabel={t('stats.range')}
-        value={range}
-        onChange={setRange}
-        options={[
-          { value: '3m', label: t('stats.range3m') },
-          { value: '1y', label: t('stats.range1y') },
-          { value: 'all', label: t('stats.rangeAll') },
-        ]}
-      />
+      <RangeControl value={range} onChange={setRange} />
 
       <View
         style={{

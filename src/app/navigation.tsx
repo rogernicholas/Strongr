@@ -93,7 +93,9 @@ export function RootNavigation() {
             title:
               route.params.target.kind === 'exercise'
                 ? route.params.target.name
-                : t('stats.bodyweight'),
+                : t(
+                    route.params.target.kind === 'overview' ? 'stats.overview' : 'stats.bodyweight',
+                  ),
           })}
         />
         <Stack.Screen

@@ -56,9 +56,13 @@ export function bodyweightPoints(entries: readonly Bodyweight[]): Point[] {
     .sort((a, b) => a.t - b.t);
 }
 
+/** Start of a range (epoch ms); 0 for all time. */
+export function rangeStart(range: Range, now: number): number {
+  return range === 'all' ? 0 : now - (range === '3m' ? 91 : 365) * DAY;
+}
+
 export function inRange(points: readonly Point[], range: Range, now: number): Point[] {
-  if (range === 'all') return [...points];
-  const from = now - (range === '3m' ? 91 : 365) * DAY;
+  const from = rangeStart(range, now);
   return points.filter((p) => p.t >= from);
 }
 

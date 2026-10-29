@@ -160,7 +160,16 @@
     "highest": "Highest",
     "noChartData": "Nothing to graph in this time range.",
     "chartLabel_one": "Graph with {{count}} point, latest {{latest}}",
-    "chartLabel_other": "Graph with {{count}} points, latest {{latest}}"
+    "chartLabel_other": "Graph with {{count}} points, latest {{latest}}",
+    "overview": "Overview",
+    "overviewHint": "Averages, rest and progress across workouts",
+    "workouts": "Workouts",
+    "perWeek": "Per week",
+    "avgLength": "Avg length",
+    "avgSets": "Avg sets",
+    "avgRest": "Avg rest",
+    "biggestProgress": "Biggest progress",
+    "smallestProgress": "Smallest progress"
   },
   "done": {
     "phrase1": "Good job!",

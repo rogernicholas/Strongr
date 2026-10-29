@@ -22,7 +22,7 @@ interface Props {
   reloadToken?: number;
 }
 
-/** Bodyweight first, then every exercise that has been logged. */
+/** Overview and bodyweight first, then every exercise that has been logged. */
 export function StatsList({ onOpen, reloadToken }: Props) {
   const { t, i18n } = useTranslation();
   const db = useDb();
@@ -50,6 +50,10 @@ export function StatsList({ onOpen, reloadToken }: Props) {
 
   return (
     <View style={{ gap: 8 }}>
+      <Card accessibilityLabel={t('stats.overview')} onPress={() => onOpen({ kind: 'overview' })}>
+        <AppText variant="heading">{t('stats.overview')}</AppText>
+        <AppText variant="muted">{t('stats.overviewHint')}</AppText>
+      </Card>
       <Card
         accessibilityLabel={t('stats.bodyweight')}
         onPress={() => onOpen({ kind: 'bodyweight' })}
