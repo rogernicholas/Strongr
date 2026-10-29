@@ -65,6 +65,7 @@ src/
 - Timestamps are epoch milliseconds (UTC) in INTEGER columns. Workouts also store the device timezone.
 - Adding migration N: add `src/core/db/migrations/00N_name.ts`, append it to the list in `migrations/index.ts`, and add `test/migrations/fixtures/vN.ts` with sample data. The tests fail until the fixture exists.
 - Installable APK: `npx eas-cli build -p android --profile preview` (config in `eas.json`; the build runs in Expo's cloud under Roger's Expo account, so it runs on his PC after he has signed in with `npx eas-cli login` himself). Bump `version` and `android.versionCode` in `app.json` for each build that is shared.
+- Over-the-air updates (expo-updates, from 0.3.0): after `npm run check`, publish JavaScript changes from Roger's PC with `npx eas-cli update --channel preview --message "<what changed>"`, and only when Roger says so. `runtimeVersion` follows the app `version`, so an update reaches only builds with the same `version`: bump `version` only for a new APK. Native changes (new native package, SDK upgrade, icon, splash, permissions, app.json plugins) need a new APK.
 - The first APK (0.1.0, schema version 3) shipped on 2026-10-16, so every existing migration is frozen: schema changes need a new numbered migration. Migration 004 (`sets.rest_s`, schema version 4) ships in 0.2.0.
 
 ## Data rules (cheap now, expensive later)
@@ -250,4 +251,8 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-29: Calendar workout cards lead with the routine name (or "Workout") as a large teal title.
 - 2026-10-29: Upgraded to Expo SDK 58 (React Native 0.88) so the Play Store Expo Go opens the project. Check the current Expo SDK before starting any new project.
 - 2026-10-29: APK 0.2.0 (versionCode 3, schema 4, SDK 58) is built for 64-bit ARM phones only (expo-build-properties `buildArchs: arm64-v8a`, from PR #7). It installs as an update over 0.1.0: never uninstall first, because that wipes the data.
+- 2026-10-29: Calendar workout cards get more spacing between exercises (the Instrument Sans lines looked crowded).
+- 2026-10-29: Over-the-air updates (expo-updates) from 0.3.0: the app checks on open, downloads in the background and applies the update on the next open. Claude publishes an update only when Roger says so.
+- 2026-10-29: Logo and app icon: a white "S" with a red dot in Changa One on the dark background (#0C0C1D), matching the "Strongr." wordmark. Also used on the launch screen.
+- 2026-10-29: APK 0.3.0 (versionCode 4) carries the logo and over-the-air updates.
 - Open: scoreboard metric and caps, sign-in method.

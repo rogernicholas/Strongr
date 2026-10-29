@@ -2,7 +2,10 @@
   "expo": {
     "name": "Strongr",
     "slug": "strongr",
-    "version": "0.2.0",
+    "version": "0.3.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -18,7 +21,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 3
+      "versionCode": 4
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,7 +35,7 @@
         {
           "backgroundColor": "#0C0C1D",
           "image": "./assets/splash-icon.png",
-          "imageWidth": 160
+          "imageWidth": 200
         }
       ],
       "expo-status-bar",
@@ -51,6 +54,11 @@
         "projectId": "16b0cd94-1c33-48f7-bd51-e16a6f996efe"
       }
     },
-    "owner": "rozero_n"
+    "owner": "rozero_n",
+    "updates": {
+      "url": "https://u.expo.dev/16b0cd94-1c33-48f7-bd51-e16a6f996efe",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }
