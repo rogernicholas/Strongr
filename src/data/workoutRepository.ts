@@ -238,7 +238,11 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       });
     },
 
-    async addSet(workoutExerciseId: string, input: SetInput): Promise<LoggedSet> {
+    /**
+     * Logs a set. `timed: false` for sets added to a past workout: they get no
+     * completion time, so they can't stretch that workout's length or rest stats.
+     */
+    async addSet(workoutExerciseId: string, input: SetInput, timed = true): Promise<LoggedSet> {
       if (!hasValue(input)) throw new Error('A set needs at least one value.');
       const id = newId();
       const now = clock();
@@ -261,7 +265,7 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
           input.distanceM,
           input.rpe,
           input.isWarmup ? 1 : 0,
-          now,
+          timed ? now : null,
           now,
           now,
         ],
@@ -322,12 +326,18 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       return 'saved';
     },
 
-    /** Finished workouts started in [from, to), oldest first, with all sets. */
+    /**
+     * Finished workouts started in [from, to), oldest first, with all sets. Workouts whose
+     * sets were all deleted while editing are left out, like an empty workout at Finish.
+     */
     async listFinished(from = 0, to = Number.MAX_SAFE_INTEGER): Promise<Workout[]> {
-      return loadWorkouts('w.ended_at IS NOT NULL AND w.started_at >= ? AND w.started_at < ?', [
-        from,
-        to,
-      ]);
+      return loadWorkouts(
+        `w.ended_at IS NOT NULL AND w.started_at >= ? AND w.started_at < ?
+         AND EXISTS (SELECT 1 FROM sets s
+           JOIN workout_exercises we ON we.id = s.workout_exercise_id AND we.deleted_at IS NULL
+           WHERE we.workout_id = w.id AND s.deleted_at IS NULL)`,
+        [from, to],
+      );
     },
 
     async remove(workoutId: string): Promise<void> {
@@ -398,15 +408,19 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       return sessions;
     },
 
-    /** Sets from the most recent other workout that logged this exercise. */
-    async previousSets(exerciseId: string, excludeWorkoutId: string): Promise<LoggedSet[]> {
+    /**
+     * Sets from the most recent earlier workout that logged this exercise. "Earlier" is
+     * relative to `workoutId`, so editing an old workout shows the session before it.
+     */
+    async previousSets(exerciseId: string, workoutId: string): Promise<LoggedSet[]> {
       const last = await db.getFirst<{ id: string }>(
         `SELECT w.id FROM workouts w
          JOIN workout_exercises we ON we.workout_id = w.id AND we.deleted_at IS NULL
          JOIN sets s ON s.workout_exercise_id = we.id AND s.deleted_at IS NULL
          WHERE we.exercise_id = ? AND w.id != ? AND w.deleted_at IS NULL
+           AND w.started_at <= COALESCE((SELECT started_at FROM workouts WHERE id = ?), w.started_at)
          ORDER BY w.started_at DESC LIMIT 1`,
-        [exerciseId, excludeWorkoutId],
+        [exerciseId, workoutId, workoutId],
       );
       if (!last) return [];
       const rows = await db.getAll<SetRow>(

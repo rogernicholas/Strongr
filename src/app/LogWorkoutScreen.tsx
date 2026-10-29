@@ -12,7 +12,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'LogWorkout'>;
 
 export function LogWorkoutScreen({ route, navigation }: Props) {
   const { t } = useTranslation();
-  const { workoutId } = route.params;
+  const { workoutId, mode } = route.params;
   const [focusCount, setFocusCount] = useState(0);
 
   // Reload after returning from "Add exercise".
@@ -21,9 +21,14 @@ export function LogWorkoutScreen({ route, navigation }: Props) {
   return (
     <LogWorkout
       workoutId={workoutId}
+      mode={mode}
       reloadToken={focusCount}
       onAddExercises={() => navigation.navigate('PickExercises', { addToWorkoutId: workoutId })}
       onFinished={(result) => {
+        if (mode === 'edit') {
+          navigation.goBack();
+          return;
+        }
         if (result !== 'saved') {
           const message = result === 'cancelled' ? t('logging.cancelled') : t('logging.discarded');
           ToastAndroid.show(message, ToastAndroid.SHORT);

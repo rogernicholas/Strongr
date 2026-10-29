@@ -23,7 +23,8 @@ export type RootStackParamList = {
     /** Picking exercises to add to a workout in progress. */
     addToWorkoutId?: string;
   };
-  LogWorkout: { workoutId: string; title?: string };
+  /** `edit` opens a finished workout from the calendar. */
+  LogWorkout: { workoutId: string; title?: string; mode?: 'live' | 'edit' };
   /** "Good job" summary after a saved workout. */
   WorkoutDone: { workoutId: string };
   Routines: undefined;

@@ -141,6 +141,10 @@ describe('workoutRepository', () => {
       [40, 8],
     ]);
     expect(await repo.previousSets(id('Squat'), w4)).toEqual([]);
+
+    // Editing an old workout shows the session before it, not the newest one.
+    expect((await repo.previousSets(bench, w2)).map((s) => s.weightKg)).toEqual([45]);
+    expect(await repo.previousSets(bench, w1)).toEqual([]);
   });
 });
 
@@ -172,6 +176,11 @@ describe('workoutRepository history', () => {
     expect((await repo.listFinished(2_000, 6_000)).map((w) => w.id)).toEqual([b]);
     await repo.remove(a);
     expect((await repo.listFinished()).map((w) => w.id)).toEqual([b]);
+
+    // Deleting every set of a past workout while editing hides it from history.
+    const only = (await repo.get(b))!.exercises[0]!.sets[0]!;
+    await repo.deleteSet(only.id);
+    expect(await repo.listFinished()).toEqual([]);
   });
 });
 

@@ -58,7 +58,19 @@ export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParam
           <HomePage navigation={navigation} reloadToken={reloadToken} />
         </View>
         <View style={{ width }}>
-          <Calendar top reloadToken={reloadToken} onChanged={onChanged} footer={<ExportButton />} />
+          <Calendar
+            top
+            reloadToken={reloadToken}
+            onChanged={onChanged}
+            onOpenWorkout={(workout) =>
+              navigation.navigate('LogWorkout', {
+                workoutId: workout.id,
+                mode: 'edit',
+                title: workout.name ?? t('logging.editTitle'),
+              })
+            }
+            footer={<ExportButton />}
+          />
         </View>
         <View style={{ width }}>
           <Screen top>

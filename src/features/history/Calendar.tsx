@@ -36,11 +36,13 @@ interface Props {
   top?: boolean;
   /** Called after a workout or bodyweight was changed here, so other pages can refresh. */
   onChanged?(): void;
+  /** Tap on a logged workout, to edit it. */
+  onOpenWorkout?(workout: Workout): void;
 }
 
 const WEEK_CELL = 48;
 
-export function Calendar({ footer, reloadToken, top, onChanged }: Props) {
+export function Calendar({ footer, reloadToken, top, onChanged, onOpenWorkout }: Props) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const dialog = useDialog();
@@ -262,7 +264,12 @@ export function Calendar({ footer, reloadToken, top, onChanged }: Props) {
         <AppText variant="muted">{t('history.restDay')}</AppText>
       ) : (
         dayWorkouts.map((workout) => (
-          <Card key={workout.id} onLongPress={() => void confirmDelete(workout)}>
+          <Card
+            key={workout.id}
+            accessibilityLabel={workout.name ?? t('logging.editTitle')}
+            onPress={onOpenWorkout ? () => onOpenWorkout(workout) : undefined}
+            onLongPress={() => void confirmDelete(workout)}
+          >
             {workout.name ? <AppText variant="heading">{workout.name}</AppText> : null}
             {workout.exercises
               .filter((e) => e.sets.length > 0)

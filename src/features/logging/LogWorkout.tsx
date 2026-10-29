@@ -19,6 +19,8 @@ import { ExerciseLogCard } from './ExerciseLogCard';
 
 interface Props {
   workoutId: string;
+  /** `edit`: a finished workout opened from the calendar. Changes save as you go; Done leaves. */
+  mode?: 'live' | 'edit';
   /** Changes when exercises were added elsewhere, to reload. */
   reloadToken?: number;
   onAddExercises(): void;
@@ -51,9 +53,18 @@ async function loadWorkout(db: Db, workoutId: string, known: Previous) {
   return { workout, previous: { ...known, ...Object.fromEntries(entries) } as Previous };
 }
 
-/** The mid-workout screen: big targets, pre-filled numbers, works offline, screen stays on. */
-export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished }: Props) {
+function KeepAwake() {
   useKeepAwake();
+  return null;
+}
+
+/**
+ * The mid-workout screen: big targets, pre-filled numbers, works offline, screen stays on.
+ * The same cards edit a finished workout.
+ */
+export function LogWorkout(props: Props) {
+  const { workoutId, mode = 'live', reloadToken, onAddExercises, onFinished } = props;
+  const live = mode === 'live';
   const { t } = useTranslation();
   const theme = useTheme();
   const dialog = useDialog();
@@ -85,13 +96,14 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
       setExpandedId((current) => {
         if (added[0]) return added[0];
         if (current && ids.includes(current)) return current;
+        if (!live) return null;
         return exercises.find((e) => e.sets.length === 0)?.id ?? ids[0] ?? null;
       });
     });
     return () => {
       active = false;
     };
-  }, [db, workoutId, reloadToken, version]);
+  }, [db, workoutId, live, reloadToken, version]);
 
   const repo = createWorkoutRepository(db);
   const run = (action: Promise<unknown>) =>
@@ -153,6 +165,7 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
       edges={['bottom', 'left', 'right']}
       style={{ flex: 1, backgroundColor: theme.colors.background }}
     >
+      {live ? <KeepAwake /> : null}
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{ padding: 16, gap: 12 }}
@@ -167,7 +180,7 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
               rpeEnabled={settings.rpeEnabled}
               expanded={expandedId === exercise.id}
               onToggle={() => setExpandedId((id) => (id === exercise.id ? null : exercise.id))}
-              onAddSet={(input) => run(repo.addSet(exercise.id, input))}
+              onAddSet={(input) => run(repo.addSet(exercise.id, input, live))}
               onUpdateSet={(setId, input) => run(repo.updateSet(setId, input))}
               onDeleteSet={(setId) => run(repo.deleteSet(setId))}
               onRemove={() => void removeExercise(exercise)}
@@ -186,16 +199,20 @@ export function LogWorkout({ workoutId, reloadToken, onAddExercises, onFinished 
             backgroundColor: theme.colors.surface,
           }}
         >
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Button
-              label={t('logging.cancelWorkout')}
-              variant="quiet"
-              onPress={() => void cancel()}
-            />
-            <View style={{ flex: 1 }}>
-              <Button label={t('logging.finish')} onPress={() => void finish()} />
+          {live ? (
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <Button
+                label={t('logging.cancelWorkout')}
+                variant="quiet"
+                onPress={() => void cancel()}
+              />
+              <View style={{ flex: 1 }}>
+                <Button label={t('logging.finish')} onPress={() => void finish()} />
+              </View>
             </View>
-          </View>
+          ) : (
+            <Button label={t('logging.done')} onPress={() => onFinished('saved')} />
+          )}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
