@@ -115,14 +115,14 @@ export function StatsDetail({ target }: { target: StatsTarget }) {
 
   return (
     <Screen>
-      {metric === 'topSet' || metric === 'e1rm' ? (
+      {metric === 'allSets' || metric === 'volume' ? (
         <SegmentedControl<Metric>
           accessibilityLabel={t('stats.metric')}
           value={metric}
           onChange={setMetric}
           options={[
-            { value: 'topSet', label: t('stats.topSet') },
-            { value: 'e1rm', label: t('stats.e1rm') },
+            { value: 'allSets', label: t('stats.allSets') },
+            { value: 'volume', label: t('stats.volume') },
           ]}
         />
       ) : null}
