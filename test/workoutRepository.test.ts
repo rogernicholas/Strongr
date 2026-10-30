@@ -15,7 +15,8 @@ const set = (weightKg: number | null, reps: number | null, extra: Partial<SetInp
   ...extra,
 });
 
-async function setup() {
+/** By default each call to the clock moves it on by a second. */
+async function setup(clock?: () => number) {
   const db = openNodeDb();
   await migrate(db, migrations);
   const exercises = createExerciseRepository(db);
@@ -23,7 +24,7 @@ async function setup() {
   const all = await exercises.list();
   const id = (name: string) => all.find((e) => e.name === name)!.id;
   let now = 1_000;
-  const repo = createWorkoutRepository(db, () => (now += 1_000));
+  const repo = createWorkoutRepository(db, clock ?? (() => (now += 1_000)));
   return { db, repo, id };
 }
 
@@ -72,6 +73,30 @@ describe('workoutRepository', () => {
     expect(sets.map((s) => [s.restS, s.completedAt === null])).toEqual([
       [92, false],
       [null, true],
+    ]);
+  });
+
+  it('saves rest when the next set is the same exercise, never across a changeover', async () => {
+    let now = 0;
+    const { repo, id } = await setup(() => now);
+    const workoutId = await repo.start({ exerciseIds: [id('Bench press'), id('Row machine')] });
+    const [bench, row] = (await repo.get(workoutId))!.exercises.map((e) => e.id);
+    const at = async (seconds: number, we: string) => {
+      now = seconds * 1000;
+      return repo.addSet(we!, set(50, 8));
+    };
+    await at(0, bench!); // 90 s until the next bench set: rest
+    await at(90, bench!); // next set is rows: a changeover, no rest
+    await at(200, row!); // 6 minutes (a phone call): left out
+    await at(560, row!); // 40 s: rest
+    const handLogged = await at(600, row!);
+    await repo.logRest(handLogged.id, 45); // logged by hand: kept as logged
+    await at(700, row!); // next set is bench again: a changeover
+    await at(760, bench!);
+    const sets = (await repo.get(workoutId))!.exercises.map((e) => e.sets.map((s) => s.restS));
+    expect(sets).toEqual([
+      [90, null, null],
+      [null, 40, 45, null],
     ]);
   });
 

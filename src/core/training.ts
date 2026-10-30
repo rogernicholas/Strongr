@@ -6,6 +6,12 @@ import { seedEnergy } from '@/config/seedExercises';
  * weights are canonical kg. Warm-up sets never count.
  */
 
+/**
+ * Longest gap between two sets of the same exercise that counts as rest. Longer gaps
+ * (a phone call, a chat) are left out of rest stats.
+ */
+export const MAX_REST_S = 5 * 60;
+
 export interface TrainingSet {
   weightKg: number | null;
   reps: number | null;

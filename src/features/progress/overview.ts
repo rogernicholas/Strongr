@@ -1,5 +1,11 @@
 import { weekStartKey } from '@/core/dates';
-import { bodyweightFor, workingSets, workoutCalories, workoutLengthMs } from '@/core/training';
+import {
+  bodyweightFor,
+  MAX_REST_S,
+  workingSets,
+  workoutCalories,
+  workoutLengthMs,
+} from '@/core/training';
 import type { Bodyweight, ExerciseSession, Workout } from '@/data';
 
 import { defaultMetric, sessionValue } from './stats';
@@ -99,7 +105,9 @@ export function summarizeOverview(
     avgWorkingSets: mean(
       workouts.map((w) => workingSets(w.exercises.flatMap((e) => e.sets)).length),
     ),
-    avgRestS: mean(sets.flatMap((s) => (s.restS === null ? [] : [s.restS]))),
+    avgRestS: mean(
+      sets.flatMap((s) => (s.restS === null || s.restS > MAX_REST_S ? [] : [s.restS])),
+    ),
     biggest: ranked[0] ?? null,
     smallest: ranked.length > 1 ? ranked[ranked.length - 1]! : null,
   };

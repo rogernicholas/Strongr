@@ -3,11 +3,13 @@ import { View } from 'react-native';
 
 import { useTranslation } from '@/core/i18n';
 import { SUGGEST_REPS_RANGE, useSettings } from '@/core/settings';
+import { useTheme } from '@/core/theme';
 import type { WeightUnit } from '@/core/units';
 import { AppText, NumberStepper, Screen, SegmentedControl, Toggle } from '@/ui';
 
 export function SettingsScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const { settings, updateSettings } = useSettings();
   const [repsText, setRepsText] = useState(String(settings.suggestAtReps));
 
@@ -50,17 +52,24 @@ export function SettingsScreen() {
           value={settings.weightSuggestions}
           onChange={(weightSuggestions) => void updateSettings({ weightSuggestions })}
         />
-        {settings.weightSuggestions ? (
-          <View style={{ gap: 8, paddingTop: 8 }}>
-            <AppText variant="muted">{t('settings.suggestAt')}</AppText>
-            <NumberStepper
-              label={t('logging.reps')}
-              value={repsText}
-              onChangeText={changeReps}
-              step={1}
-            />
-          </View>
-        ) : null}
+        <View
+          style={{
+            gap: 8,
+            marginLeft: 16,
+            padding: 12,
+            borderRadius: theme.radius.md,
+            backgroundColor: theme.colors.surface,
+          }}
+        >
+          <AppText variant="muted">{t('settings.suggestAt')}</AppText>
+          <NumberStepper
+            label={t('logging.reps')}
+            value={repsText}
+            onChangeText={changeReps}
+            step={1}
+            disabled={!settings.weightSuggestions}
+          />
+        </View>
       </View>
     </Screen>
   );

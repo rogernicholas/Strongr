@@ -10,6 +10,7 @@ interface Props {
   onChangeText(text: string): void;
   step: number;
   decimals?: boolean;
+  disabled?: boolean;
 }
 
 function bump(text: string, delta: number): string {
@@ -19,13 +20,15 @@ function bump(text: string, delta: number): string {
 }
 
 /** One row: label, then −, a wide numeric field and +. The field gets most of the width. */
-export function NumberStepper({ label, value, onChangeText, step, decimals = false }: Props) {
+export function NumberStepper(props: Props) {
+  const { label, value, onChangeText, step, decimals = false, disabled = false } = props;
   const theme = useTheme();
   const button = (sign: -1 | 1) => (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${sign < 0 ? '−' : '+'}${step} ${label}`}
       onPress={() => onChangeText(bump(value, sign * step))}
+      disabled={disabled}
       hitSlop={6}
       style={({ pressed }) => ({
         width: 44,
@@ -42,7 +45,9 @@ export function NumberStepper({ label, value, onChangeText, step, decimals = fal
   );
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+    <View
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 10, opacity: disabled ? 0.4 : 1 }}
+    >
       <AppText variant="label" style={{ width: 52 }}>
         {label.toUpperCase()}
       </AppText>
@@ -52,6 +57,7 @@ export function NumberStepper({ label, value, onChangeText, step, decimals = fal
         onChangeText={onChangeText}
         keyboardType={decimals ? 'decimal-pad' : 'number-pad'}
         selectTextOnFocus
+        editable={!disabled}
         accessibilityLabel={label}
         style={{
           flex: 1,

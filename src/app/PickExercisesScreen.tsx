@@ -147,7 +147,7 @@ export function PickExercisesScreen({ route, navigation }: Props) {
             ) : hasRoutineChanges(exerciseIds ?? [], ids) ? (
               <Button
                 label={t('routines.saveChanges')}
-                variant="accent"
+                variant="secondary"
                 disabled={ids.length === 0}
                 onPress={() => void saveChanges(ids)}
               />
