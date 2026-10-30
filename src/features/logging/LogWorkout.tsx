@@ -198,10 +198,12 @@ export function LogWorkout(props: Props) {
           contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 12 }}
           keyboardShouldPersistTaps="handled"
         >
-          {workout.exercises.map((exercise) => (
+          {workout.exercises.map((exercise, i) => (
             <ExerciseLogCard
               key={exercise.id}
               exercise={exercise}
+              position={i + 1}
+              total={workout.exercises.length}
               previousSets={previous[exercise.exerciseId] ?? []}
               unit={settings.weightUnit}
               rpeEnabled={settings.rpeEnabled}
