@@ -100,7 +100,11 @@ export function HomePage({ navigation, reloadToken }: Props) {
           {lastTrained ? <AppText variant="muted">{lastTrained}</AppText> : null}
         </View>
 
-        <View style={{ gap: theme.spacing(3) }}>
+        {/* Nothing until loaded, so a wrong button never flashes up under a thumb. */}
+        <View
+          pointerEvents={home ? 'auto' : 'none'}
+          style={{ gap: theme.spacing(3), opacity: home ? 1 : 0 }}
+        >
           {activeWorkoutId ? (
             <Card
               accessibilityLabel={t('home.resume')}
