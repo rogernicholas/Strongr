@@ -2,15 +2,14 @@ import { Pressable, View } from 'react-native';
 
 import { useTheme } from '@/core/theme';
 
-import { AppText } from './AppText';
-
 interface Props {
+  /** Read out by screen readers; not shown. */
   labels: readonly string[];
   active: number;
   onSelect(index: number): void;
 }
 
-/** Labelled tabs along the bottom; the active one is teal with a bar above it. */
+/** One short bar per page along the bottom; the active one is teal. */
 export function TabBar({ labels, active, onSelect }: Props) {
   const theme = useTheme();
   return (
@@ -21,28 +20,24 @@ export function TabBar({ labels, active, onSelect }: Props) {
           <Pressable
             key={label}
             accessibilityRole="tab"
+            accessibilityLabel={label}
             accessibilityState={{ selected }}
             onPress={() => onSelect(i)}
-            style={{ flex: 1, minHeight: 52, alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              flex: 1,
+              minHeight: theme.minTouch,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
             <View
               style={{
-                position: 'absolute',
-                top: 0,
                 width: 32,
-                height: 3,
+                height: 4,
                 borderRadius: 2,
-                backgroundColor: selected ? theme.colors.accent : 'transparent',
+                backgroundColor: selected ? theme.colors.accent : theme.colors.subtle,
               }}
             />
-            <AppText
-              style={{
-                fontWeight: '600',
-                color: selected ? theme.colors.accent : theme.colors.textMuted,
-              }}
-            >
-              {label}
-            </AppText>
           </Pressable>
         );
       })}

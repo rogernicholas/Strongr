@@ -266,4 +266,5 @@ Record each decision here with the date. Claude updates this whenever Roger deci
   - Overview: workouts, per week and progress first, calories last; empty tiles say why; per week waits for two weeks of data; "Smallest progress" is renamed "Stalled".
   - Stats list: trend line and latest change on every exercise and on bodyweight, plus a "Log this week" bodyweight button.
 - 2026-10-30: The dot in the "Strongr." wordmark on Home is red, matching the app icon.
+- 2026-10-30: The tab bar has no words: one short bar per page, teal for the current page, for a minimal look. Tapping and swiping still work.
 - Open: scoreboard metric and caps, sign-in method.
