@@ -5,9 +5,9 @@ import type { Bodyweight, ExerciseSession, Workout } from '@/data';
 import { defaultMetric, sessionValue } from './stats';
 
 const WEEK = 7 * 24 * 60 * 60 * 1000;
-/** Progress compares the average of this many first and last sessions. */
+/** Progress compares the average of up to this many first and last sessions. */
 const ENDS = 2;
-const MIN_SESSIONS = 4;
+const MIN_SESSIONS = 2;
 
 export interface ExerciseProgress {
   name: string;
@@ -51,8 +51,10 @@ export function exerciseProgress(sessions: readonly ExerciseSession[]): number |
     return v === null ? [] : [v];
   });
   if (values.length < MIN_SESSIONS) return null;
-  const first = mean(values.slice(0, ENDS))!;
-  const last = mean(values.slice(-ENDS))!;
+  // Two or three sessions compare first with last; four or more average two at each end.
+  const ends = Math.min(ENDS, Math.floor(values.length / 2));
+  const first = mean(values.slice(0, ends))!;
+  const last = mean(values.slice(-ends))!;
   return first > 0 ? (last - first) / first : null;
 }
 
