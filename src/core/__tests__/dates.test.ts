@@ -1,4 +1,10 @@
-import { localDateKey, monthGrid, parseDateKey, weekStartKey } from '@/core/dates';
+import {
+  calendarDaysBetween,
+  localDateKey,
+  monthGrid,
+  parseDateKey,
+  weekStartKey,
+} from '@/core/dates';
 
 describe('dates', () => {
   it('formats local date keys', () => {
@@ -19,5 +25,12 @@ describe('dates', () => {
     expect(grid[0]![3]!.getDate()).toBe(1);
     expect(grid.every((w) => w.length === 7)).toBe(true);
     expect(grid.flat().filter(Boolean)).toHaveLength(31);
+  });
+
+  it('counts calendar days, not 24-hour blocks', () => {
+    const late = new Date(2026, 9, 28, 23, 30);
+    expect(calendarDaysBetween(late, new Date(2026, 9, 28, 23, 59))).toBe(0);
+    expect(calendarDaysBetween(late, new Date(2026, 9, 29, 0, 10))).toBe(1);
+    expect(calendarDaysBetween(late, new Date(2026, 9, 31, 8))).toBe(3);
   });
 });

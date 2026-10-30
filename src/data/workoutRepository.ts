@@ -402,6 +402,19 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       ]);
     },
 
+    /** The most recent finished workout that has sets: when it started and its routine. */
+    async latestFinished(): Promise<{ startedAt: number; templateId: string | null } | null> {
+      const row = await db.getFirst<{ started_at: number; template_id: string | null }>(
+        `SELECT w.started_at, w.template_id FROM workouts w
+         WHERE w.deleted_at IS NULL AND w.ended_at IS NOT NULL
+           AND EXISTS (SELECT 1 FROM sets s
+             JOIN workout_exercises we ON we.id = s.workout_exercise_id AND we.deleted_at IS NULL
+             WHERE we.workout_id = w.id AND s.deleted_at IS NULL)
+         ORDER BY w.started_at DESC LIMIT 1`,
+      );
+      return row ? { startedAt: row.started_at, templateId: row.template_id } : null;
+    },
+
     /** How many workouts have been finished and kept. */
     async countFinished(): Promise<number> {
       const row = await db.getFirst<{ n: number }>(

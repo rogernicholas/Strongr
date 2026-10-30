@@ -46,6 +46,13 @@ export function parseDateKey(key: string): Date {
   return new Date(y!, m! - 1, d!);
 }
 
+/** Whole calendar days from `earlier` to `later` in local time (0 = same day). */
+export function calendarDaysBetween(earlier: Date, later: Date): number {
+  const day = (d: Date) => parseDateKey(localDateKey(d)).getTime();
+  // Rounding absorbs the 23- and 25-hour days of daylight-saving switches.
+  return Math.round((day(later) - day(earlier)) / (24 * 60 * 60 * 1000));
+}
+
 /** Weeks start on Monday. Returns the Monday of the date's week as "YYYY-MM-DD". */
 export function weekStartKey(date: Date): string {
   const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate());

@@ -12,7 +12,14 @@
     "about": "About",
     "resume": "Resume workout",
     "resumeHint": "You have a workout in progress.",
-    "myRoutines": "My routines"
+    "myRoutines": "My routines",
+    "tab": "Home",
+    "calendarTab": "Calendar",
+    "nextUp": "Next up",
+    "start": "Start {{name}}",
+    "lastTrainedToday": "Last trained today",
+    "lastTrainedYesterday": "Last trained yesterday",
+    "lastTrainedDays": "Last trained {{count}} days ago"
   },
   "settings": {
     "title": "Settings",

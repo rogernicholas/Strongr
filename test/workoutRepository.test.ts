@@ -225,6 +225,21 @@ describe('workoutRepository history', () => {
   });
 });
 
+describe('workoutRepository latestFinished', () => {
+  it('returns the newest finished workout with sets, and its routine', async () => {
+    const { repo, id } = await setup();
+    expect(await repo.latestFinished()).toBeNull();
+    const first = await repo.start({ exerciseIds: [id('Bench press')], templateId: null });
+    await repo.addSet((await repo.get(first))!.exercises[0]!.id, set(50, 8));
+    await repo.finish(first);
+    const firstStart = (await repo.get(first))!.startedAt;
+    // An empty workout is discarded at Finish; one still open doesn't count either.
+    await repo.finish(await repo.start({ exerciseIds: [id('Bench press')] }));
+    await repo.start({ exerciseIds: [id('Bench press')] });
+    expect(await repo.latestFinished()).toEqual({ startedAt: firstStart, templateId: null });
+  });
+});
+
 describe('workoutRepository stats queries', () => {
   it('lists logged exercises and their sessions, ignoring unfinished and deleted workouts', async () => {
     const { repo, id } = await setup();
