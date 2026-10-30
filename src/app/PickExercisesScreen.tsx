@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ToastAndroid, View } from 'react-native';
 
 import { useDb } from '@/core/db';
@@ -31,6 +31,8 @@ export function PickExercisesScreen({ route, navigation }: Props) {
   const [dialogKey, setDialogKey] = useState(0);
   // Bumped after a save so the routine cards show the saved exercises.
   const [routinesVersion, setRoutinesVersion] = useState(0);
+  // A quick double tap must not start two workouts.
+  const starting = useRef(false);
 
   async function openSaveDialog(ids: string[]) {
     const existing = await createRoutineRepository(db).list();
@@ -66,12 +68,18 @@ export function PickExercisesScreen({ route, navigation }: Props) {
   }
 
   async function start(ids: string[]) {
-    const workoutId = await createWorkoutRepository(db).start({
-      exerciseIds: ids,
-      templateId: routineId ?? null,
-      name: routineName ?? null,
-    });
-    navigation.replace('LogWorkout', { workoutId, title: routineName });
+    if (starting.current) return;
+    starting.current = true;
+    try {
+      const workoutId = await createWorkoutRepository(db).start({
+        exerciseIds: ids,
+        templateId: routineId ?? null,
+        name: routineName ?? null,
+      });
+      navigation.replace('LogWorkout', { workoutId, title: routineName });
+    } finally {
+      starting.current = false;
+    }
   }
 
   async function addToWorkout(workoutId: string, ids: string[]) {

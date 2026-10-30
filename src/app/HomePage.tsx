@@ -1,5 +1,5 @@
 import type { NavigationProp } from '@react-navigation/native';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -56,6 +56,8 @@ export function HomePage({ navigation, reloadToken }: Props) {
   const theme = useTheme();
   const db = useDb();
   const [home, setHome] = useState<HomeData | null>(null);
+  // A quick double tap must not start two workouts.
+  const starting = useRef(false);
   const today = new Date();
 
   useEffect(() => {
@@ -67,12 +69,18 @@ export function HomePage({ navigation, reloadToken }: Props) {
   }, [db, reloadToken]);
 
   async function startNext(routine: Routine) {
-    const workoutId = await createWorkoutRepository(db).start({
-      exerciseIds: routine.exerciseIds,
-      templateId: routine.id,
-      name: routine.name,
-    });
-    navigation.navigate('LogWorkout', { workoutId, title: routine.name });
+    if (starting.current) return;
+    starting.current = true;
+    try {
+      const workoutId = await createWorkoutRepository(db).start({
+        exerciseIds: routine.exerciseIds,
+        templateId: routine.id,
+        name: routine.name,
+      });
+      navigation.navigate('LogWorkout', { workoutId, title: routine.name });
+    } finally {
+      starting.current = false;
+    }
   }
 
   const lastAt = home?.lastTrainedAt ?? null;

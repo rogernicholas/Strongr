@@ -282,9 +282,10 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
             [workoutExerciseId],
           )
         : null;
+      const gapS = last ? Math.round((now - last.at) / 1000) : 0;
       const restS =
-        last && last.we === workoutExerciseId && last.rest === null
-          ? Math.round((now - last.at) / 1000)
+        last && last.we === workoutExerciseId && last.rest === null && gapS <= MAX_REST_S
+          ? gapS
           : null;
       await db.transaction(async () => {
         await db.run(
@@ -306,7 +307,7 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
             now,
           ],
         );
-        if (last && restS !== null && restS <= MAX_REST_S) {
+        if (last && restS !== null) {
           await db.run('UPDATE sets SET rest_s = ?, updated_at = ? WHERE id = ?', [
             restS,
             now,
