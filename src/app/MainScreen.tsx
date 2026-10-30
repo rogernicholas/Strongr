@@ -88,6 +88,7 @@ export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParam
             <AppText variant="title">{t('stats.title')}</AppText>
             <StatsList
               reloadToken={reloadToken}
+              onChanged={onChanged}
               onOpen={(target) => navigation.navigate('StatsDetail', { target })}
             />
           </Screen>

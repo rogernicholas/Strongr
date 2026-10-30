@@ -69,6 +69,8 @@ describe('summarizeOverview', () => {
     expect(o.avgWorkingSets).toBe(1.5);
     expect(o.avgRestS).toBe(120);
     expect(summarizeOverview(workouts, [], 11 * DAY, 24 * DAY).workouts).toBe(1);
+    // Under two weeks of data, a per-week rate would mislead.
+    expect(summarizeOverview(workouts, [], 0, 20 * DAY).perWeek).toBeNull();
 
     // 80 kg: 40 min = 5 × 80 × 2/3 ≈ 266.7 kcal, 60 min = 400 kcal.
     const withWeight = summarizeOverview(

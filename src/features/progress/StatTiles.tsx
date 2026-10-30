@@ -7,13 +7,25 @@ import type { Range } from './stats';
 
 export const DASH = '–';
 
+interface TileProps {
+  label: string;
+  /** Null shows `reason` (why there is no number yet) instead. */
+  value: string | null;
+  reason?: string;
+  wide?: boolean;
+}
+
 /** Half-width card with a label and a big value; `wide` takes the full row. */
-export function StatTile({ label, value, wide }: { label: string; value: string; wide?: boolean }) {
+export function StatTile({ label, value, reason, wide }: TileProps) {
   return (
     <View style={{ width: wide ? '100%' : '48.5%' }}>
       <Card>
         <AppText variant="label">{label.toUpperCase()}</AppText>
-        <AppText variant="stat">{value}</AppText>
+        {value === null && reason ? (
+          <AppText variant="muted">{reason}</AppText>
+        ) : (
+          <AppText variant="stat">{value ?? DASH}</AppText>
+        )}
       </Card>
     </View>
   );

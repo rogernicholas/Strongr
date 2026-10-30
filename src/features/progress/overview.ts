@@ -13,7 +13,8 @@ import { defaultMetric, sessionValue } from './stats';
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 /** Progress compares the average of this many first and last sessions. */
 const ENDS = 2;
-const MIN_SESSIONS = 4;
+export const MIN_SESSIONS = 4;
+export const MIN_WEEKS = 2;
 
 export interface ExerciseProgress {
   name: string;
@@ -23,6 +24,7 @@ export interface ExerciseProgress {
 
 export interface Overview {
   workouts: number;
+  /** Null until the range spans MIN_WEEKS: a few days would extrapolate wildly. */
   perWeek: number | null;
   /** First to last logged set (start to Finish for one-set workouts). */
   avgDurationMs: number | null;
@@ -30,7 +32,7 @@ export interface Overview {
   avgCalories: number | null;
   totalCalories: number | null;
   avgWorkingSets: number | null;
-  /** From rests saved with Log rest. */
+  /** From saved rests (automatic or Log rest), leaving out gaps over MAX_REST_S. */
   avgRestS: number | null;
   biggest: ExerciseProgress | null;
   smallest: ExerciseProgress | null;
@@ -62,6 +64,22 @@ export function exerciseProgress(sessions: readonly ExerciseSession[]): number |
   return first > 0 ? (last - first) / first : null;
 }
 
+/** Each exercise's sessions with working sets, oldest first, keyed by exercise id. */
+export function sessionsByExercise(
+  workouts: readonly Workout[],
+): Map<string, { name: string; sessions: ExerciseSession[] }> {
+  const byExercise = new Map<string, { name: string; sessions: ExerciseSession[] }>();
+  for (const w of workouts) {
+    for (const e of w.exercises) {
+      if (workingSets(e.sets).length === 0) continue;
+      const entry = byExercise.get(e.exerciseId) ?? { name: e.exerciseName, sessions: [] };
+      entry.sessions.push({ workoutId: w.id, startedAt: w.startedAt, sets: e.sets });
+      byExercise.set(e.exerciseId, entry);
+    }
+  }
+  return byExercise;
+}
+
 /** Workout-wide stats for finished workouts (oldest first) started at or after `from`. */
 export function summarizeOverview(
   all: readonly Workout[],
@@ -73,18 +91,9 @@ export function summarizeOverview(
   const sets = workouts.flatMap((w) => w.exercises.flatMap((e) => e.sets));
 
   const first = workouts[0]?.startedAt;
-  const weeks = first === undefined ? null : Math.max(1, (now - first) / WEEK);
+  const weeks = first === undefined ? null : (now - first) / WEEK;
 
-  const byExercise = new Map<string, { name: string; sessions: ExerciseSession[] }>();
-  for (const w of workouts) {
-    for (const e of w.exercises) {
-      if (workingSets(e.sets).length === 0) continue;
-      const entry = byExercise.get(e.exerciseId) ?? { name: e.exerciseName, sessions: [] };
-      entry.sessions.push({ workoutId: w.id, startedAt: w.startedAt, sets: e.sets });
-      byExercise.set(e.exerciseId, entry);
-    }
-  }
-  const ranked = [...byExercise.values()]
+  const ranked = [...sessionsByExercise(workouts).values()]
     .flatMap(({ name, sessions }) => {
       const change = exerciseProgress(sessions);
       return change === null ? [] : [{ name, change }];
@@ -98,7 +107,7 @@ export function summarizeOverview(
 
   return {
     workouts: workouts.length,
-    perWeek: weeks === null ? null : workouts.length / weeks,
+    perWeek: weeks === null || weeks < MIN_WEEKS ? null : workouts.length / weeks,
     avgDurationMs: mean(workouts.flatMap((w) => lengthOf(w) ?? [])),
     avgCalories: mean(calories),
     totalCalories: calories.length ? calories.reduce((a, b) => a + b, 0) : null,

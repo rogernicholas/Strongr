@@ -4,7 +4,11 @@ import { View } from 'react-native';
 import { formatLongDate, parseDateKey } from '@/core/dates';
 import { useTranslation } from '@/core/i18n';
 import { formatNumber, toDisplayWeight, type WeightUnit } from '@/core/units';
-import { AppText, Button, ModalCard, TextField } from '@/ui';
+
+import { AppText } from './AppText';
+import { Button } from './Button';
+import { ModalCard } from './ModalCard';
+import { TextField } from './TextField';
 
 /** A positive weight, 0 for "remove" (empty or zero), or null when invalid. */
 function parse(text: string): number | null {

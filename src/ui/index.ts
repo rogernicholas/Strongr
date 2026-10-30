@@ -1,4 +1,5 @@
 export { AppText } from './AppText';
+export { BodyweightDialog } from './BodyweightDialog';
 export { Button } from './Button';
 export { Card } from './Card';
 export { Chips } from './Chips';
@@ -9,6 +10,7 @@ export { ModalCard } from './ModalCard';
 export { NumberStepper } from './NumberStepper';
 export { Screen } from './Screen';
 export { SegmentedControl } from './SegmentedControl';
+export { Sparkline } from './Sparkline';
 export { TabBar } from './TabBar';
 export { TextField } from './TextField';
 export { Toggle } from './Toggle';
