@@ -57,16 +57,17 @@ export function fontFamilyFor(weight: string | number | undefined): string {
 const spacing = (n: number) => n * 4;
 
 /**
- * One blue hue (238°) runs through the background, surfaces, muted text and
- * lines, so the page reads as a deep version of the navy. Red and teal are
- * tuned to sit closer in lightness so neither shouts.
+ * "Soft navy": a calm, low-saturation blue runs through the background, surfaces,
+ * muted text and lines. Cards step up in lightness rather than in blue, so they lift
+ * off the page and saturation is kept for the red and teal accents.
+ * (The splash and icon background, #0C0C1D in app.json, is the near-identical old ink.)
  */
 const palette = {
-  ink: '#0C0C1D',
-  navy: '#11135A',
-  navyRaised: '#1F226B',
-  line: '#2E317A',
-  mist: '#ABAED9',
+  ink: '#0B0C18',
+  navy: '#1C1F3B',
+  navyRaised: '#282C4F',
+  line: '#373B62',
+  mist: '#B2B5D6',
   white: '#F3F3FC',
   red: '#EB424B',
   redDim: '#793437',
@@ -93,7 +94,7 @@ export const darkTheme: Theme = {
     border: 'transparent',
     subtle: palette.line,
     danger: palette.redSoft,
-    backdrop: 'rgba(12, 12, 29, 0.82)',
+    backdrop: 'rgba(11, 12, 24, 0.82)',
   },
   spacing,
   radius: { sm: 10, md: 14, lg: 22, pill: 999 },

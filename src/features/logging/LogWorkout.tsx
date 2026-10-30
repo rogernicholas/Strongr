@@ -54,6 +54,19 @@ async function loadWorkout(db: Db, workoutId: string, known: Previous) {
   return { workout, previous: { ...known, ...Object.fromEntries(entries) } as Previous };
 }
 
+const FADE_STEPS = [0.15, 0.35, 0.6, 0.85];
+
+/** Cards scrolling under the bottom bar fade out instead of being cut mid-line. */
+function Fade({ color }: { color: string }) {
+  return (
+    <View pointerEvents="none" style={{ position: 'absolute', top: -24, left: 0, right: 0 }}>
+      {FADE_STEPS.map((opacity) => (
+        <View key={opacity} style={{ height: 6, backgroundColor: color, opacity }} />
+      ))}
+    </View>
+  );
+}
+
 function KeepAwake() {
   useKeepAwake();
   return null;
@@ -162,14 +175,17 @@ export function LogWorkout(props: Props) {
   if (!workout) return null;
 
   // The rest timer runs from the most recently logged set until its rest is logged.
-  const lastSet = workout.exercises
-    .flatMap((e) => e.sets)
-    .reduce<LoggedSet | null>(
-      (last, s) =>
-        s.completedAt !== null && (last === null || s.completedAt > last.completedAt!) ? s : last,
+  const last = workout.exercises
+    .flatMap((e) => e.sets.map((set) => ({ set, exerciseId: e.id })))
+    .reduce<{ set: LoggedSet; exerciseId: string } | null>(
+      (latest, entry) =>
+        entry.set.completedAt !== null &&
+        (latest === null || entry.set.completedAt > latest.set.completedAt!)
+          ? entry
+          : latest,
       null,
     );
-  const resting = live && settings.showRestTimer && lastSet !== null && lastSet.restS === null;
+  const resting = live && settings.showRestTimer && last !== null && last.set.restS === null;
 
   return (
     <SafeAreaView
@@ -179,13 +195,15 @@ export function LogWorkout(props: Props) {
       {live ? <KeepAwake /> : null}
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={{ padding: 16, gap: 12 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 12 }}
           keyboardShouldPersistTaps="handled"
         >
-          {workout.exercises.map((exercise) => (
+          {workout.exercises.map((exercise, i) => (
             <ExerciseLogCard
               key={exercise.id}
               exercise={exercise}
+              position={i + 1}
+              total={workout.exercises.length}
               previousSets={previous[exercise.exerciseId] ?? []}
               unit={settings.weightUnit}
               rpeEnabled={settings.rpeEnabled}
@@ -203,19 +221,15 @@ export function LogWorkout(props: Props) {
           <Button label={t('logging.addExercise')} variant="secondary" onPress={onAddExercises} />
         </ScrollView>
         <View
-          style={{
-            padding: 16,
-            gap: 8,
-            borderTopWidth: 1,
-            borderTopColor: theme.colors.border,
-            backgroundColor: theme.colors.surface,
-          }}
+          style={{ padding: 16, paddingTop: 8, gap: 8, backgroundColor: theme.colors.background }}
         >
+          <Fade color={theme.colors.background} />
           {resting ? (
             <RestTimer
-              key={lastSet.id}
-              since={lastSet.completedAt!}
-              onLog={(seconds) => run(repo.logRest(lastSet.id, seconds))}
+              key={last.set.id}
+              since={last.set.completedAt!}
+              changeover={expandedId !== null && expandedId !== last.exerciseId}
+              onLog={(seconds) => run(repo.logRest(last.set.id, seconds))}
             />
           ) : null}
           {live ? (
@@ -226,11 +240,19 @@ export function LogWorkout(props: Props) {
                 onPress={() => void cancel()}
               />
               <View style={{ flex: 1 }}>
-                <Button label={t('logging.finish')} onPress={() => void finish()} />
+                <Button
+                  label={t('logging.finish')}
+                  variant="secondary"
+                  onPress={() => void finish()}
+                />
               </View>
             </View>
           ) : (
-            <Button label={t('logging.done')} onPress={() => onFinished('saved')} />
+            <Button
+              label={t('logging.done')}
+              variant="secondary"
+              onPress={() => onFinished('saved')}
+            />
           )}
         </View>
       </KeyboardAvoidingView>

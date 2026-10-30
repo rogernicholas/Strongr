@@ -255,4 +255,16 @@ Record each decision here with the date. Claude updates this whenever Roger deci
 - 2026-10-29: Over-the-air updates (expo-updates) from 0.3.0: the app checks on open, downloads in the background and applies the update on the next open. Claude publishes an update only when Roger says so.
 - 2026-10-29: Logo and app icon: a white "S" with a red dot in Changa One on the dark background (#0C0C1D), matching the "Strongr." wordmark. Also used on the launch screen.
 - 2026-10-29: APK 0.3.0 (versionCode 4) carries the logo and over-the-air updates.
+- 2026-10-30: Biggest and smallest progress keep the four-session threshold (first two vs last two sessions); Roger chose steadier numbers over earlier ones.
+- 2026-10-30: UI specialist review applied (Roger chose the recommended options):
+  - Colours: "Soft navy" replaces the saturated navy: background #0B0C18, cards #1C1F3B (raised #282C4F), lines #373B62, muted text #B2B5D6. Red and teal unchanged. One red button per screen; teal for state.
+  - Rest: saved automatically when the next set is the same exercise within 5 minutes; a different exercise in between is a changeover and never counts. The timer reads CHANGEOVER while another exercise is open. Log rest stays as a manual override. Average rest leaves out gaps over 5 minutes. (Replaces the 29 Oct rule of saving rest only via Log rest.)
+  - Navigation: a labelled Home · Calendar · Stats tab bar replaces the page dots; swiping still works. Home shows "Next up" (the routine after the last one trained, in name order), "Last trained" and one Start button.
+  - Workout screen: Finish is a secondary button; "Exercise 2 of 5" on each card; last session's sets show faintly beside each set and as targets for sets still to do.
+  - Routines: tapping one in My routines opens it to rename, change exercises (tap order is the order), save or start.
+  - Settings use on/off switches; the rep target sits under Weight suggestions and greys out when they are off.
+  - Overview: workouts, per week and progress first, calories last; empty tiles say why; per week waits for two weeks of data; "Smallest progress" is renamed "Stalled".
+  - Stats list: trend line and latest change on every exercise and on bodyweight, plus a "Log this week" bodyweight button.
+- 2026-10-30: The dot in the "Strongr." wordmark on Home is red, matching the app icon.
+- 2026-10-30: The tab bar has no words: one short bar per page, teal for the current page, for a minimal look. Tapping and swiping still work.
 - Open: scoreboard metric and caps, sign-in method.

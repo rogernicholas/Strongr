@@ -1,6 +1,7 @@
 import { currentTimezone, systemClock, type Clock } from '@/core/clock';
 import type { Db, SqlValue } from '@/core/db';
 import { newId } from '@/core/id';
+import { MAX_REST_S } from '@/core/training';
 
 /** One logged set. Canonical units: kg, seconds, meters. */
 export interface LoggedSet {
@@ -14,7 +15,10 @@ export interface LoggedSet {
   isWarmup: boolean;
   /** When the set was logged live; null for sets added to a past workout. */
   completedAt: number | null;
-  /** Rest after this set, from the rest timer's Log rest button. */
+  /**
+   * Rest after this set: filled in when the next set of the same exercise is logged
+   * within MAX_REST_S, or by the rest timer's Log rest button.
+   */
   restS: number | null;
 }
 
@@ -266,25 +270,51 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
         [workoutExerciseId],
       );
       const position = row?.next ?? 0;
-      await db.run(
-        `INSERT INTO sets (id, workout_exercise_id, position, weight_kg, reps, duration_s, distance_m,
-           rpe, is_warmup, completed_at, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          id,
-          workoutExerciseId,
-          position,
-          input.weightKg,
-          input.reps,
-          input.durationS,
-          input.distanceM,
-          input.rpe,
-          input.isWarmup ? 1 : 0,
-          timed ? now : null,
-          now,
-          now,
-        ],
-      );
+      // The workout's last live set. Only when it was this exercise is the gap rest:
+      // a different exercise in between means a changeover, which never counts.
+      const last = timed
+        ? await db.getFirst<{ id: string; we: string; at: number; rest: number | null }>(
+            `SELECT s.id, s.workout_exercise_id AS we, s.completed_at AS at, s.rest_s AS rest
+             FROM sets s JOIN workout_exercises we ON we.id = s.workout_exercise_id
+             WHERE we.workout_id = (SELECT workout_id FROM workout_exercises WHERE id = ?)
+               AND we.deleted_at IS NULL AND s.deleted_at IS NULL AND s.completed_at IS NOT NULL
+             ORDER BY s.completed_at DESC LIMIT 1`,
+            [workoutExerciseId],
+          )
+        : null;
+      const gapS = last ? Math.round((now - last.at) / 1000) : 0;
+      const restS =
+        last && last.we === workoutExerciseId && last.rest === null && gapS <= MAX_REST_S
+          ? gapS
+          : null;
+      await db.transaction(async () => {
+        await db.run(
+          `INSERT INTO sets (id, workout_exercise_id, position, weight_kg, reps, duration_s,
+             distance_m, rpe, is_warmup, completed_at, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            id,
+            workoutExerciseId,
+            position,
+            input.weightKg,
+            input.reps,
+            input.durationS,
+            input.distanceM,
+            input.rpe,
+            input.isWarmup ? 1 : 0,
+            timed ? now : null,
+            now,
+            now,
+          ],
+        );
+        if (last && restS !== null) {
+          await db.run('UPDATE sets SET rest_s = ?, updated_at = ? WHERE id = ?', [
+            restS,
+            now,
+            last.id,
+          ]);
+        }
+      });
       return { id, position, ...input, completedAt: timed ? now : null, restS: null };
     },
 
@@ -371,6 +401,19 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
         now,
         workoutId,
       ]);
+    },
+
+    /** The most recent finished workout that has sets: when it started and its routine. */
+    async latestFinished(): Promise<{ startedAt: number; templateId: string | null } | null> {
+      const row = await db.getFirst<{ started_at: number; template_id: string | null }>(
+        `SELECT w.started_at, w.template_id FROM workouts w
+         WHERE w.deleted_at IS NULL AND w.ended_at IS NOT NULL
+           AND EXISTS (SELECT 1 FROM sets s
+             JOIN workout_exercises we ON we.id = s.workout_exercise_id AND we.deleted_at IS NULL
+             WHERE we.workout_id = w.id AND s.deleted_at IS NULL)
+         ORDER BY w.started_at DESC LIMIT 1`,
+      );
+      return row ? { startedAt: row.started_at, templateId: row.template_id } : null;
     },
 
     /** How many workouts have been finished and kept. */

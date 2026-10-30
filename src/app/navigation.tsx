@@ -24,6 +24,8 @@ export type RootStackParamList = {
     addToWorkoutId?: string;
     /** Building a new routine from My routines: save it, no workout. */
     newRoutine?: boolean;
+    /** Opened from My routines: rename the routine or change its exercises, or start it. */
+    editRoutine?: boolean;
   };
   /** `edit` opens a finished workout from the calendar. */
   LogWorkout: { workoutId: string; title?: string; mode?: 'live' | 'edit' };

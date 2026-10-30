@@ -10,7 +10,7 @@ import type { RootStackParamList } from './navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Routines'>;
 
-/** "My routines": make a new routine, or tap a saved one to start from it. */
+/** "My routines": make a new routine, or tap a saved one to edit or start it. */
 export function RoutinesScreen({ navigation }: Props) {
   const { t } = useTranslation();
   const [focusCount, setFocusCount] = useState(0);
@@ -30,6 +30,7 @@ export function RoutinesScreen({ navigation }: Props) {
             routineId: routine.id,
             routineName: routine.name,
             exerciseIds: routine.exerciseIds,
+            editRoutine: true,
           })
         }
       />

@@ -1,7 +1,6 @@
 {
   "app": {
     "name": "Strongr",
-    "logo": "Strongr.",
     "loading": "Loading…",
     "startupError": "Strongr couldn't open its database.",
     "startupErrorDetail": "Your data has not been changed. Details: {{message}}"
@@ -12,7 +11,14 @@
     "about": "About",
     "resume": "Resume workout",
     "resumeHint": "You have a workout in progress.",
-    "myRoutines": "My routines"
+    "myRoutines": "My routines",
+    "tab": "Home",
+    "calendarTab": "Calendar",
+    "nextUp": "Next up",
+    "start": "Start {{name}}",
+    "lastTrainedToday": "Last trained today",
+    "lastTrainedYesterday": "Last trained yesterday",
+    "lastTrainedDays": "Last trained {{count}} days ago"
   },
   "settings": {
     "title": "Settings",
@@ -72,7 +78,9 @@
     "startWorkout": "Start workout",
     "title": "My routines",
     "empty": "No routines yet. Tap New routine and pick its exercises.",
-    "longPressHint": "Tap a routine to start from it. Long-press to delete.",
+    "longPressHint": "Tap a routine to edit or start it. Long-press to delete.",
+    "name": "Routine name",
+    "orderHint": "Exercises run in the order you tap them. Untap and tap again to move one to the end.",
     "useHint": "Loads this routine’s exercises.",
     "selected": "Selected",
     "tapToUse": "Tap to use",
@@ -94,7 +102,8 @@
     "tapToEdit": "Tap to edit or delete",
     "setCount_one": "{{count}} set",
     "setCount_other": "{{count}} sets",
-    "lastTime": "Last time: {{sets}}",
+    "position": "Exercise {{n}} of {{total}}",
+    "lastTimeHeader": "Last time in grey",
     "firstTime": "First time logging this",
     "addExercise": "+ Add exercise",
     "noExercises": "No exercises yet. Add one to start logging.",
@@ -119,6 +128,7 @@
     "done": "Done",
     "editTitle": "Edit workout",
     "rest": "Rest",
+    "changeover": "Changeover",
     "logRest": "Log rest"
   },
   "history": {
@@ -175,11 +185,16 @@
     "avgSets": "Avg sets",
     "avgRest": "Avg rest",
     "biggestProgress": "Biggest progress",
-    "smallestProgress": "Smallest progress",
+    "stalled": "Stalled",
+    "needsSessions": "Needs {{count}} sessions of an exercise",
+    "needsTwoExercises": "Needs a second exercise with {{count}} sessions",
+    "needsWeeks": "Shows after {{count}} weeks",
+    "needsBodyweight": "Log bodyweight in the calendar",
+    "noRest": "No rests saved yet",
+    "logBodyweight": "Log this week",
     "avgCalories": "Avg calories",
     "totalCalories": "Total calories",
     "kcal": "{{value}} kcal",
-    "caloriesNeedBodyweight": "Log your bodyweight in the calendar to see calories.",
     "overviewSummary_one": "{{count}} workout · {{kcal}} kcal avg",
     "overviewSummary_other": "{{count}} workouts · {{kcal}} kcal avg",
     "overviewCount_one": "{{count}} workout",

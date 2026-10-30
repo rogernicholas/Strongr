@@ -13,6 +13,9 @@ import { suggestNextSet } from './setEntry';
 
 interface Props {
   exercise: WorkoutExercise;
+  /** 1-based place in the workout, and how many exercises it has. */
+  position: number;
+  total: number;
   previousSets: LoggedSet[];
   unit: WeightUnit;
   rpeEnabled: boolean;
@@ -25,14 +28,25 @@ interface Props {
 }
 
 export function ExerciseLogCard(props: Props) {
-  const { exercise, previousSets, unit, rpeEnabled, expanded } = props;
+  const { exercise, previousSets, unit, rpeEnabled, expanded, position, total } = props;
   const { t } = useTranslation();
   const theme = useTheme();
   const formatSet = useFormatSet();
   const [editingId, setEditingId] = useState<string | null>(null);
   const editing = exercise.sets.find((s) => s.id === editingId) ?? null;
+  const rowStyle = {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    minHeight: 40,
+    paddingHorizontal: 8,
+    borderRadius: theme.radius.sm,
+  } as const;
 
-  const lastTime = previousSets.map(formatSet).join(', ');
+  // Open cards list last session's sets too, as faint targets for the sets still to do.
+  const rows = expanded
+    ? Math.max(exercise.sets.length, previousSets.length)
+    : exercise.sets.length;
   const suggestion = suggestNextSet(exercise.sets, previousSets);
 
   return (
@@ -51,6 +65,9 @@ export function ExerciseLogCard(props: Props) {
         onPress={props.onToggle}
         style={{ padding: 16, gap: 4 }}
       >
+        <AppText variant="label">
+          {t('logging.position', { n: position, total }).toUpperCase()}
+        </AppText>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppText variant="heading" style={{ flex: 1 }}>
             {exercise.exerciseName}
@@ -78,39 +95,59 @@ export function ExerciseLogCard(props: Props) {
             </AppText>
           </Pressable>
         </View>
-        <AppText variant="muted">
-          {lastTime ? t('logging.lastTime', { sets: lastTime }) : t('logging.firstTime')}
-        </AppText>
+        {expanded ? (
+          <AppText variant="muted">
+            {previousSets.length > 0 ? t('logging.lastTimeHeader') : t('logging.firstTime')}
+          </AppText>
+        ) : null}
       </Pressable>
 
-      {exercise.sets.length > 0 ? (
+      {rows > 0 ? (
         <View style={{ paddingHorizontal: 16, paddingBottom: expanded ? 0 : 12, gap: 4 }}>
-          {exercise.sets.map((set, i) => (
-            <Pressable
-              key={set.id}
-              accessibilityRole="button"
-              accessibilityHint={t('logging.tapToEdit')}
-              onPress={() => setEditingId(set.id === editingId ? null : set.id)}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 12,
-                minHeight: 40,
-                paddingHorizontal: 8,
-                borderRadius: theme.radius.sm,
-                backgroundColor: set.id === editingId ? theme.colors.background : 'transparent',
-              }}
-            >
+          {Array.from({ length: rows }, (_, i) => {
+            const set = exercise.sets[i];
+            const before = previousSets[i];
+            const target = before ? (
+              <AppText variant="muted" style={{ opacity: set ? 0.7 : 1 }}>
+                {formatSet(before)}
+              </AppText>
+            ) : null;
+            const number = (
               <AppText variant="muted" style={{ width: 20 }}>
                 {i + 1}
               </AppText>
-              <AppText variant="heading" style={{ flex: 1 }}>
-                {formatSet(set)}
-                {set.rpe !== null ? `  @${set.rpe}` : ''}
-              </AppText>
-              {set.isWarmup ? <AppText variant="muted">{t('logging.warmupShort')}</AppText> : null}
-            </Pressable>
-          ))}
+            );
+            if (!set) {
+              return (
+                <View key={`target-${i}`} style={rowStyle}>
+                  {number}
+                  {target}
+                </View>
+              );
+            }
+            return (
+              <Pressable
+                key={set.id}
+                accessibilityRole="button"
+                accessibilityHint={t('logging.tapToEdit')}
+                onPress={() => setEditingId(set.id === editingId ? null : set.id)}
+                style={[
+                  rowStyle,
+                  set.id === editingId ? { backgroundColor: theme.colors.background } : null,
+                ]}
+              >
+                {number}
+                <AppText variant="heading" style={{ flex: 1 }}>
+                  {formatSet(set)}
+                  {set.rpe !== null ? `  @${set.rpe}` : ''}
+                  {set.isWarmup ? (
+                    <AppText variant="muted">{`  ${t('logging.warmupShort')}`}</AppText>
+                  ) : null}
+                </AppText>
+                {expanded ? target : null}
+              </Pressable>
+            );
+          })}
         </View>
       ) : null}
 

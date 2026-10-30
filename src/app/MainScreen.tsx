@@ -15,14 +15,12 @@ import { useTheme } from '@/core/theme';
 import { ExportButton } from '@/features/backup';
 import { Calendar } from '@/features/history';
 import { StatsList } from '@/features/progress';
-import { AppText, PageDots, Screen } from '@/ui';
+import { AppText, Screen, TabBar } from '@/ui';
 
 import { HomePage } from './HomePage';
 import type { RootStackParamList } from './navigation';
 
-const PAGE_COUNT = 3;
-
-/** Home, Calendar and Stats side by side; swipe left and right between them. */
+/** Home, Calendar and Stats side by side; swipe between them or tap the tabs. */
 export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'Main'>) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -37,17 +35,24 @@ export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParam
 
   useFocusEffect(useCallback(() => setFocusCount((n) => n + 1), []));
 
+  const goTo = useCallback(
+    (index: number) => {
+      pager.current?.scrollTo({ x: index * width, animated: true });
+      setPage(index);
+    },
+    [width],
+  );
+
   // Android back from Calendar or Stats returns to Home instead of leaving the app.
   useFocusEffect(
     useCallback(() => {
       if (page === 0) return;
       const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-        pager.current?.scrollTo({ x: 0, animated: true });
-        setPage(0);
+        goTo(0);
         return true;
       });
       return () => sub.remove();
-    }, [page]),
+    }, [page, goTo]),
   );
 
   return (
@@ -83,13 +88,18 @@ export function MainScreen({ navigation }: NativeStackScreenProps<RootStackParam
             <AppText variant="title">{t('stats.title')}</AppText>
             <StatsList
               reloadToken={reloadToken}
+              onChanged={onChanged}
               onOpen={(target) => navigation.navigate('StatsDetail', { target })}
             />
           </Screen>
         </View>
       </ScrollView>
       <SafeAreaView edges={['bottom']}>
-        <PageDots count={PAGE_COUNT} active={page} />
+        <TabBar
+          labels={[t('home.tab'), t('home.calendarTab'), t('stats.title')]}
+          active={page}
+          onSelect={goTo}
+        />
       </SafeAreaView>
     </View>
   );

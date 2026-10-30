@@ -11,10 +11,10 @@ import {
   type Bodyweight,
   type Workout,
 } from '@/data';
-import { AppText, Screen } from '@/ui';
+import { Screen } from '@/ui';
 
-import { summarizeOverview, type ExerciseProgress } from './overview';
-import { DASH, RangeControl, StatTile } from './StatTiles';
+import { MIN_SESSIONS, MIN_WEEKS, summarizeOverview, type ExerciseProgress } from './overview';
+import { RangeControl, StatTile } from './StatTiles';
 import { rangeStart, type Range } from './stats';
 
 /** Workout-wide averages and which exercises moved most and least. */
@@ -43,33 +43,58 @@ export function OverviewDetail() {
   );
   if (!o) return <Screen>{null}</Screen>;
 
-  const num = (v: number | null, decimals = 1) => (v === null ? DASH : formatNumber(v, decimals));
+  const num = (v: number | null, decimals = 1) => (v === null ? null : formatNumber(v, decimals));
   const progress = (p: ExerciseProgress | null) =>
-    p ? `${p.name}  ${p.change > 0 ? '+' : ''}${formatNumber(p.change * 100, 1)}%` : DASH;
+    p ? `${p.name}  ${p.change > 0 ? '+' : ''}${formatNumber(p.change * 100, 1)}%` : null;
   const kcal = (v: number | null) =>
-    v === null ? DASH : t('stats.kcal', { value: Math.round(v) });
+    v === null ? null : t('stats.kcal', { value: Math.round(v) });
+  // With no workouts in range every tile is empty for the same reason, so just a dash.
+  const why = (reason: string) => (o.workouts > 0 ? reason : undefined);
+  const needsBodyweight = why(t('stats.needsBodyweight'));
+  // Most telling first; calorie estimates are rough for lifting, so they come last.
   const tiles = [
     { label: t('stats.workouts'), value: String(o.workouts) },
-    { label: t('stats.perWeek'), value: num(o.perWeek) },
-    { label: t('stats.avgCalories'), value: kcal(o.avgCalories) },
-    { label: t('stats.totalCalories'), value: kcal(o.totalCalories) },
+    {
+      label: t('stats.perWeek'),
+      value: num(o.perWeek),
+      reason: why(t('stats.needsWeeks', { count: MIN_WEEKS })),
+    },
+    {
+      label: t('stats.biggestProgress'),
+      value: progress(o.biggest),
+      reason: why(t('stats.needsSessions', { count: MIN_SESSIONS })),
+      wide: true,
+    },
+    {
+      label: t('stats.stalled'),
+      value: progress(o.smallest),
+      reason: why(
+        o.biggest
+          ? t('stats.needsTwoExercises', { count: MIN_SESSIONS })
+          : t('stats.needsSessions', { count: MIN_SESSIONS }),
+      ),
+      wide: true,
+    },
     {
       label: t('stats.avgLength'),
       value:
         o.avgDurationMs === null
-          ? DASH
+          ? null
           : t('done.minutes', { count: Math.round(o.avgDurationMs / 60_000) }),
     },
     { label: t('stats.avgSets'), value: num(o.avgWorkingSets) },
-    { label: t('stats.avgRest'), value: o.avgRestS === null ? DASH : formatClock(o.avgRestS) },
+    {
+      label: t('stats.avgRest'),
+      value: o.avgRestS === null ? null : formatClock(o.avgRestS),
+      reason: why(t('stats.noRest')),
+    },
+    { label: t('stats.avgCalories'), value: kcal(o.avgCalories), reason: needsBodyweight },
+    { label: t('stats.totalCalories'), value: kcal(o.totalCalories), reason: needsBodyweight },
   ];
 
   return (
     <Screen>
       <RangeControl value={range} onChange={setRange} />
-      {o.workouts > 0 && data?.bodyweights.length === 0 ? (
-        <AppText variant="muted">{t('stats.caloriesNeedBodyweight')}</AppText>
-      ) : null}
       <View
         style={{
           flexDirection: 'row',
@@ -81,8 +106,6 @@ export function OverviewDetail() {
         {tiles.map((tile) => (
           <StatTile key={tile.label} {...tile} />
         ))}
-        <StatTile wide label={t('stats.biggestProgress')} value={progress(o.biggest)} />
-        <StatTile wide label={t('stats.smallestProgress')} value={progress(o.smallest)} />
       </View>
     </Screen>
   );

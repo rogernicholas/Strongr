@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ToastAndroid, View } from 'react-native';
 
 import { useDb } from '@/core/db';
@@ -12,7 +12,7 @@ import {
   SaveRoutineDialog,
   suggestRoutineName,
 } from '@/features/templates';
-import { Button } from '@/ui';
+import { AppText, Button, TextField } from '@/ui';
 
 import type { RootStackParamList } from './navigation';
 
@@ -22,12 +22,17 @@ type Props = NativeStackScreenProps<RootStackParamList, 'PickExercises'>;
 export function PickExercisesScreen({ route, navigation }: Props) {
   const { t } = useTranslation();
   const db = useDb();
-  const { routineId, routineName, exerciseIds, addToWorkoutId, newRoutine } = route.params;
+  const { routineId, routineName, exerciseIds, addToWorkoutId, newRoutine, editRoutine } =
+    route.params;
+  const [name, setName] = useState(routineName ?? '');
+  const renamed = editRoutine === true && name.trim() !== '' && name.trim() !== routineName;
   const [saveDialog, setSaveDialog] = useState<{ ids: string[]; suggestion: string } | null>(null);
   // Bumped on open so the dialog remounts with the new suggestion but still fades out on close.
   const [dialogKey, setDialogKey] = useState(0);
   // Bumped after a save so the routine cards show the saved exercises.
   const [routinesVersion, setRoutinesVersion] = useState(0);
+  // A quick double tap must not start two workouts.
+  const starting = useRef(false);
 
   async function openSaveDialog(ids: string[]) {
     const existing = await createRoutineRepository(db).list();
@@ -54,20 +59,27 @@ export function PickExercisesScreen({ route, navigation }: Props) {
 
   async function saveChanges(ids: string[]) {
     if (!routineId || !routineName) return;
-    await createRoutineRepository(db).update(routineId, { exerciseIds: ids });
+    const newName = renamed ? name.trim() : routineName;
+    await createRoutineRepository(db).update(routineId, { exerciseIds: ids, name: newName });
     setRoutinesVersion((v) => v + 1);
-    // The routine now matches the selection, so the Save changes button hides.
-    navigation.setParams({ exerciseIds: ids });
-    ToastAndroid.show(t('routines.saved', { name: routineName }), ToastAndroid.SHORT);
+    // The routine now matches the screen, so the Save changes button hides.
+    navigation.setParams({ exerciseIds: ids, routineName: newName });
+    ToastAndroid.show(t('routines.saved', { name: newName }), ToastAndroid.SHORT);
   }
 
   async function start(ids: string[]) {
-    const workoutId = await createWorkoutRepository(db).start({
-      exerciseIds: ids,
-      templateId: routineId ?? null,
-      name: routineName ?? null,
-    });
-    navigation.replace('LogWorkout', { workoutId, title: routineName });
+    if (starting.current) return;
+    starting.current = true;
+    try {
+      const workoutId = await createWorkoutRepository(db).start({
+        exerciseIds: ids,
+        templateId: routineId ?? null,
+        name: routineName ?? null,
+      });
+      navigation.replace('LogWorkout', { workoutId, title: routineName });
+    } finally {
+      starting.current = false;
+    }
   }
 
   async function addToWorkout(workoutId: string, ids: string[]) {
@@ -123,17 +135,30 @@ export function PickExercisesScreen({ route, navigation }: Props) {
         selectionKey={routineId ?? 'new'}
         initialSelectedIds={exerciseIds}
         header={
-          <RoutineCarousel
-            selectedId={routineId}
-            reloadToken={routinesVersion}
-            onSelect={(routine) =>
-              navigation.setParams({
-                routineId: routine.id,
-                routineName: routine.name,
-                exerciseIds: routine.exerciseIds,
-              })
-            }
-          />
+          editRoutine ? (
+            <View style={{ gap: 8 }}>
+              <TextField
+                value={name}
+                onChangeText={setName}
+                placeholder={t('routines.name')}
+                accessibilityLabel={t('routines.name')}
+                maxLength={40}
+              />
+              <AppText variant="muted">{t('routines.orderHint')}</AppText>
+            </View>
+          ) : (
+            <RoutineCarousel
+              selectedId={routineId}
+              reloadToken={routinesVersion}
+              onSelect={(routine) =>
+                navigation.setParams({
+                  routineId: routine.id,
+                  routineName: routine.name,
+                  exerciseIds: routine.exerciseIds,
+                })
+              }
+            />
+          )
         }
         renderFooter={(ids) => (
           <View style={{ gap: 8 }}>
@@ -144,10 +169,10 @@ export function PickExercisesScreen({ route, navigation }: Props) {
                 disabled={ids.length === 0}
                 onPress={() => void openSaveDialog(ids)}
               />
-            ) : hasRoutineChanges(exerciseIds ?? [], ids) ? (
+            ) : renamed || hasRoutineChanges(exerciseIds ?? [], ids) ? (
               <Button
                 label={t('routines.saveChanges')}
-                variant="accent"
+                variant="secondary"
                 disabled={ids.length === 0}
                 onPress={() => void saveChanges(ids)}
               />

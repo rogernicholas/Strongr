@@ -17,9 +17,7 @@ import { useTheme } from '@/core/theme';
 import { useFormatSet } from '@/core/useFormatSet';
 import { formatNumber, fromDisplayWeight, toDisplayWeight } from '@/core/units';
 import { createBodyweightRepository, createWorkoutRepository, type Workout } from '@/data';
-import { AppText, Card, Screen, useDialog } from '@/ui';
-
-import { BodyweightDialog } from './BodyweightDialog';
+import { AppText, BodyweightDialog, Card, Screen, useDialog } from '@/ui';
 
 /** Monday-first short weekday names, e.g. ["Mon", …, "Sun"]. */
 function weekdayNames(language: string): string[] {
