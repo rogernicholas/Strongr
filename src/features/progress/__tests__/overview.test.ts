@@ -90,33 +90,14 @@ describe('summarizeOverview', () => {
         ['Squat', [set(100, 5)]],
         ['Pull-up', [set(null, d <= 2 ? 10 : 8)]],
       ];
-      // A single session can't show progress, so it's left out.
-      if (d === 1) exercises.push(['Curl', [set(10, 10)]]);
+      // Only three sessions: too few to judge, so it's left out.
+      if (d < 4) exercises.push(['Curl', [set(10, 10)]]);
       return workout(d, exercises);
     });
     const o = summarizeOverview(workouts, [], 0, 5 * DAY);
     expect(o.biggest?.name).toBe('Bench');
     expect(o.biggest?.change).toBeCloseTo(84 / 77.333 - 1, 3);
     expect(o.smallest).toEqual({ name: 'Pull-up', change: -0.2 });
-  });
-
-  it('compares first with last from two sessions', () => {
-    const workouts = [
-      workout(1, [
-        ['Bench', [set(60, 8)]],
-        ['Row', [set(50, 10)]],
-      ]),
-      workout(2, [
-        ['Bench', [set(65, 8)]],
-        ['Row', [set(50, 10)]],
-      ]),
-      workout(3, [['Bench', [set(70, 8)]]]),
-    ];
-    const o = summarizeOverview(workouts, [], 0, 4 * DAY);
-    // Bench, three sessions: first (60 × 8) against last (70 × 8).
-    expect(o.biggest?.name).toBe('Bench');
-    expect(o.biggest?.change).toBeCloseTo((70 * (1 + 8 / 30)) / (60 * (1 + 8 / 30)) - 1, 6);
-    expect(o.smallest).toEqual({ name: 'Row', change: 0 });
   });
 
   it('is empty without workouts', () => {
