@@ -1,6 +1,6 @@
 import type { NavigationProp } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { calendarDaysBetween, formatLongDate } from '@/core/dates';
@@ -95,7 +95,10 @@ export function HomePage({ navigation, reloadToken }: Props) {
     >
       <View style={{ flex: 1, justifyContent: 'center', gap: theme.spacing(6) }}>
         <View style={{ alignItems: 'center' }}>
-          <AppText variant="logo">{t('app.logo')}</AppText>
+          <AppText variant="logo">
+            {t('app.name')}
+            <Text style={{ color: theme.colors.primary }}>.</Text>
+          </AppText>
           <AppText variant="muted">{formatLongDate(today, i18n.language)}</AppText>
           {lastTrained ? <AppText variant="muted">{lastTrained}</AppText> : null}
         </View>
