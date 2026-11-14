@@ -39,7 +39,8 @@ export function RangeControl({ value, onChange }: { value: Range; onChange(range
       value={value}
       onChange={onChange}
       options={[
-        { value: '3m', label: t('stats.range3m') },
+        { value: '1m', label: t('stats.range1m') },
+        { value: '6m', label: t('stats.range6m') },
         { value: '1y', label: t('stats.range1y') },
         { value: 'all', label: t('stats.rangeAll') },
       ]}

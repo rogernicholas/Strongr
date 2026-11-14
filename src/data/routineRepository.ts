@@ -9,6 +9,23 @@ export interface Routine {
   exerciseIds: string[];
 }
 
+/**
+ * A routine's exercises re-sorted to follow a workout's order. Exercises the workout
+ * also has take the routine's slots in the workout's order; the rest stay where they are.
+ * `[A, B, C, D]` with a workout of `[C, X, A]` gives `[C, B, A, D]`.
+ */
+export function followOrder(routine: readonly string[], workout: readonly string[]): string[] {
+  const shared = new Set(routine.filter((id) => workout.includes(id)));
+  const queue = workout.filter((id, i) => shared.has(id) && workout.indexOf(id) === i);
+  // Each shared exercise's first slot is refilled; a routine listing one twice keeps the copy.
+  const slots = routine.flatMap((id, i) =>
+    shared.has(id) && routine.indexOf(id) === i ? [i] : [],
+  );
+  const result = [...routine];
+  slots.forEach((slot, k) => (result[slot] = queue[k]!));
+  return result;
+}
+
 export function createRoutineRepository(db: Db, clock: Clock = systemClock) {
   async function replaceExercises(routineId: string, exerciseIds: readonly string[], now: number) {
     await db.run(
@@ -73,6 +90,35 @@ export function createRoutineRepository(db: Db, clock: Clock = systemClock) {
           ]);
         }
         if (changes.exerciseIds) await replaceExercises(id, changes.exerciseIds, now);
+      });
+    },
+
+    /**
+     * Remembers the order a workout used (its exercise ids), so the routine starts that way
+     * next time.
+     * Only positions change; exercises are never added or removed here.
+     */
+    async followWorkoutOrder(id: string, workoutOrder: readonly string[]): Promise<void> {
+      const rows = await db.getAll<{ id: string; exercise_id: string }>(
+        `SELECT id, exercise_id FROM template_exercises
+         WHERE template_id = ? AND deleted_at IS NULL ORDER BY position`,
+        [id],
+      );
+      const wanted = followOrder(
+        rows.map((r) => r.exercise_id),
+        workoutOrder,
+      );
+      const now = clock();
+      const remaining = [...rows];
+      await db.transaction(async () => {
+        for (const [position, exerciseId] of wanted.entries()) {
+          const at = remaining.findIndex((r) => r.exercise_id === exerciseId);
+          const [row] = remaining.splice(at, 1);
+          await db.run(
+            'UPDATE template_exercises SET position = ?, updated_at = ? WHERE id = ? AND position <> ?',
+            [position, now, row!.id, position],
+          );
+        }
       });
     },
 

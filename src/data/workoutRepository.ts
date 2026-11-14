@@ -240,6 +240,33 @@ export function createWorkoutRepository(db: Db, clock: Clock = systemClock) {
       await db.transaction(() => addExercises(workoutId, exerciseIds, row?.next ?? 0));
     },
 
+    /**
+     * Puts a workout's exercises in the given order (workout_exercises ids, first to last).
+     * Ids not in the workout are ignored; exercises missing from the list keep their
+     * relative order after the listed ones.
+     */
+    async reorderExercises(workoutId: string, orderedIds: readonly string[]): Promise<void> {
+      const rows = await db.getAll<{ id: string }>(
+        `SELECT id FROM workout_exercises
+         WHERE workout_id = ? AND deleted_at IS NULL ORDER BY position`,
+        [workoutId],
+      );
+      const current = rows.map((r) => r.id);
+      const listed = orderedIds.filter(
+        (id, i) => current.includes(id) && orderedIds.indexOf(id) === i,
+      );
+      const order = [...listed, ...current.filter((id) => !listed.includes(id))];
+      const now = clock();
+      await db.transaction(async () => {
+        for (const [position, id] of order.entries()) {
+          await db.run(
+            'UPDATE workout_exercises SET position = ?, updated_at = ? WHERE id = ? AND position <> ?',
+            [position, now, id, position],
+          );
+        }
+      });
+    },
+
     /** Takes an exercise out of a workout, with its sets (soft delete). */
     async removeExercise(workoutExerciseId: string): Promise<void> {
       const now = clock();

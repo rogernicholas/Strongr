@@ -1,6 +1,6 @@
 import { useKeepAwake } from 'expo-keep-awake';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, LayoutAnimation, ScrollView, View } from 'react-native';
+import { Animated, KeyboardAvoidingView, LayoutAnimation, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useDb, type Db } from '@/core/db';
@@ -8,6 +8,7 @@ import { useTranslation } from '@/core/i18n';
 import { useSettings } from '@/core/settings';
 import { useTheme } from '@/core/theme';
 import {
+  createRoutineRepository,
   createWorkoutRepository,
   type LoggedSet,
   type Workout,
@@ -17,6 +18,10 @@ import { AppText, Button, useDialog } from '@/ui';
 
 import { ExerciseLogCard } from './ExerciseLogCard';
 import { RestTimer } from './RestTimer';
+import { useDragReorder } from './useDragReorder';
+
+/** Matches the list's padding and gap below; the drag math needs them. */
+const LIST_LAYOUT = { top: 16, gap: 12 };
 
 interface Props {
   workoutId: string;
@@ -91,6 +96,19 @@ export function LogWorkout(props: Props) {
   const [version, setVersion] = useState(0);
   // Card ids from the last load, to spot exercises that were just added or removed.
   const shownIds = useRef<string[] | null>(null);
+  // The card that was open before a drag folded them all up.
+  const openBeforeDrag = useRef<string | null>(null);
+  const exerciseIds = workout?.exercises.map((e) => e.id) ?? [];
+  const {
+    controller: drag,
+    dragId,
+    order,
+    scrollRef,
+    containerRef,
+  } = useDragReorder(exerciseIds, LIST_LAYOUT, {
+    onDrop: (ids) => run(saveOrder(ids)),
+    onEnd: () => setExpandedId(openBeforeDrag.current),
+  });
 
   useEffect(() => {
     let active = true;
@@ -140,6 +158,34 @@ export function LogWorkout(props: Props) {
     }
   }
 
+  /**
+   * Saves a new exercise order. A live workout from a routine also updates the routine,
+   * so the next session starts in this order.
+   */
+  async function saveOrder(ids: string[]) {
+    await repo.reorderExercises(workoutId, ids);
+    if (!live || !workout?.templateId) return;
+    const byId = new Map(workout.exercises.map((e) => [e.id, e.exerciseId]));
+    const exerciseOrder = ids.flatMap((id) => byId.get(id) ?? []);
+    await createRoutineRepository(db).followWorkoutOrder(workout.templateId, exerciseOrder);
+  }
+
+  function startDrag(id: string, pageY: number) {
+    openBeforeDrag.current = expandedId;
+    setExpandedId(null);
+    drag.start(id, order, pageY);
+  }
+
+  function moveBy(id: string, by: -1 | 1) {
+    const from = order.indexOf(id);
+    const to = from + by;
+    if (from < 0 || to < 0 || to >= order.length) return;
+    const next = [...order];
+    next.splice(from, 1);
+    next.splice(to, 0, id);
+    run(saveOrder(next));
+  }
+
   async function removeExercise(exercise: WorkoutExercise) {
     if (exercise.sets.length > 0) {
       const ok = await dialog({
@@ -173,6 +219,7 @@ export function LogWorkout(props: Props) {
   }
 
   if (!workout) return null;
+  const byId = new Map(workout.exercises.map((e) => [e.id, e]));
 
   // The rest timer runs from the most recently logged set until its rest is logged.
   const last = workout.exercises
@@ -194,32 +241,65 @@ export function LogWorkout(props: Props) {
     >
       {live ? <KeepAwake /> : null}
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-        <ScrollView
-          contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 12 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          {workout.exercises.map((exercise, i) => (
-            <ExerciseLogCard
-              key={exercise.id}
-              exercise={exercise}
-              position={i + 1}
-              total={workout.exercises.length}
-              previousSets={previous[exercise.exerciseId] ?? []}
-              unit={settings.weightUnit}
-              rpeEnabled={settings.rpeEnabled}
-              expanded={expandedId === exercise.id}
-              onToggle={() => setExpandedId((id) => (id === exercise.id ? null : exercise.id))}
-              onAddSet={(input) => run(repo.addSet(exercise.id, input, live))}
-              onUpdateSet={(setId, input) => run(repo.updateSet(setId, input))}
-              onDeleteSet={(setId) => run(repo.deleteSet(setId))}
-              onRemove={() => void removeExercise(exercise)}
-            />
-          ))}
-          {workout.exercises.length === 0 ? (
-            <AppText variant="muted">{t('logging.noExercises')}</AppText>
-          ) : null}
-          <Button label={t('logging.addExercise')} variant="secondary" onPress={onAddExercises} />
-        </ScrollView>
+        <View ref={containerRef} style={{ flex: 1 }} {...drag.panHandlers}>
+          <ScrollView
+            ref={scrollRef}
+            scrollEnabled={dragId === null}
+            onScroll={drag.onScroll}
+            scrollEventThrottle={16}
+            onLayout={drag.onViewportLayout}
+            onContentSizeChange={drag.onContentSize}
+            contentContainerStyle={{
+              padding: LIST_LAYOUT.top,
+              paddingBottom: 32,
+              gap: LIST_LAYOUT.gap,
+            }}
+            keyboardShouldPersistTaps="handled"
+          >
+            {order.map((id, i) => {
+              const exercise = byId.get(id);
+              if (!exercise) return null;
+              const lifted = dragId === id;
+              return (
+                <Animated.View
+                  key={id}
+                  onLayout={(e) => drag.onCardLayout(id, e)}
+                  style={{
+                    zIndex: lifted ? 1 : 0,
+                    opacity: lifted ? 0.92 : 1,
+                    transform: [
+                      { translateY: lifted ? drag.dragY : drag.shift(id) },
+                      { scale: lifted ? 1.02 : 1 },
+                    ],
+                  }}
+                >
+                  <ExerciseLogCard
+                    exercise={exercise}
+                    position={i + 1}
+                    total={order.length}
+                    previousSets={previous[exercise.exerciseId] ?? []}
+                    unit={settings.weightUnit}
+                    rpeEnabled={settings.rpeEnabled}
+                    expanded={expandedId === id}
+                    lifted={lifted}
+                    onToggle={() => setExpandedId((open) => (open === id ? null : id))}
+                    onLongPress={(pageY) => startDrag(id, pageY)}
+                    onPressOut={() => drag.pressOut()}
+                    onMove={(by) => moveBy(id, by)}
+                    onAddSet={(input) => run(repo.addSet(id, input, live))}
+                    onUpdateSet={(setId, input) => run(repo.updateSet(setId, input))}
+                    onDeleteSet={(setId) => run(repo.deleteSet(setId))}
+                    onRemove={() => void removeExercise(exercise)}
+                  />
+                </Animated.View>
+              );
+            })}
+            {workout.exercises.length === 0 ? (
+              <AppText variant="muted">{t('logging.noExercises')}</AppText>
+            ) : null}
+            <Button label={t('logging.addExercise')} variant="secondary" onPress={onAddExercises} />
+          </ScrollView>
+        </View>
         <View
           style={{ padding: 16, paddingTop: 8, gap: 8, backgroundColor: theme.colors.background }}
         >
@@ -240,11 +320,7 @@ export function LogWorkout(props: Props) {
                 onPress={() => void cancel()}
               />
               <View style={{ flex: 1 }}>
-                <Button
-                  label={t('logging.finish')}
-                  variant="secondary"
-                  onPress={() => void finish()}
-                />
+                <Button label={t('logging.finish')} onPress={() => void finish()} />
               </View>
             </View>
           ) : (

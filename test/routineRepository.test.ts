@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { seedExercises } from '@/config/seedExercises';
 import { migrate, migrations } from '@/core/db';
-import { createExerciseRepository, createRoutineRepository } from '@/data';
+import { createExerciseRepository, createRoutineRepository, followOrder } from '@/data';
 
 import { openNodeDb } from './helpers/nodeDb';
 
@@ -46,6 +46,22 @@ describe('routineRepository', () => {
     await db.run('UPDATE exercises SET deleted_at = 1 WHERE id = ?', [id('Dips')]);
     const [routine] = await repo.list();
     expect(routine!.exerciseIds).toEqual([id('Bench press')]);
+  });
+
+  it('follows a workout order, keeping exercises the workout lacks in their slots', () => {
+    expect(followOrder(['A', 'B', 'C', 'D'], ['C', 'X', 'A'])).toEqual(['C', 'B', 'A', 'D']);
+    expect(followOrder(['A', 'B', 'C'], ['C', 'B', 'A'])).toEqual(['C', 'B', 'A']);
+    expect(followOrder(['A', 'B'], ['X'])).toEqual(['A', 'B']);
+    expect(followOrder(['A', 'B', 'A'], ['B', 'A'])).toEqual(['B', 'A', 'A']);
+  });
+
+  it('remembers a workout order without replacing rows', async () => {
+    const { db, repo, id } = await setup();
+    const created = await repo.create('A', [id('Bench press'), id('Dips'), id('Squat')]);
+    await repo.followWorkoutOrder(created.id, [id('Squat'), id('Bench press')]);
+    const [routine] = await repo.list();
+    expect(routine!.exerciseIds).toEqual([id('Squat'), id('Dips'), id('Bench press')]);
+    expect(await db.getAll('SELECT * FROM template_exercises')).toHaveLength(3);
   });
 
   it('requires a name', async () => {

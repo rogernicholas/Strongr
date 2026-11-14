@@ -142,6 +142,23 @@ describe('workoutRepository', () => {
     expect(names).toEqual(['Bench press', 'Dips']);
   });
 
+  it('reorders exercises, keeping sets with their exercise', async () => {
+    const { repo, id } = await setup();
+    const workoutId = await repo.start({
+      exerciseIds: [id('Bench press'), id('Row machine'), id('Squat')],
+    });
+    const [bench, , squat] = (await repo.get(workoutId))!.exercises;
+    await repo.addSet(bench!.id, set(50, 7));
+    await repo.reorderExercises(workoutId, [squat!.id, bench!.id, 'unknown']);
+    const workout = (await repo.get(workoutId))!;
+    expect(workout.exercises.map((e) => e.exerciseName)).toEqual([
+      'Squat',
+      'Bench press',
+      'Row machine',
+    ]);
+    expect(workout.exercises[1]!.sets).toHaveLength(1);
+  });
+
   it('removes an exercise with its sets mid-workout', async () => {
     const { repo, id } = await setup();
     const workoutId = await repo.start({ exerciseIds: [id('Bench press'), id('Row machine')] });

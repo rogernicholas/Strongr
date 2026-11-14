@@ -65,8 +65,12 @@ describe('stats', () => {
 
   it('filters by range and measures change over four weeks', () => {
     const points = [0, 10, 30, 40].map((d, i) => ({ t: d * DAY, value: 80 + i }));
-    expect(inRange(points, '3m', 90 * DAY).map((p) => p.value)).toEqual([80, 81, 82, 83]);
-    expect(inRange(points, '3m', 95 * DAY).map((p) => p.value)).toEqual([81, 82, 83]);
+    expect(inRange(points, '1m', 40 * DAY).map((p) => p.value)).toEqual([81, 82, 83]);
+    expect(inRange(points, '1m', 45 * DAY).map((p) => p.value)).toEqual([82, 83]);
+    expect(inRange(points, '6m', 182 * DAY).map((p) => p.value)).toEqual([80, 81, 82, 83]);
+    expect(inRange(points, '6m', 190 * DAY).map((p) => p.value)).toEqual([81, 82, 83]);
+    expect(inRange(points, '1y', 370 * DAY).map((p) => p.value)).toEqual([81, 82, 83]);
+    expect(inRange(points, 'all', 9999 * DAY)).toHaveLength(4);
     expect(changeOver(points, 28)).toBe(2); // 83 vs the point on day 10
     expect(changeOver(points.slice(0, 1), 28)).toBeNull();
   });

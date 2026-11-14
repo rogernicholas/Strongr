@@ -5,7 +5,12 @@ export {
   type ExerciseRepository,
 } from './exerciseRepository';
 export { createMetaRepository } from './metaRepository';
-export { createRoutineRepository, type Routine, type RoutineRepository } from './routineRepository';
+export {
+  createRoutineRepository,
+  followOrder,
+  type Routine,
+  type RoutineRepository,
+} from './routineRepository';
 export { createSettingsRepository, type SettingsRepository } from './settingsRepository';
 export {
   createWorkoutRepository,

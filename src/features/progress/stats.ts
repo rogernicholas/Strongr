@@ -9,7 +9,9 @@ const DAY = 24 * 60 * 60 * 1000;
  * working sets), total volume, or most reps for exercises logged without weight.
  */
 export type Metric = 'allSets' | 'volume' | 'reps';
-export type Range = '3m' | '1y' | 'all';
+export type Range = '1m' | '6m' | '1y' | 'all';
+
+const RANGE_DAYS: Record<Exclude<Range, 'all'>, number> = { '1m': 30, '6m': 182, '1y': 365 };
 
 export interface Point {
   /** Epoch ms. */
@@ -58,7 +60,7 @@ export function bodyweightPoints(entries: readonly Bodyweight[]): Point[] {
 
 /** Start of a range (epoch ms); 0 for all time. */
 export function rangeStart(range: Range, now: number): number {
-  return range === 'all' ? 0 : now - (range === '3m' ? 91 : 365) * DAY;
+  return range === 'all' ? 0 : now - RANGE_DAYS[range] * DAY;
 }
 
 export function inRange(points: readonly Point[], range: Range, now: number): Point[] {
