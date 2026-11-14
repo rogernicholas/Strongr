@@ -65,7 +65,7 @@ src/
 - Timestamps are epoch milliseconds (UTC) in INTEGER columns. Workouts also store the device timezone.
 - Adding migration N: add `src/core/db/migrations/00N_name.ts`, append it to the list in `migrations/index.ts`, and add `test/migrations/fixtures/vN.ts` with sample data. The tests fail until the fixture exists.
 - Installable APK: `npx eas-cli build -p android --profile preview` (config in `eas.json`; the build runs in Expo's cloud under Roger's Expo account, so it runs on his PC after he has signed in with `npx eas-cli login` himself). Bump `version` and `android.versionCode` in `app.json` for each build that is shared.
-- Over-the-air updates (expo-updates, from 0.3.0): after `npm run check`, publish JavaScript changes from Roger's PC with `npx eas-cli update --channel preview --message "<what changed>"`, and only when Roger says so. `runtimeVersion` follows the app `version`, so an update reaches only builds with the same `version`: bump `version` only for a new APK. Native changes (new native package, SDK upgrade, icon, splash, permissions, app.json plugins) need a new APK.
+- Over-the-air updates (expo-updates, from 0.3.0): after `npm run check`, publish JavaScript changes from Roger's PC with `npx eas-cli update --channel preview --environment preview --message "<what changed>"` (`--environment` is needed when run non-interactively), and only when Roger says so. `runtimeVersion` follows the app `version`, so an update reaches only builds with the same `version`: bump `version` only for a new APK. Native changes (new native package, SDK upgrade, icon, splash, permissions, app.json plugins) need a new APK.
 - The first APK (0.1.0, schema version 3) shipped on 2026-10-16, so every existing migration is frozen: schema changes need a new numbered migration. Migration 004 (`sets.rest_s`, schema version 4) ships in 0.2.0.
 
 ## Data rules (cheap now, expensive later)
@@ -267,4 +267,7 @@ Record each decision here with the date. Claude updates this whenever Roger deci
   - Stats list: trend line and latest change on every exercise and on bodyweight, plus a "Log this week" bodyweight button.
 - 2026-10-30: The dot in the "Strongr." wordmark on Home is red, matching the app icon.
 - 2026-10-30: The tab bar has no words: one short bar per page, teal for the current page, for a minimal look. Tapping and swiping still work.
+- 2026-11-14: Stats ranges are 1M / 6M / 1Y / All (replacing 3M / 1Y / All), on the Overview and on each exercise.
+- 2026-11-14: During a workout, long-press an exercise's name and drag it to reorder. The workout saves the new order; a workout started from a routine also updates the routine, so the next session starts in that order (exercises the workout doesn't have keep their place in the routine). No schema change; JS-only (React Native's own PanResponder), ships over the air.
+- 2026-11-14: Finish workout is the red main button again.
 - Open: scoreboard metric and caps, sign-in method.

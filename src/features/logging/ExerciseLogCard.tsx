@@ -20,7 +20,14 @@ interface Props {
   unit: WeightUnit;
   rpeEnabled: boolean;
   expanded: boolean;
+  /** Being dragged to a new place in the workout. */
+  lifted?: boolean;
   onToggle(): void;
+  /** Long-press on the header starts a drag; `pageY` is where the finger is. */
+  onLongPress?(pageY: number): void;
+  onPressOut?(): void;
+  /** Screen readers move the exercise one place up (-1) or down (1) instead of dragging. */
+  onMove?(by: -1 | 1): void;
   onAddSet(input: SetInput): void;
   onUpdateSet(setId: string, input: SetInput): void;
   onDeleteSet(setId: string): void;
@@ -54,7 +61,7 @@ export function ExerciseLogCard(props: Props) {
       style={{
         borderRadius: theme.radius.md,
         borderWidth: 1,
-        borderColor: expanded ? theme.colors.accent : theme.colors.border,
+        borderColor: expanded || props.lifted ? theme.colors.accent : theme.colors.border,
         backgroundColor: theme.colors.surface,
         overflow: 'hidden',
       }}
@@ -62,7 +69,17 @@ export function ExerciseLogCard(props: Props) {
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ expanded }}
+        accessibilityActions={[
+          { name: 'moveUp', label: t('logging.moveUp') },
+          { name: 'moveDown', label: t('logging.moveDown') },
+        ]}
+        onAccessibilityAction={(e) =>
+          props.onMove?.(e.nativeEvent.actionName === 'moveUp' ? -1 : 1)
+        }
         onPress={props.onToggle}
+        onLongPress={(e) => props.onLongPress?.(e.nativeEvent.pageY)}
+        onPressOut={props.onPressOut}
+        delayLongPress={300}
         style={{ padding: 16, gap: 4 }}
       >
         <AppText variant="label">
